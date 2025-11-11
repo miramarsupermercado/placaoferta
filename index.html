@@ -203,9 +203,8 @@
     .small{font-size:12px;color:#666;margin-top:6px}
 
     #saved-list {
-      position: absolute;
-      top: 80px;
-      right: 20px;
+      position: relative;
+      top: 65px;
       width: 360px;
       max-height: 90vh;
       overflow-y: auto;
@@ -276,13 +275,10 @@
   <div class="wrap">
     <!-- PREVIEWS -->
     <div>
-      <h3>
-    Preview Cartaz 1
-</h3>
+      <h3>Preview Cartaz 1</h3>
       <div class="preview" aria-hidden="false">
         <div class="cartaz" id="cartaz1">
           <div class="card" id="card1">
-            <!-- Logo removed -->
             <div class="descricao" id="descricao-output1"></div>
             <div class="preco-antigo" id="preco-antigo-output1"></div>
             <div class="preco-area">
@@ -300,7 +296,6 @@
       <div class="preview" aria-hidden="false">
         <div class="cartaz" id="cartaz2">
           <div class="card" id="card2">
-            <!-- Logo removed -->
             <div class="descricao" id="descricao-output2"></div>
             <div class="preco-antigo" id="preco-antigo-output2"></div>
             <div class="preco-area">
@@ -319,7 +314,6 @@
     <div>
       <div class="editor-area" role="region" aria-label="Editor Cartaz 1">
         <h3>Editor do Cartaz 1</h3>
-        <!-- Logo input removed -->
         <div class="field">
           <label>Descrição</label>
           <input id="descricao1" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL OU DESNATADO 1L" maxlength="60" />
@@ -357,7 +351,6 @@
 
       <div class="editor-area" role="region" aria-label="Editor Cartaz 2">
         <h3>Editor do Cartaz 2</h3>
-        <!-- Logo input removed -->
         <div class="field">
           <label>Descrição</label>
           <input id="descricao2" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL OU DESNATADO 1L" maxlength="60" />
@@ -394,17 +387,16 @@
       </div>
 
       <div style="margin-top: 6px; gap: 8px;">
-        <button id="save-both-combined" style="width: 100%; padding:10px; border-radius:6px; border:none; background:#217c3f; color:#fff; cursor:pointer;">📄 Unir os cartazes e salvar para impressão</button>
+        <button id="save-both-combined" style="width: 100%; padding:10px; border-radius:6px; border:none; background:#217c3f; color:#fff; cursor:pointer; position: relative; top: -37px;">📄 Unir os cartazes e salvar para impressão</button>
       </div>
 
       <div style="margin-top:20px" class="small">
-        
       </div>
+    </div>
 
-      <div id="saved-list" aria-live="polite">
-        <h4>Cartazes salvos</h4>
-        <ul id="pdf-list"></ul>
-      </div>
+    <div id="saved-list" aria-live="polite">
+      <h4>Cartazes salvos</h4>
+      <ul id="pdf-list"></ul>
     </div>
   </div>
 
