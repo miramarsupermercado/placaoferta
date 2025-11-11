@@ -101,8 +101,10 @@
       color:#606060;
       font-family:'SugoDisplay';
       font-size:30px;
-      text-decoration:line-through;
       margin:6px 0 8px 0;
+    }
+    .preco-antigo .numeros-riscados {
+      text-decoration: line-through;
     }
 
     .preco-area{
@@ -550,10 +552,14 @@
 
       if (precoAntesInput.value.trim()) {
         const v = Number(String(precoAntesInput.value).replace(/[^0-9,\.]/g, '').replace(',', '.'));
-        if (!isNaN(v)) precoAntigoOutput.textContent = 'DE R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })+ ' POR:' ;
-        precoAntigoOutput.style.display = '';
-        precoAntigoOutput.style.position = 'relative';
-        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '260px';
+        if (!isNaN(v)) {
+          // Format number and wrap only numbers in span with line-through
+          const valorFormatado = v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          precoAntigoOutput.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatado}</span> POR:`;
+          precoAntigoOutput.style.display = '';
+          precoAntigoOutput.style.position = 'relative';
+          document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '260px';
+        }
       } else {
         precoAntigoOutput.style.display = 'none';
         document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
