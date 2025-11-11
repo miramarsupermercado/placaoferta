@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Criar Cartaz Miramar</title>
+  <link rel="icon" href="https://miramarsupermercado.com.br/wp-content/uploads/2024/10/cropped-icone.png" type="image/png">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
+
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+  <style>
+    :root{
+      --blue:#213966;
+      --orange:#ff8a1c;
+      --card-bg:#ffffff;
+      --text:#222;
+    }
+    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f1f3f6;}
+    .wrap{
+      display:flex;
+      gap:20px;
+      padding:10px;
+      box-sizing:border-box;
+      align-items:flex-start;
+      flex-wrap: wrap;
+      background-color: lightslategray;
+    }
+    @media(max-width:900px){ .wrap{flex-direction:column;} .editor-area{width:100%} }
+
+    .preview{
+      width:420px;
+      box-sizing:border-box;
+      margin-bottom: 20px;
+    }
+
+    .cartaz{
+      width:420px;
+      height:594px;
+      background-color: #fff;
+      background-image: url('fundo-cartaz.png');
+      background-size: contain;
+      background-position: center top;
+      background-repeat: no-repeat;
+      padding:18px;
+      box-sizing:border-box;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      color:var(--text);
+      box-shadow:0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .card{
+      width:100%;
+      height:100%;
+      box-sizing:border-box;
+      padding:22px 20px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      position:relative;
+      left: 5px;
+      overflow:hidden;
+    }
+
+    /* Removed .logo styles */
+
+    .descricao{
+      position: absolute;
+      top:170px;
+      left: 10px;
+      width: 100%;
+      font-family:'UturnaRoundBold';
+      text-align:center;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      line-height: 0.8;
+      color:#1a1a1a;
+      margin:20px 0 6px 0;
+      max-width:92%;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      align-items: center;
+      justify-content: center;
+      line-height: -1;
+      word-break: break-word;
+    }
+
+    .preco-antigo{
+      position: relative;
+      top:275px;
+      color:#606060;
+      font-family:'SugoDisplay';
+      font-size:30px;
+      text-decoration:line-through;
+      margin:6px 0 8px 0;
+    }
+
+    .preco-area{
+      font-family:'Yatra One', cursive;
+      width:100%;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      position:relative;
+    }
+
+    .rs{
+      font-family:'SugoDisplay';
+      font-size:42px;
+      align-self:flex-end;
+      margin-bottom:60px;
+      position:relative;
+      left:-15px
+    }
+
+    .big-value{
+      font-family:'SugoDisplay';
+      font-size:160px;
+      line-height:0.85;
+      color:#222;
+      transform-origin:top;
+      display:inline-block;
+      margin-right:6px;
+      letter-spacing: 10px;
+    }
+
+    .centavos{
+      font-family:'SugoDisplay';
+      letter-spacing:1px;
+      font-size:80px;
+      line-height:1;
+      align-self:flex-start;
+      margin-top:6px;
+      color:#222;
+    }
+
+    .cada{
+      font-family:'SugoDisplay';
+      text-transform: uppercase;
+      font-size:40px;
+      letter-spacing:1px;
+      align-self:flex-end;
+      margin-bottom:65px;
+      position: absolute;
+      left: 270px;
+      transition: left 0.3s ease, font-size 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .rodape{
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      position:absolute;
+      bottom:18px;
+      left:10px;
+      right:20px;
+      font-size:14px;
+      text-align:center;
+      color:#222;
+    }
+
+    .card::before{
+      content:'';
+      position:absolute; inset:0;
+      border-radius:20px;
+      pointer-events:none;
+      box-shadow: inset 0 0 0 14px rgba(33,57,102,0.0);
+    }
+
+    .editor-area{
+      width:360px;
+      background:#fff;
+      border-radius:10px;
+      padding:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      box-sizing:border-box;
+      font-size:14px;
+      position: relative;
+      top: 65px;
+      margin-bottom: 295px;
+    }
+    .editor-area h3{margin:0 0 8px 0;font-size:16px}
+    .field{margin-bottom:10px}
+    label{display:block;font-weight:700;margin-bottom:6px}
+    input[type=text], textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ddd;box-sizing:border-box;font-size:14px}
+    textarea{resize:vertical}
+    .row{display:flex;gap:8px}
+    .half{flex:1}
+    button{padding:10px;border-radius:6px;border:none;background:#213966;color:#fff;font-weight:700;cursor:pointer}
+    .btn-ghost{background:#f3f4f6;color:#213966;border:1px solid #ddd}
+    .small{font-size:12px;color:#666;margin-top:6px}
+
+    #saved-list {
+      position: absolute;
+      top: 80px;
+      right: 20px;
+      width: 360px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px;
+      box-sizing: border-box;
+      font-size: 14px;
+      z-index: 1000;
+    }
+    #saved-list h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+    #saved-list ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    #saved-list li {
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    #saved-list a {
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      word-break: break-word;
+    }
+    #saved-list a.descricao-link {
+      color: #222;
+      font-weight: 600;
+    }
+    #saved-list a:hover {
+      text-decoration: underline;
+    }
+    #saved-list button {
+      margin-left: 0;
+      cursor: pointer;
+      align-self: flex-start;
+      background: none;
+      border: none;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      color: #c00;
+    }
+    
+    @font-face {
+  font-family: 'UturnaRoundBold';
+  src: url('fonts/UturnaRoundBold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SugoDisplay';
+  src: url('fonts/SugoDisplay.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- PREVIEWS -->
+    <div>
+      <h3>
+    Preview Cartaz 1
+</h3>
+      <div class="preview" aria-hidden="false">
+        <div class="cartaz" id="cartaz1">
+          <div class="card" id="card1">
+            <!-- Logo removed -->
+            <div class="descricao" id="descricao-output1"></div>
+            <div class="preco-antigo" id="preco-antigo-output1"></div>
+            <div class="preco-area">
+              <div class="rs">R$</div>
+              <div class="big-value" id="reais-output1"></div>
+              <div class="centavos" id="centavos-output1"></div>
+              <div class="cada" id="cada-output1"></div>
+            </div>
+            <div class="rodape" id="rodape-output1"></div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Preview Cartaz 2</h3>
+      <div class="preview" aria-hidden="false">
+        <div class="cartaz" id="cartaz2">
+          <div class="card" id="card2">
+            <!-- Logo removed -->
+            <div class="descricao" id="descricao-output2"></div>
+            <div class="preco-antigo" id="preco-antigo-output2"></div>
+            <div class="preco-area">
+              <div class="rs">R$</div>
+              <div class="big-value" id="reais-output2"></div>
+              <div class="centavos" id="centavos-output2"></div>
+              <div class="cada" id="cada-output2"></div>
+            </div>
+            <div class="rodape" id="rodape-output2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDITORS -->
+    <div>
+      <div class="editor-area" role="region" aria-label="Editor Cartaz 1">
+        <h3>Editor do Cartaz 1</h3>
+        <!-- Logo input removed -->
+        <div class="field">
+          <label>Descrição</label>
+          <input id="descricao1" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL OU DESNATADO 1L" maxlength="60" />
+        </div>
+        <div class="field" style="display:flex; gap:8px; margin-bottom:10px;">
+          <button id="font-increase1" type="button">+ A</button>
+          <button id="font-decrease1" type="button">- A</button>
+          <button id="move-up1" type="button">▲</button>
+          <button id="move-down1" type="button">▼</button>
+        </div>
+        <div class="row">
+          <div class="field half">
+            <label>Preço ANTES</label>
+            <input id="preco-antigo1" type="text" placeholder="" />
+          </div>
+          <div class="field half">
+            <label>Preço OFERTA</label>
+            <input id="preco-oferta1" type="text" placeholder="" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field half">
+            <label>UND / CADA</label>
+            <input id="cada1" type="text" maxlength="7" placeholder="" />
+          </div>
+          <div class="field half">
+            <label>Data / Observação</label>
+            <input id="rodape1" type="text" placeholder="Oferta válida até DD/MM/AAAA..." value="" />
+          </div>
+        </div>
+        <div style="margin-top: 10px;">
+          <button id="save-cartaz1" style="width: 100%; background:#4a90e2;">💾 Salvar Cartaz 1</button>
+        </div>
+      </div>
+
+      <div class="editor-area" role="region" aria-label="Editor Cartaz 2">
+        <h3>Editor do Cartaz 2</h3>
+        <!-- Logo input removed -->
+        <div class="field">
+          <label>Descrição</label>
+          <input id="descricao2" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL OU DESNATADO 1L" maxlength="60" />
+        </div>
+        <div class="field" style="display:flex; gap:8px; margin-bottom:10px;">
+          <button id="font-increase2" type="button">+ A</button>
+          <button id="font-decrease2" type="button">- A</button>
+          <button id="move-up2" type="button">▲</button>
+          <button id="move-down2" type="button">▼</button>
+        </div>
+        <div class="row">
+          <div class="field half">
+            <label>Preço ANTES</label>
+            <input id="preco-antigo2" type="text" placeholder="" />
+          </div>
+          <div class="field half">
+            <label>Preço OFERTA</label>
+            <input id="preco-oferta2" type="text" placeholder="" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field half">
+            <label>UND / CADA</label>
+            <input id="cada2" type="text" maxlength="7" placeholder="" value="" />
+          </div>
+          <div class="field half">
+            <label>Data / Observação</label>
+            <input id="rodape2" type="text" placeholder="Oferta válida até DD/MM/AAAA..." value="" />
+          </div>
+        </div>
+        <div style="margin-top: 10px;">
+          <button id="save-cartaz2" style="width: 100%; background:#4a90e2;">💾 Salvar Cartaz 2</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 6px; gap: 8px;">
+        <button id="save-both-combined" style="width: 100%; padding:10px; border-radius:6px; border:none; background:#217c3f; color:#fff; cursor:pointer;">📄 Unir os cartazes e salvar para impressão</button>
+      </div>
+
+      <div style="margin-top:20px" class="small">
+        
+      </div>
+
+      <div id="saved-list" aria-live="polite">
+        <h4>Cartazes salvos</h4>
+        <ul id="pdf-list"></ul>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function sanitizeFileName(name, ext = 'pdf') {
+    if (!name) name = 'cartaz';
+    name = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    name = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const now = new Date().toISOString().replace(/[:.]/g, '-');
+    return `${name}-${now}.${ext}`;
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function base64ToBlobUrl(base64) {
+    const parts = base64.split(',');
+    const mime = parts[0].match(/:(.*?);/)[1];
+    const bstr = atob(parts[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while(n--) u8arr[n] = bstr.charCodeAt(n);
+    const blob = new Blob([u8arr], {type:mime});
+    return URL.createObjectURL(blob);
+  }
+
+  function loadSavedCartazes() {
+    const saved = JSON.parse(localStorage.getItem('cartazesSalvos') || '[]');
+    const pdfList = document.getElementById('pdf-list');
+    pdfList.innerHTML = '';
+
+    if (saved.length === 0) {
+      pdfList.innerHTML = '<li>Nenhum cartaz salvo.</li>';
+      return;
+    }
+
+    saved.forEach(({ filename, base64, descricaoText, precoText, dateStr, timeStr }, index) => {
+      const li = document.createElement('li');
+      li.style.display = 'flex';
+      li.style.flexDirection = 'column';
+      li.style.gap = '4px';
+
+      const descricaoLink = document.createElement('a');
+      descricaoLink.href = base64ToBlobUrl(base64);
+      descricaoLink.target = '_blank';
+      descricaoLink.textContent = `Criado em: ${dateStr} ${timeStr} | Descrição: ${descricaoText.toUpperCase()} | Preço: R$ ${precoText}`;
+      descricaoLink.classList.add('descricao-link');
+      descricaoLink.style.textDecoration = 'none';
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '❌';
+      delBtn.style.marginLeft = '0';
+      delBtn.style.cursor = 'pointer';
+      delBtn.title = 'Remover cartaz salvo';
+      delBtn.addEventListener('click', () => {
+        saved.splice(index, 1);
+        localStorage.setItem('cartazesSalvos', JSON.stringify(saved));
+        loadSavedCartazes();
+      });
+
+      li.appendChild(descricaoLink);
+      li.appendChild(delBtn);
+
+      pdfList.appendChild(li);
+    });
+  } 
+
+  function setupCartaz(idSuffix) {
+    const descricaoInput = document.getElementById('descricao' + idSuffix);
+    const precoAntesInput = document.getElementById('preco-antigo' + idSuffix);
+    const precoOfertaInput = document.getElementById('preco-oferta' + idSuffix);
+    const cadaInput = document.getElementById('cada' + idSuffix);
+    const rodapeInput = document.getElementById('rodape' + idSuffix);
+
+    const descricaoOutput = document.getElementById('descricao-output' + idSuffix);
+    const precoAntigoOutput = document.getElementById('preco-antigo-output' + idSuffix);
+    const reaisOutput = document.getElementById('reais-output' + idSuffix);
+    const centavosOutput = document.getElementById('centavos-output' + idSuffix);
+    const cadaOutput = document.getElementById('cada-output' + idSuffix);
+    const rodapeOutput = document.getElementById('rodape-output' + idSuffix);
+
+    const fontIncreaseBtn = document.getElementById('font-increase' + idSuffix);
+    const fontDecreaseBtn = document.getElementById('font-decrease' + idSuffix);
+    const moveUpBtn = document.getElementById('move-up' + idSuffix);
+    const moveDownBtn = document.getElementById('move-down' + idSuffix);
+
+    function formatPtBrToParts(value) {
+      if (!value) return { reais: '', centavos: '' };
+      const s = String(value).replace(/[^0-9,\.]/g, '').replace(',', '.');
+      const n = parseFloat(s);
+      if (isNaN(n)) return { reais: '', centavos: '' };
+      const parts = n.toFixed(2).split('.');
+      return { reais: String(Number(parts[0])), centavos: ',' + parts[1] };
+    }
+
+    function ajustarCadaPosicaoEFonte() {
+      const texto = cadaOutput.textContent || '';
+      const len = texto.length;
+      if (len > 4 && len <= 7) {
+        cadaOutput.style.fontSize = '35px';
+        const deslocamento = Math.min((len - 4) * 10, 30);
+        cadaOutput.style.left = (270 - deslocamento) + 'px';
+      } else {
+        cadaOutput.style.fontSize = '40px';
+        if (len > 7) {
+          const deslocamento = 60;
+          cadaOutput.style.left = (270 - deslocamento) + 'px';
+        } else {
+          cadaOutput.style.left = '270px';
+        }
+      }
+    }
+
+    function adjustDescricaoFontSize() {
+      const el = descricaoOutput;
+      const textLength = el.textContent.length;
+
+      let fontSize;
+      if (textLength <= 10) {
+        fontSize = 120;
+      } else if (textLength <= 15) {
+        fontSize = 100;
+      } else if (textLength <= 25) {
+        fontSize = 70;
+      } else if (textLength <= 35) {
+        fontSize = 55;
+      } else if (textLength <= 60) {
+        fontSize = 45;
+      } else {
+        fontSize = 40;
+      }
+
+      el.style.fontSize = fontSize + 'px';
+    }
+
+    function updatePreview() {
+      descricaoOutput.textContent = (descricaoInput.value || descricaoOutput.textContent).toUpperCase();
+      adjustDescricaoFontSize();
+
+      if (precoAntesInput.value.trim()) {
+        const v = Number(String(precoAntesInput.value).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+        if (!isNaN(v)) precoAntigoOutput.textContent = 'DE R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })+ ' POR:' ;
+        precoAntigoOutput.style.display = '';
+        precoAntigoOutput.style.position = 'relative';
+        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '260px';
+      } else {
+        precoAntigoOutput.style.display = 'none';
+        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
+      }
+
+      const parts = formatPtBrToParts(precoOfertaInput.value);
+      reaisOutput.textContent = parts.reais || '';
+      centavosOutput.textContent = parts.centavos || '';
+
+      if ((parts.reais || '').length >= 3) {
+        reaisOutput.style.fontSize = '220px';
+        reaisOutput.style.transform = 'scaleY(1.2)';
+      } else if ((parts.reais || '').length === 2) {
+        reaisOutput.style.fontSize = '260px';
+        reaisOutput.style.transform = 'scaleY(1)';
+      } else {
+        reaisOutput.style.fontSize = '260px';
+        reaisOutput.style.transform = 'scaleY(1)';
+      }
+
+      cadaOutput.textContent = cadaInput.value || '';
+      ajustarCadaPosicaoEFonte();
+
+      rodapeOutput.textContent = rodapeInput.value || '';
+    }
+
+    fontIncreaseBtn.addEventListener('click', () => {
+      const style = window.getComputedStyle(descricaoOutput);
+      const fontSize = parseFloat(style.fontSize);
+      descricaoOutput.style.fontSize = Math.min(fontSize + 5, 120) + 'px';
+    });
+
+    fontDecreaseBtn.addEventListener('click', () => {
+      const style = window.getComputedStyle(descricaoOutput);
+      const fontSize = parseFloat(style.fontSize);
+      descricaoOutput.style.fontSize = Math.max(fontSize - 5, 10) + 'px';
+    });
+
+    moveUpBtn.addEventListener('click', () => {
+      const style = window.getComputedStyle(descricaoOutput);
+      const top = parseFloat(style.top) || 0;
+      descricaoOutput.style.top = (top - 5) + 'px';
+    });
+
+    moveDownBtn.addEventListener('click', () => {
+      const style = window.getComputedStyle(descricaoOutput);
+      const top = parseFloat(style.top) || 0;
+      descricaoOutput.style.top = (top + 5) + 'px';
+    });
+
+    descricaoInput.addEventListener('input', updatePreview);
+    precoAntesInput.addEventListener('input', updatePreview);
+    precoOfertaInput.addEventListener('input', updatePreview);
+    cadaInput.addEventListener('input', updatePreview);
+    rodapeInput.addEventListener('input', updatePreview);
+
+    descricaoInput.value = descricaoOutput.textContent;
+    precoAntesInput.value = '';
+    precoOfertaInput.value = '';
+    updatePreview();
+
+    return {
+      container: document.getElementById('card' + idSuffix),
+      descricaoInput,
+      precoOfertaInput
+    };
+  }
+
+  async function savePdfToLocalStorage(pdf, descricaoText, precoText) {
+    const pdfBlob = pdf.output('blob');
+    const base64 = await blobToBase64(pdfBlob);
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('pt-BR');
+    const timeStr = now.toLocaleTimeString('pt-BR');
+    const filename = sanitizeFileName(descricaoText + '-A4', 'pdf');
+
+    const saved = JSON.parse(localStorage.getItem('cartazesSalvos') || '[]');
+    saved.unshift({ filename, base64, descricaoText, precoText, dateStr, timeStr });
+    if (saved.length > 10) saved.pop();
+    localStorage.setItem('cartazesSalvos', JSON.stringify(saved));
+    loadSavedCartazes();
+  }
+
+  async function saveSingleCartazToList(container, descricaoInput, precoOfertaInput) {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      unit: 'mm',
+      format: 'a4',
+      compress: true
+    });
+    
+    const canvas = await html2canvas(container, { scale: 8, useCORS: true, backgroundColor: null });
+    const imgData = canvas.toDataURL('image/png');
+    
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const imgProps = {  
+      width: canvas.width,
+      height: canvas.height
+    };
+    const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+
+    const imgWidth = imgProps.width * ratio;
+    const imgHeight = imgProps.height * ratio;
+    
+    const marginX = (pdfWidth - imgWidth) / 2;
+    const marginY = (pdfHeight - imgHeight) / 2 - 5; // Subir 5px (mm)
+
+    pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+
+    await savePdfToLocalStorage(pdf, descricaoInput.value || '', precoOfertaInput.value || '');
+    alert('Cartaz salvo com sucesso!');
+  }
+
+  async function saveCombinedCartazToList(container1, container2, descricaoInput1, precoOfertaInput1, descricaoInput2, precoOfertaInput2) {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'landscape',
+      compress: true
+    });
+
+    const canvas1 = await html2canvas(container1, { scale: 4, useCORS: true, backgroundColor: null });
+    const canvas2 = await html2canvas(container2, { scale: 4, useCORS: true, backgroundColor: null });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const margin = 10;
+    const maxHeight = pdfHeight - 2 * margin;
+    const halfWidth = (pdfWidth - 3 * margin) / 2;
+
+    function calcSize(canvas) {
+      const ratio = Math.min(halfWidth / canvas.width, maxHeight / canvas.height);
+      return { w: canvas.width * ratio, h: canvas.height * ratio };
+    }
+    const size1 = calcSize(canvas1);
+    const size2 = calcSize(canvas2);
+    const yOffset = margin + (maxHeight - Math.max(size1.h, size2.h)) / 2;
+
+    pdf.addImage(canvas1.toDataURL('image/png'), 'PNG', margin, yOffset, size1.w, size1.h);
+    const cartaz2X = pdfWidth - margin - size2.w + 5;
+    pdf.addImage(canvas2.toDataURL('image/png'), 'PNG', cartaz2X, yOffset, size2.w, size2.h);
+
+    await savePdfToLocalStorage(
+      pdf,
+      `${descricaoInput1.value || ''} + ${descricaoInput2.value || ''}`,
+      `${precoOfertaInput1.value || ''} + ${precoOfertaInput2.value || ''}`
+    );
+    alert('PDF combinado salvo com sucesso! Você pode baixar pelo link na lista de cartazes salvos.');
+  }
+
+  const cartaz1 = setupCartaz('1');
+  const cartaz2 = setupCartaz('2');
+
+  document.getElementById('save-cartaz1').addEventListener('click', async () => {
+    await saveSingleCartazToList(cartaz1.container, cartaz1.descricaoInput, cartaz1.precoOfertaInput);
+  });
+
+  document.getElementById('save-cartaz2').addEventListener('click', async () => {
+    await saveSingleCartazToList(cartaz2.container, cartaz2.descricaoInput, cartaz2.precoOfertaInput);
+  });
+
+  document.getElementById('save-both-combined').addEventListener('click', async () => {
+    await saveCombinedCartazToList(
+      cartaz1.container,
+      cartaz2.container,
+      cartaz1.descricaoInput,
+      cartaz1.precoOfertaInput,
+      cartaz2.descricaoInput,
+      cartaz2.precoOfertaInput
+    );
+  });
+
+  document.fonts && document.fonts.ready.then(() => {
+    loadSavedCartazes();
+  }).catch(() => {
+    loadSavedCartazes();
+  });
+</script>
+</body>
+</html>
