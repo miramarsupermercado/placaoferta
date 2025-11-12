@@ -71,8 +71,6 @@
       overflow:hidden;
     }
 
-    /* Removed .logo styles */
-
     .descricao{
       position: absolute;
       top:170px;
@@ -258,17 +256,67 @@
     }
     
     @font-face {
-  font-family: 'UturnaRoundBold';
-  src: url('UturnaRoundBold.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'SugoDisplay';
-  src: url('SugoDisplay.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
+      font-family: 'UturnaRoundBold';
+      src: url('UturnaRoundBold.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'SugoDisplay';
+      src: url('SugoDisplay.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    /* Smaller loading card styles with spinner */
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.6);
+      z-index: 9999;
+      display: none; /* Hidden by default */
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    #loading-card {
+      background: white;
+      width: 300px;
+      height: 190px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+      font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 20px;
+      text-align: center;
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Spinner circle */
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 6px solid #ccc;
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -399,6 +447,14 @@
       <ul id="pdf-list"></ul>
     </div>
   </div>
+
+  <!-- Loading overlay with spinning circle -->
+  <div id="loading-overlay" aria-live="assertive" aria-label="Carregando">
+  <div id="loading-card" role="alert" aria-busy="true" aria-live="assertive" aria-atomic="true">
+    <div>Gerando o PDF, por favor aguarde...</div>
+    <img src="spinner.gif" alt="Carregando..." style="width:95px; height:50px; margin: 0 auto; display: block;" />
+  </div>
+</div>
 
 <script>
   function sanitizeFileName(name, ext = 'pdf') {
@@ -545,7 +601,6 @@
       if (precoAntesInput.value.trim()) {
         const v = Number(String(precoAntesInput.value).replace(/[^0-9,\.]/g, '').replace(',', '.'));
         if (!isNaN(v)) {
-          // Format number and wrap only numbers in span with line-through
           const valorFormatado = v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           precoAntigoOutput.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatado}</span> POR:`;
           precoAntigoOutput.style.display = '';
@@ -635,75 +690,98 @@
     loadSavedCartazes();
   }
 
+  const loadingOverlay = document.getElementById('loading-overlay');
+
+  function showLoading() {
+    loadingOverlay.style.display = 'flex';
+  }
+  function hideLoading() {
+    loadingOverlay.style.display = 'none';
+  }
+
   async function saveSingleCartazToList(container, descricaoInput, precoOfertaInput) {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      unit: 'mm',
-      format: 'a4',
-      compress: true
-    });
-    
-    const canvas = await html2canvas(container, { scale: 8, useCORS: true, backgroundColor: null });
-    const imgData = canvas.toDataURL('image/png');
-    
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+    showLoading();
+    try {
+      const { jsPDF } = window.jspdf;
 
-    const imgProps = {  
-      width: canvas.width,
-      height: canvas.height
-    };
-    const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+      const canvas = await html2canvas(container, { scale: 8, useCORS: true, backgroundColor: null });
 
-    const imgWidth = imgProps.width * ratio;
-    const imgHeight = imgProps.height * ratio;
-    
-    const marginX = (pdfWidth - imgWidth) / 2;
-    const marginY = (pdfHeight - imgHeight) / 2 - 5; // Subir 5px (mm)
+      const pdf = new jsPDF({
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
 
-    pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    await savePdfToLocalStorage(pdf, descricaoInput.value || '', precoOfertaInput.value || '');
-    alert('Cartaz salvo com sucesso!');
+      const imgProps = {  
+        width: canvas.width,
+        height: canvas.height
+      };
+      const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+
+      const imgWidth = imgProps.width * ratio;
+      const imgHeight = imgProps.height * ratio;
+      
+      const marginX = (pdfWidth - imgWidth) / 2;
+      const marginY = (pdfHeight - imgHeight) / 2 - 5;
+
+      pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+
+      await savePdfToLocalStorage(pdf, descricaoInput.value || '', precoOfertaInput.value || '');
+      alert('Cartaz salvo com sucesso!');
+    } finally {
+      hideLoading();
+    }
   }
 
   async function saveCombinedCartazToList(container1, container2, descricaoInput1, precoOfertaInput1, descricaoInput2, precoOfertaInput2) {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'landscape',
-      compress: true
-    });
+    showLoading();
+    try {
+      const { jsPDF } = window.jspdf;
 
-    const canvas1 = await html2canvas(container1, { scale: 4, useCORS: true, backgroundColor: null });
-    const canvas2 = await html2canvas(container2, { scale: 4, useCORS: true, backgroundColor: null });
+      const canvas1 = await html2canvas(container1, { scale: 4, useCORS: true, backgroundColor: null });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvas2 = await html2canvas(container2, { scale: 4, useCORS: true, backgroundColor: null });
 
-    const margin = 10;
-    const maxHeight = pdfHeight - 2 * margin;
-    const halfWidth = (pdfWidth - 3 * margin) / 2;
+      const pdf = new jsPDF({
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'landscape',
+        compress: true
+      });
 
-    function calcSize(canvas) {
-      const ratio = Math.min(halfWidth / canvas.width, maxHeight / canvas.height);
-      return { w: canvas.width * ratio, h: canvas.height * ratio };
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const margin = 10;
+      const maxHeight = pdfHeight - 2 * margin;
+      const halfWidth = (pdfWidth - 3 * margin) / 2;
+
+      function calcSize(canvas) {
+        const ratio = Math.min(halfWidth / canvas.width, maxHeight / canvas.height);
+        return { w: canvas.width * ratio, h: canvas.height * ratio };
+      }
+      const size1 = calcSize(canvas1);
+      const size2 = calcSize(canvas2);
+      const yOffset = margin + (maxHeight - Math.max(size1.h, size2.h)) / 2;
+
+      pdf.addImage(canvas1.toDataURL('image/png'), 'PNG', margin, yOffset, size1.w, size1.h);
+      const cartaz2X = pdfWidth - margin - size2.w + 5;
+      pdf.addImage(canvas2.toDataURL('image/png'), 'PNG', cartaz2X, yOffset, size2.w, size2.h);
+
+      await savePdfToLocalStorage(
+        pdf,
+        `${descricaoInput1.value || ''} + ${descricaoInput2.value || ''}`,
+        `${precoOfertaInput1.value || ''} + ${precoOfertaInput2.value || ''}`
+      );
+      alert('PDF combinado salvo com sucesso! Você pode baixar pelo link na lista de cartazes salvos.');
+    } finally {
+      hideLoading();
     }
-    const size1 = calcSize(canvas1);
-    const size2 = calcSize(canvas2);
-    const yOffset = margin + (maxHeight - Math.max(size1.h, size2.h)) / 2;
-
-    pdf.addImage(canvas1.toDataURL('image/png'), 'PNG', margin, yOffset, size1.w, size1.h);
-    const cartaz2X = pdfWidth - margin - size2.w + 5;
-    pdf.addImage(canvas2.toDataURL('image/png'), 'PNG', cartaz2X, yOffset, size2.w, size2.h);
-
-    await savePdfToLocalStorage(
-      pdf,
-      `${descricaoInput1.value || ''} + ${descricaoInput2.value || ''}`,
-      `${precoOfertaInput1.value || ''} + ${precoOfertaInput2.value || ''}`
-    );
-    alert('PDF combinado salvo com sucesso! Você pode baixar pelo link na lista de cartazes salvos.');
   }
 
   const cartaz1 = setupCartaz('1');
@@ -726,6 +804,11 @@
       cartaz2.descricaoInput,
       cartaz2.precoOfertaInput
     );
+  });
+
+  // Ensure loading overlay is hidden on page load
+  window.addEventListener('load', () => {
+    loadingOverlay.style.display = 'none';
   });
 
   document.fonts && document.fonts.ready.then(() => {
