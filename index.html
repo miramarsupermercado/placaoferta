@@ -95,7 +95,8 @@
 
     .preco-antigo{
       position: relative;
-      top:275px;
+      top:295px;
+      right: 130px;
       color:#606060;
       font-family:'SugoDisplay';
       font-size:30px;
@@ -103,6 +104,11 @@
     }
     .preco-antigo .numeros-riscados {
       text-decoration: line-through;
+    }
+    .de-texto, .por-texto {
+      font-size: 18px;
+      font-weight: normal;
+      margin: 4px 0;
     }
 
     .preco-area{
@@ -595,22 +601,57 @@
     }
 
     function updatePreview() {
-      descricaoOutput.textContent = (descricaoInput.value || descricaoOutput.textContent).toUpperCase();
-      adjustDescricaoFontSize();
+  descricaoOutput.textContent = (descricaoInput.value || descricaoOutput.textContent).toUpperCase();
+  adjustDescricaoFontSize();
 
-      if (precoAntesInput.value.trim()) {
-        const v = Number(String(precoAntesInput.value).replace(/[^0-9,\.]/g, '').replace(',', '.'));
-        if (!isNaN(v)) {
-          const valorFormatado = v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          precoAntigoOutput.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatado}</span> POR:`;
-          precoAntigoOutput.style.display = '';
-          precoAntigoOutput.style.position = 'relative';
-          document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '260px';
-        }
+  if (precoAntesInput.value.trim()) {
+    const vAntes = Number(String(precoAntesInput.value).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+
+    // Pega o valor do preço oferta e divide na vírgula para contar caracteres à esquerda
+    const precoOfertaValor = precoOfertaInput.value || '';
+    const parteInteira = precoOfertaValor.split(',')[0].replace(/\D/g, ''); // só números antes da vírgula
+    const charsLeftOfComma = parteInteira.length;
+
+    if (!isNaN(vAntes)) {
+      const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      if (charsLeftOfComma >= 3) {
+        precoAntigoOutput.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
+        precoAntigoOutput.style.display = '';
+        precoAntigoOutput.style.position = 'relative';
+        precoAntigoOutput.style.top = '275px';
+        precoAntigoOutput.style.right = '0';
+        precoAntigoOutput.style.color = '#606060';
+        precoAntigoOutput.style.fontFamily = "'SugoDisplay'";
+        precoAntigoOutput.style.fontSize = '30px';
+        precoAntigoOutput.style.margin = '6px 0 8px 0';
+
+        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '260px';
       } else {
-        precoAntigoOutput.style.display = 'none';
-        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
+        precoAntigoOutput.innerHTML = `DE <br> <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>  POR:`;   
+        precoAntigoOutput.style.display = '';
+        precoAntigoOutput.style.position = 'relative';
+        precoAntigoOutput.style.top = '295px';
+
+        if (charsLeftOfComma === 1) {
+          precoAntigoOutput.style.right = '130px';
+        } else {
+          precoAntigoOutput.style.right = '150px';
+        }
+
+        precoAntigoOutput.style.color = '';
+        precoAntigoOutput.style.fontFamily = '';
+        precoAntigoOutput.style.fontSize = '';
+        precoAntigoOutput.style.margin = '6px 0 8px 0';
+
+        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '210px';
       }
+    }
+  } else {
+    precoAntigoOutput.style.display = 'none';
+    document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
+  }
+
 
       const parts = formatPtBrToParts(precoOfertaInput.value);
       reaisOutput.textContent = parts.reais || '';
