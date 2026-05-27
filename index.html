@@ -6,12 +6,9 @@
   <title>Criar Cartaz Miramar</title>
   <link rel="icon" href="https://miramarsupermercado.com.br/wp-content/uploads/2024/10/cropped-icone.png" type="image/png">
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
 
-  <!-- html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
   <style>
@@ -192,13 +189,12 @@
       box-sizing:border-box;
       font-size:14px;
       position: relative;
-      top: 65px;
       margin-bottom: 295px;
     }
     .editor-area h3{margin:0 0 8px 0;font-size:16px}
     .field{margin-bottom:10px}
     label{display:block;font-weight:700;margin-bottom:6px}
-    input[type=text], textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ddd;box-sizing:border-box;font-size:14px}
+    input[type=text], input[type=date], textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ddd;box-sizing:border-box;font-size:14px}
     textarea{resize:vertical}
     .row{display:flex;gap:8px}
     .half{flex:1}
@@ -208,7 +204,6 @@
 
     #saved-list {
       position: relative;
-      top: 65px;
       width: 360px;
       max-height: 90vh;
       overflow-y: auto;
@@ -323,20 +318,209 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    /* Estilos do Pop-up de Opções de Cartaz */
+    #popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+    #popup-container {
+      background: white;
+      width: 500px;
+      max-width: 90%;
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+      padding: 25px;
+      box-sizing: border-box;
+      text-align: center;
+      font-family: 'Oswald', sans-serif;
+    }
+    #popup-container h2 {
+      margin-top: 0;
+      color: var(--blue);
+      font-size: 24px;
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .popup-options-grid {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .popup-btn-option {
+      padding: 0;
+      height: 90px;
+      width: 215px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background-size: 216px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .popup-btn-option:hover {
+      border-color: var(--blue);
+      transform: scale(1.05);
+    }
+
+    /* Estilo da área de busca por Código de Barras */
+    .barcode-search-area {
+      width: 360px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-sizing: border-box;
+      font-size: 14px;
+      position: relative;
+      margin-bottom: 15px;
+      border: 2px solid var(--blue);
+    }
+    .barcode-search-area h3 { margin:0 0 8px 0; font-size:16px; color: var(--blue); }
+
+    /* Estilos da Guia Lateral Oculta */
+    #menu-lateral-toggle {
+      position: fixed;
+      right: 0;
+      top: 5%;
+      transform: translateY(-50%);
+      background: var(--blue);
+      color: white;
+      border: none;
+      padding: 15px 10px;
+      border-radius: 8px 0 0 8px;
+      cursor: pointer;
+      z-index: 10001;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+      transition: right 0.3s ease;
+    }
+    #menu-lateral-toggle .tracinho {
+      width: 20px;
+      height: 3px;
+      background-color: white;
+      display: block;
+      border-radius: 2px;
+    }
+    #menu-lateral-container {
+      position: fixed;
+      right: -250px;
+      top: 0;
+      width: 250px;
+      height: 100%;
+      background: white;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      z-index: 10000;
+      transition: right 0.3s ease;
+      box-sizing: border-box;
+      padding: 80px 20px 20px 20px;
+    }
+    #menu-lateral-container.aberto {
+      right: 0;
+    }
+    #menu-lateral-toggle.aberto {
+      right: 250px;
+    }
+    .btn-menu-lateral {
+      margin-top: -35%;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: var(--blue);
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 6px;
+      box-sizing: border-box;
+      transition: background 0.2s;
+    }
+    .btn-menu-lateral:hover {
+      background: var(--orange);
+    }
+    #menu-lateral-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      z-index: 9999;
+      display: none;
+    }
+
+    /* Estilo do Botão Salvar Todos Congelado no Canto Inferior Direito */
+    #btn-salvar-todos-congelado {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      z-index: 10002;
+      background: #e67e22;
+      color: white;
+      border: 2px solid white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      padding: 10px 15px;
+      display: none; /* Oculto inicialmente */
+    }
+    #btn-salvar-todos-congelado:hover {
+      background: #d35400;
+    }
   </style>
 </head>
 <body>
+
+  <button type="button" id="btn-salvar-todos-congelado" onclick="salvarTodosCartazesPreenchidos()">💾 Salvar Todos os Cartazes</button>
+
+  <button type="button" id="menu-lateral-toggle" onclick="toggleMenuLateral()" title="Menu">
+    <span class="tracinho"></span>
+    <span class="tracinho"></span>
+    <span class="tracinho"></span>
+  </button>
+
+  <div id="menu-lateral-overlay" onclick="toggleMenuLateral()"></div>
+
+  <div id="menu-lateral-container">
+  <a href="datas.html" target="_blank" onclick="window.open(this.href, '_blank'); return false;" class="btn-menu-lateral">Visualizar cartazes salvos</a>
+</div>
+
+  <div id="popup-overlay">
+    <div id="popup-container">
+      <h2>Selecione o Encarte</h2>
+      <div class="popup-options-grid">
+        <button type="button" class="popup-btn-option" style="background-image: url('capa-encarte semanal.png'); background-color: #f3f4f6;" onclick="selecionarOpcaoCartaz('ENCARTE SEMANAL')"></button>
+        <button type="button" class="popup-btn-option" style="background-size: 222px; background-image: url('capa-app.png');" onclick="selecionarOpcaoCartaz('OFERTAS APP')"></button>
+        <button type="button" class="popup-btn-option" style="background-image: url('capa-terça da carne.png');" onclick="selecionarOpcaoCartaz('TERÇA DA CARNE')"></button>
+        <button type="button" class="popup-btn-option" style="background-image: url('capa-quinta da feira.png');" onclick="selecionarOpcaoCartaz('QUINTA DA FEIRA')"></button>
+        <button type="button" class="popup-btn-option" style="background-image: url('capa-fds.png');" onclick="selecionarOpcaoCartaz('FINAL DE SEMANA DE OFERTAS')"></button>
+        <button type="button" class="popup-btn-option" style="background-image: url('capa-fecha mês.png');" onclick="selecionarOpcaoCartaz('FECHA MÊS')"></button>
+        <button type="button" class="popup-btn-option" style="background-image: url('capa-preço avulso.png'); background-color: #f3f4f6;" onclick="selecionarOpcaoCartaz('PREÇO AVULSO')"></button>
+      </div>
+    </div>
+  </div>
+
   <div class="wrap">
-    <!-- PREVIEWS -->
     <div>
-      <h3>Preview Cartaz 1</h3>
       <div class="preview" aria-hidden="false">
         <div class="cartaz" id="cartaz1">
           <div class="card" id="card1">
             <div class="descricao" id="descricao-output1"></div>
             <div class="preco-antigo" id="preco-antigo-output1"></div>
             <div class="preco-area">
-              <div class="rs">R$</div>
+              <div class="rs" id="rs-output1">R$</div>
               <div class="big-value" id="reais-output1"></div>
               <div class="centavos" id="centavos-output1"></div>
               <div class="cada" id="cada-output1"></div>
@@ -346,14 +530,13 @@
         </div>
       </div>
 
-      <h3>Preview Cartaz 2</h3>
       <div class="preview" aria-hidden="false">
         <div class="cartaz" id="cartaz2">
           <div class="card" id="card2">
             <div class="descricao" id="descricao-output2"></div>
             <div class="preco-antigo" id="preco-antigo-output2"></div>
             <div class="preco-area">
-              <div class="rs">R$</div>
+              <div class="rs" id="rs-output2">R$</div>
               <div class="big-value" id="reais-output2"></div>
               <div class="centavos" id="centavos-output2"></div>
               <div class="cada" id="cada-output2"></div>
@@ -364,10 +547,17 @@
       </div>
     </div>
 
-    <!-- EDITORS -->
     <div>
+      <div class="barcode-search-area">
+        <h3>🔍 Consultar Código de Barras (Cartaz 1)</h3>
+        <div class="field">
+          <input id="barcode-input1" type="text" placeholder="Digite ou passe o leitor para o Cartaz 1..." autofocus />
+          <div id="barcode-status1" class="small" style="color: gray; font-weight: bold; margin-top: 4px;">Carregando banco de produtos...</div>
+        </div>
+      </div>
+
       <div class="editor-area" role="region" aria-label="Editor Cartaz 1">
-        <h3>Editor do Cartaz 1</h3>
+        <h3>Editor do Cartaz 1 <span id="label-campanha-1" style="color:var(--orange); font-size:12px; margin-left:5px;"></span></h3>
         <div class="field">
           <label>Descrição</label>
           <input id="descricao1" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL OU DESNATADO 1L" maxlength="60" />
@@ -390,21 +580,40 @@
         </div>
         <div class="row">
           <div class="field half">
+            <label>Data Inicial</label>
+            <input id="data-inicial1" type="date" />
+          </div>
+          <div class="field half">
+            <label>Data Final</label>
+            <input id="data-final1" type="date" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field half">
             <label>UND / CADA</label>
             <input id="cada1" type="text" maxlength="7" placeholder="" />
           </div>
           <div class="field half">
-            <label>Data / Observação</label>
+            <label>Observação</label>
             <input id="rodape1" type="text" placeholder="Oferta válida até DD/MM/AAAA..." value="" />
           </div>
         </div>
-        <div style="margin-top: 10px;">
-          <button id="save-cartaz1" style="width: 100%; background:#4a90e2;">💾 Salvar Cartaz 1</button>
+        <div style="margin-top: 10px; display: flex; gap: 8px;">
+          <button id="save-cartaz1" style="flex: 1; background:#4a90e2;">💾 Salvar Cartaz 1</button>
+          <button id="save-image-cartaz1" style="flex: 1; background:#2ecc71;">🖼️ Salvar com Imagem</button>
+        </div>
+      </div>
+
+      <div class="barcode-search-area" style="margin-top: -280px;">
+        <h3>🔍 Consultar Código de Barras (Cartaz 2)</h3>
+        <div class="field">
+          <input id="barcode-input2" type="text" placeholder="Digite ou passe o leitor para o Cartaz 2..." />
+          <div id="barcode-status2" class="small" style="color: gray; font-weight: bold; margin-top: 4px;">Carregando banco de produtos...</div>
         </div>
       </div>
 
       <div class="editor-area" role="region" aria-label="Editor Cartaz 2">
-        <h3>Editor do Cartaz 2</h3>
+        <h3>Editor do Cartaz 2 <span id="label-campanha-2" style="color:var(--orange); font-size:12px; margin-left:5px;"></span></h3>
         <div class="field">
           <label>Descrição</label>
           <input id="descricao2" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL OU DESNATADO 1L" maxlength="60" />
@@ -427,21 +636,28 @@
         </div>
         <div class="row">
           <div class="field half">
+            <label>Data Inicial</label>
+            <input id="data-inicial2" type="date" />
+          </div>
+          <div class="field half">
+            <label>Data Final</label>
+            <input id="data-final2" type="date" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field half">
             <label>UND / CADA</label>
             <input id="cada2" type="text" maxlength="7" placeholder="" value="" />
           </div>
           <div class="field half">
-            <label>Data / Observação</label>
+            <label>Observação</label>
             <input id="rodape2" type="text" placeholder="Oferta válida até DD/MM/AAAA..." value="" />
           </div>
         </div>
-        <div style="margin-top: 10px;">
-          <button id="save-cartaz2" style="width: 100%; background:#4a90e2;">💾 Salvar Cartaz 2</button>
+        <div style="margin-top: 10px; display: flex; gap: 8px;">
+          <button id="save-cartaz2" style="flex: 1; background:#4a90e2;">💾 Salvar Cartaz 2</button>
+          <button id="save-image-cartaz2" style="flex: 1; background:#2ecc71;">🖼️ Salvar com Imagem</button>
         </div>
-      </div>
-
-      <div style="margin-top: 6px; gap: 8px;">
-        <button id="save-both-combined" style="width: 100%; padding:10px; border-radius:6px; border:none; background:#217c3f; color:#fff; cursor:pointer; position: relative; top: -37px;">📄 Unir os cartazes e salvar para impressão</button>
       </div>
 
       <div style="margin-top:20px" class="small">
@@ -449,20 +665,151 @@
     </div>
 
     <div id="saved-list" aria-live="polite">
-      <h4>Cartazes salvos</h4>
+      <h4>Cartazes salvos (<span id="current-category-label">Geral</span>)</h4>
       <ul id="pdf-list"></ul>
     </div>
   </div>
 
-  <!-- Loading overlay with spinning circle -->
   <div id="loading-overlay" aria-live="assertive" aria-label="Carregando">
-  <div id="loading-card" role="alert" aria-busy="true" aria-live="assertive" aria-atomic="true">
-    <div>Gerando o PDF, por favor aguarde...</div>
-    <img src="spinner.gif" alt="Carregando..." style="width:95px; height:50px; margin: 0 auto; display: block;" />
+    <div id="loading-card" role="alert" aria-busy="true" aria-live="assertive" aria-atomic="true">
+      <div>Gerando o PDF, por favor aguarde...</div>
+      <img src="spinner.gif" alt="Carregando..." style="width:95px; height:50px; margin: 0 auto; display: block;" />
+    </div>
   </div>
-</div>
 
 <script>
+  // Função para controlar a abertura/fechamento do menu lateral
+  function toggleMenuLateral() {
+    const container = document.getElementById('menu-lateral-container');
+    const toggleBtn = document.getElementById('menu-lateral-toggle');
+    const overlay = document.getElementById('menu-lateral-overlay');
+    
+    container.classList.toggle('aberto');
+    toggleBtn.classList.toggle('aberto');
+    
+    if (container.classList.contains('aberto')) {
+      overlay.style.display = 'block';
+    } else {
+      overlay.style.display = 'none';
+    }
+  }
+
+  // Variável global para armazenar a opção selecionada no pop-up
+  window.opcaoCartazSelecionada = "";
+  // Objeto global que conterá o mapeamento nativo vindo do JSON
+  window.bancoProdutosEan = {};
+
+  // Flags globais para controlar se o usuário modificou o tamanho da fonte manualmente
+  window.modificadoManualmente1 = false;
+  window.modificadoManualmente2 = false;
+
+  // Função assíncrona robusta para ler o JSON limpando quebras de linha invisíveis
+  async function carregarBancoProdutosTxt() {
+    const statusEl1 = document.getElementById('barcode-status1');
+    const statusEl2 = document.getElementById('barcode-status2');
+    try {
+      const resposta = await fetch('codigo-prod-emb.json');
+      if (!resposta.ok) throw new Error('Arquivo não encontrado');
+      
+      // Obtém o arquivo como string pura para higienizar antes do parse
+      const textoPuro = await resposta.text();
+      
+      // Remove quebras de linha (\r e \n) e espaços extras nas extremidades
+      const textoLimpo = textoPuro.replace(/[\r\n]+/g, ' ').trim();
+      
+      // Realiza o parse de forma segura e injeta no objeto global
+      window.bancoProdutosEan = JSON.parse(textoLimpo);
+      
+      const totalCarregado = Object.keys(window.bancoProdutosEan).length;
+      statusEl1.textContent = `Produtos carregados!`;
+      statusEl1.style.color = 'green';
+      statusEl2.textContent = `Produtos carregados!`;
+      statusEl2.style.color = 'green';
+    } catch (erro) {
+      console.error('Erro ao ler codigo-prod-emb.json:', erro);
+      statusEl1.textContent = 'Aviso: codigo-prod-emb.json não carregado ou vazio.';
+      statusEl1.style.color = '#c00';
+      statusEl2.textContent = 'Aviso: codigo-prod-emb.json não carregado ou vazio.';
+      statusEl2.style.color = '#c00';
+    }
+  }
+
+  // Listener em tempo real para o campo de Código de Barras do Cartaz 1
+  document.getElementById('barcode-input1').addEventListener('input', function(e) {
+    const eanDigitado = e.target.value.trim();
+    
+    if (window.bancoProdutosEan && window.bancoProdutosEan[eanDigitado]) {
+      const produtoEncontrado = window.bancoProdutosEan[eanDigitado];
+      const desc1 = document.getElementById('descricao1');
+      
+      desc1.value = produtoEncontrado;
+      desc1.dispatchEvent(new Event('input'));
+      
+      document.getElementById('barcode-status1').textContent = `Produto encontrado: ${produtoEncontrado}`;
+      document.getElementById('barcode-status1').style.color = 'green';
+    } else if (eanDigitado.length > 0) {
+      document.getElementById('barcode-status1').textContent = 'Código não cadastrado no arquivo.';
+      document.getElementById('barcode-status1').style.color = '#ff8a1c';
+    } else {
+      document.getElementById('barcode-status1').textContent = 'Aguardando digitação ou leitura...';
+      document.getElementById('barcode-status1').style.color = 'gray';
+    }
+  });
+
+  // Listener em tempo real para o campo de Código de Barras do Cartaz 2
+  document.getElementById('barcode-input2').addEventListener('input', function(e) {
+    const eanDigitado = e.target.value.trim();
+    
+    if (window.bancoProdutosEan && window.bancoProdutosEan[eanDigitado]) {
+      const produtoEncontrado = window.bancoProdutosEan[eanDigitado];
+      const desc2 = document.getElementById('descricao2');
+      
+      desc2.value = produtoEncontrado;
+      desc2.dispatchEvent(new Event('input'));
+      
+      document.getElementById('barcode-status2').textContent = `Produto encontrado: ${produtoEncontrado}`;
+      document.getElementById('barcode-status2').style.color = 'green';
+    } else if (eanDigitado.length > 0) {
+      document.getElementById('barcode-status2').textContent = 'Código não cadastrado no arquivo.';
+      document.getElementById('barcode-status2').style.color = '#ff8a1c';
+    } else {
+      document.getElementById('barcode-status2').textContent = 'Aguardando digitação ou leitura...';
+      document.getElementById('barcode-status2').style.color = 'gray';
+    }
+  });
+
+  function selecionarOpcaoCartaz(opcao) {
+    window.opcaoCartazSelecionada = scheme => opcao; // Mantém compatibilidade com escopos
+    window.opcaoCartazSelecionada = opcao;
+    document.getElementById('popup-overlay').style.display = 'none';
+    document.getElementById('label-campanha-1').textContent = `(${opcao})`;
+    document.getElementById('label-campanha-2').textContent = `(${opcao})`;
+    document.getElementById('current-category-label').textContent = opcao;
+    
+    // Altera a imagem de fundo caso seja PREÇO AVULSO
+    const cartazes = document.querySelectorAll('.cartaz');
+
+// Define a imagem baseada na opção escolhida
+if (opcao === 'PREÇO AVULSO') {
+    cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')");
+} else if (opcao === 'OFERTAS APP') {
+    cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz-app.png')");
+} else {
+    // Caso contrário, aplica o fundo padrão
+    cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz.png')");
+}
+
+// Exibe o botão de salvar todos no canto inferior direito após a escolha do cartaz
+const btnSalvar = document.getElementById('btn-salvar-todos-congelado');
+if (btnSalvar) {
+    btnSalvar.style.display = 'block';
+}
+
+if (window.initFirebaseWithCategory) {
+    window.initFirebaseWithCategory(opcao);
+}
+  }
+
   function sanitizeFileName(name, ext = 'pdf') {
     if (!name) name = 'cartaz';
     name = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -492,55 +839,21 @@
   }
 
   function loadSavedCartazes() {
-    const saved = JSON.parse(localStorage.getItem('cartazesSalvos') || '[]');
-    const pdfList = document.getElementById('pdf-list');
-    pdfList.innerHTML = '';
-
-    if (saved.length === 0) {
-      pdfList.innerHTML = '<li>Nenhum cartaz salvo.</li>';
-      return;
-    }
-
-    saved.forEach(({ filename, base64, descricaoText, precoText, dateStr, timeStr }, index) => {
-      const li = document.createElement('li');
-      li.style.display = 'flex';
-      li.style.flexDirection = 'column';
-      li.style.gap = '4px';
-
-      const descricaoLink = document.createElement('a');
-      descricaoLink.href = base64ToBlobUrl(base64);
-      descricaoLink.target = '_blank';
-      descricaoLink.textContent = `Criado em: ${dateStr} ${timeStr} | Descrição: ${descricaoText.toUpperCase()} | Preço: R$ ${precoText}`;
-      descricaoLink.classList.add('descricao-link');
-      descricaoLink.style.textDecoration = 'none';
-
-      const delBtn = document.createElement('button');
-      delBtn.textContent = '❌';
-      delBtn.style.marginLeft = '0';
-      delBtn.style.cursor = 'pointer';
-      delBtn.title = 'Remover cartaz salvo';
-      delBtn.addEventListener('click', () => {
-        saved.splice(index, 1);
-        localStorage.setItem('cartazesSalvos', JSON.stringify(saved));
-        loadSavedCartazes();
-      });
-
-      li.appendChild(descricaoLink);
-      li.appendChild(delBtn);
-
-      pdfList.appendChild(li);
-    });
+    // Esta função agora é gerenciada em tempo real pelo Firebase no bloco de script abaixo.
   } 
 
   function setupCartaz(idSuffix) {
     const descricaoInput = document.getElementById('descricao' + idSuffix);
     const precoAntesInput = document.getElementById('preco-antigo' + idSuffix);
     const precoOfertaInput = document.getElementById('preco-oferta' + idSuffix);
+    const dataInicialInput = document.getElementById('data-inicial' + idSuffix);
+    const dataFinalInput = document.getElementById('data-final' + idSuffix);
     const cadaInput = document.getElementById('cada' + idSuffix);
     const rodapeInput = document.getElementById('rodape' + idSuffix);
 
     const descricaoOutput = document.getElementById('descricao-output' + idSuffix);
     const precoAntigoOutput = document.getElementById('preco-antigo-output' + idSuffix);
+    const rsOutput = document.getElementById('rs-output' + idSuffix);
     const reaisOutput = document.getElementById('reais-output' + idSuffix);
     const centavosOutput = document.getElementById('centavos-output' + idSuffix);
     const cadaOutput = document.getElementById('cada-output' + idSuffix);
@@ -558,6 +871,12 @@
       if (isNaN(n)) return { reais: '', centavos: '' };
       const parts = n.toFixed(2).split('.');
       return { reais: String(Number(parts[0])), centavos: ',' + parts[1] };
+    }
+
+    function extrairTextoDescricaoPuro(textoCompleto) {
+      if (!textoCompleto) return "";
+      const regex = /^\[.*?\]\s*/;
+      return textoCompleto.replace(regex, "");
     }
 
     function ajustarCadaPosicaoEFonte() {
@@ -579,6 +898,10 @@
     }
 
     function adjustDescricaoFontSize() {
+      // Se a fonte foi modificada manualmente por +A ou -A, pula a autogestão de tamanho
+      if (idSuffix === '1' && window.modificadoManualmente1) return;
+      if (idSuffix === '2' && window.modificadoManualmente2) return;
+
       const el = descricaoOutput;
       const textLength = el.textContent.length;
 
@@ -598,64 +921,69 @@
       }
 
       el.style.fontSize = fontSize + 'px';
+      el.style.top = '170px';
     }
 
     function updatePreview() {
-  descricaoOutput.textContent = (descricaoInput.value || descricaoOutput.textContent).toUpperCase();
-  adjustDescricaoFontSize();
+      descricaoOutput.textContent = (descricaoInput.value || descricaoOutput.textContent).toUpperCase();
+      adjustDescricaoFontSize();
 
-  if (precoAntesInput.value.trim()) {
-    const vAntes = Number(String(precoAntesInput.value).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+      if (precoAntesInput.value.trim()) {
+        const vAntes = Number(String(precoAntesInput.value).replace(/[^0-9,\.]/g, '').replace(',', '.'));
 
-    // Pega o valor do preço oferta e divide na vírgula para contar caracteres à esquerda
-    const precoOfertaValor = precoOfertaInput.value || '';
-    const parteInteira = precoOfertaValor.split(',')[0].replace(/\D/g, ''); // só números antes da vírgula
-    const charsLeftOfComma = parteInteira.length;
+        const precoOfertaValor = precoOfertaInput.value || '';
+        const parteInteira = precoOfertaValor.split(',')[0].replace(/\D/g, '');
+        const charsLeftOfComma = parteInteira.length;
 
-    if (!isNaN(vAntes)) {
-      const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (!isNaN(vAntes)) {
+          const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-      if (charsLeftOfComma >= 3) {
-        precoAntigoOutput.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
-        precoAntigoOutput.style.display = '';
-        precoAntigoOutput.style.position = 'relative';
-        precoAntigoOutput.style.top = '275px';
-        precoAntigoOutput.style.right = '0';
-        precoAntigoOutput.style.color = '#606060';
-        precoAntigoOutput.style.fontFamily = "'SugoDisplay'";
-        precoAntigoOutput.style.fontSize = '30px';
-        precoAntigoOutput.style.margin = '6px 0 8px 0';
+          if (charsLeftOfComma >= 3) {
+            precoAntigoOutput.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
+            precoAntigoOutput.style.display = '';
+            precoAntigoOutput.style.position = 'relative';
+            precoAntigoOutput.style.top = '275px';
+            precoAntigoOutput.style.right = '0';
+            precoAntigoOutput.style.color = '#606060';
+            precoAntigoOutput.style.fontFamily = "'SugoDisplay'";
+            precoAntigoOutput.style.fontSize = '30px';
+            precoAntigoOutput.style.margin = '6px 0 8px 0';
 
-        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '260px';
-      } else {
-        precoAntigoOutput.innerHTML = `DE <br> <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>  POR:`;   
-        precoAntigoOutput.style.display = '';
-        precoAntigoOutput.style.position = 'relative';
-        precoAntigoOutput.style.top = '295px';
+            document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '260px';
+          } else {
+            precoAntigoOutput.innerHTML = `DE <br> <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>  POR:`;   
+            precoAntigoOutput.style.display = '';
+            precoAntigoOutput.style.position = 'relative';
+            precoAntigoOutput.style.top = '295px';
 
-        if (charsLeftOfComma === 1) {
-          precoAntigoOutput.style.right = '130px';
-        } else {
-          precoAntigoOutput.style.right = '150px';
+            if (charsLeftOfComma === 1) {
+              precoAntigoOutput.style.right = '130px';
+            } else {
+              precoAntigoOutput.style.right = '150px';
+            }
+
+            precoAntigoOutput.style.color = '';
+            precoAntigoOutput.style.fontFamily = '';
+            precoAntigoOutput.style.fontSize = '';
+            precoAntigoOutput.style.margin = '6px 0 8px 0';
+
+            document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '190px';
+          }
         }
-
-        precoAntigoOutput.style.color = '';
-        precoAntigoOutput.style.fontFamily = '';
-        precoAntigoOutput.style.fontSize = '';
-        precoAntigoOutput.style.margin = '6px 0 8px 0';
-
-        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '190px';
+      } else {
+        precoAntigoOutput.style.display = 'none';
+        document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
       }
-    }
-  } else {
-    precoAntigoOutput.style.display = 'none';
-    document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
-  }
-
 
       const parts = formatPtBrToParts(precoOfertaInput.value);
       reaisOutput.textContent = parts.reais || '';
       centavosOutput.textContent = parts.centavos || '';
+
+      if (!precoOfertaInput.value.trim()) {
+        rsOutput.style.display = 'none';
+      } else {
+        rsOutput.style.display = '';
+      }
 
       if ((parts.reais || '').length >= 3) {
         reaisOutput.style.fontSize = '220px';
@@ -671,16 +999,32 @@
       cadaOutput.textContent = cadaInput.value || '';
       ajustarCadaPosicaoEFonte();
 
-      rodapeOutput.textContent = rodapeInput.value || '';
+      if (dataInicialInput.value && dataFinalInput.value) {
+        const di = dataInicialInput.value.split('-');
+        const df = dataFinalInput.value.split('-');
+        const diaInicial = di[2];
+        const dataFinalFormatada = `${df[2]}/${df[1]}/${df[0]}`;
+        rodapeOutput.textContent = `OFERTA VÁLIDA DE ${diaInicial} À ${dataFinalFormatada} OU ENQUANTO DURAR O ESTOQUE`;
+      } else if (!dataInicialInput.value && dataFinalInput.value) {
+        const df = dataFinalInput.value.split('-');
+        const dataFinalFormatada = `${df[2]}/${df[1]}/${df[0]}`;
+        rodapeOutput.textContent = `OFERTA VÁLIDA ATÉ ${dataFinalFormatada} OU ENQUANTO DURAR O ESTOQUE`;
+      } else {
+        rodapeOutput.textContent = rodapeInput.value || '';
+      }
     }
 
     fontIncreaseBtn.addEventListener('click', () => {
+      if (idSuffix === '1') window.modificadoManualmente1 = true;
+      if (idSuffix === '2') window.modificadoManualmente2 = true;
       const style = window.getComputedStyle(descricaoOutput);
       const fontSize = parseFloat(style.fontSize);
       descricaoOutput.style.fontSize = Math.min(fontSize + 5, 120) + 'px';
     });
 
     fontDecreaseBtn.addEventListener('click', () => {
+      if (idSuffix === '1') window.modificadoManualmente1 = true;
+      if (idSuffix === '2') window.modificadoManualmente2 = true;
       const style = window.getComputedStyle(descricaoOutput);
       const fontSize = parseFloat(style.fontSize);
       descricaoOutput.style.fontSize = Math.max(fontSize - 5, 10) + 'px';
@@ -698,9 +1042,16 @@
       descricaoOutput.style.top = (top + 5) + 'px';
     });
 
-    descricaoInput.addEventListener('input', updatePreview);
+    descricaoInput.addEventListener('input', () => {
+      // Se o usuário apagar tudo ou redigitar, a automação volta a funcionar para recalcular
+      if (idSuffix === '1') window.modificadoManualmente1 = false;
+      if (idSuffix === '2') window.modificadoManualmente2 = false;
+      updatePreview();
+    });
     precoAntesInput.addEventListener('input', updatePreview);
     precoOfertaInput.addEventListener('input', updatePreview);
+    dataInicialInput.addEventListener('input', updatePreview);
+    dataFinalInput.addEventListener('input', updatePreview);
     cadaInput.addEventListener('input', updatePreview);
     rodapeInput.addEventListener('input', updatePreview);
 
@@ -711,24 +1062,27 @@
 
     return {
       container: document.getElementById('card' + idSuffix),
+      cartazCompleto: document.getElementById('cartaz' + idSuffix),
+      descricaoOutput,
       descricaoInput,
-      precoOfertaInput
+      precoOfertaInput,
+      dataInicialInput,
+      dataFinalInput,
+      precoAntesInput,
+      cadaInput
     };
   }
 
-  async function savePdfToLocalStorage(pdf, descricaoText, precoText) {
-    const pdfBlob = pdf.output('blob');
-    const base64 = await blobToBase64(pdfBlob);
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('pt-BR');
-    const timeStr = now.toLocaleTimeString('pt-BR');
-    const filename = sanitizeFileName(descricaoText + '-A4', 'pdf');
-
-    const saved = JSON.parse(localStorage.getItem('cartazesSalvos') || '[]');
-    saved.unshift({ filename, base64, descricaoText, precoText, dateStr, timeStr });
-    if (saved.length > 10) saved.pop();
-    localStorage.setItem('cartazesSalvos', JSON.stringify(saved));
-    loadSavedCartazes();
+  async function savePdfToLocalStorage(pdf, descricaoText, precoText, dataInicial = '', dataFinal = '', customFontSize = '', customTop = '', precoAntigoText = '', cadaText = '', comImagem = false) {
+  if (window.firebaseSaveHandler) {
+      let descricaoComCampanha = descricaoText;
+      if (window.opcaoCartazSelecionada) {
+        if (!descricaoText.toUpperCase().startsWith(`[${window.opcaoCartazSelecionada}]`)) {
+          descricaoComCampanha = `[${window.opcaoCartazSelecionada}] ${descricaoText}`;
+        }
+      }
+      await window.firebaseSaveHandler(pdf, descricaoComCampanha, precoText, dataInicial, dataFinal, customFontSize, customTop, precoAntigoText, cadaText, comImagem);
+    }
   }
 
   const loadingOverlay = document.getElementById('loading-overlay');
@@ -740,12 +1094,12 @@
     loadingOverlay.style.display = 'none';
   }
 
-  async function saveSingleCartazToList(container, descricaoInput, precoOfertaInput) {
+    async function saveSingleCartazToList(cartazObj) {
     showLoading();
     try {
       const { jsPDF } = window.jspdf;
 
-      const canvas = await html2canvas(container, { scale: 8, useCORS: true, backgroundColor: null });
+      const canvas = await html2canvas(cartazObj.container, { scale: 8, useCORS: true, backgroundColor: null });
 
       const pdf = new jsPDF({
         unit: 'mm',
@@ -754,72 +1108,145 @@
       });
 
       const imgData = canvas.toDataURL('image/png');
-      
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      const imgProps = {  
-        width: canvas.width,
-        height: canvas.height
-      };
-      const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
-
-      const imgWidth = imgProps.width * ratio;
-      const imgHeight = imgProps.height * ratio;
+      const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+      const imgWidth = canvas.width * ratio;
+      const imgHeight = canvas.height * ratio;
       
       const marginX = (pdfWidth - imgWidth) / 2;
       const marginY = (pdfHeight - imgHeight) / 2 - 5;
 
       pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
 
-      await savePdfToLocalStorage(pdf, descricaoInput.value || '', precoOfertaInput.value || '');
+      const currentFontSize = window.getComputedStyle(cartazObj.descricaoOutput).fontSize;
+      const currentTop = window.getComputedStyle(cartazObj.descricaoOutput).top;
+
+      // AQUI ESTÁ O TRECHO COMPLETO COM FALSE (SEM IMAGEM)
+      await savePdfToLocalStorage(
+        pdf, 
+        cartazObj.descricaoInput.value || '', 
+        cartazObj.precoOfertaInput.value || '', 
+        cartazObj.dataInicialInput.value || '', 
+        cartazObj.dataFinalInput.value || '',
+        currentFontSize,
+        currentTop,
+        cartazObj.precoAntesInput.value || '',
+        cartazObj.cadaInput.value || '',
+        false
+      );
       alert('Cartaz salvo com sucesso!');
     } finally {
       hideLoading();
     }
   }
 
-  async function saveCombinedCartazToList(container1, container2, descricaoInput1, precoOfertaInput1, descricaoInput2, precoOfertaInput2) {
+    async function saveSingleCartazWithImageToList(cartazObj) {
     showLoading();
     try {
       const { jsPDF } = window.jspdf;
 
-      const canvas1 = await html2canvas(container1, { scale: 4, useCORS: true, backgroundColor: null });
-
-      const canvas2 = await html2canvas(container2, { scale: 4, useCORS: true, backgroundColor: null });
+      const canvas = await html2canvas(cartazObj.cartazCompleto, { scale: 8, useCORS: true });
 
       const pdf = new jsPDF({
         unit: 'mm',
         format: 'a4',
-        orientation: 'landscape',
         compress: true
       });
 
+      const imgData = canvas.toDataURL('image/png');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      const margin = 10;
-      const maxHeight = pdfHeight - 2 * margin;
-      const halfWidth = (pdfWidth - 3 * margin) / 2;
+      // Preenchimento total da folha A4
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-      function calcSize(canvas) {
-        const ratio = Math.min(halfWidth / canvas.width, maxHeight / canvas.height);
-        return { w: canvas.width * ratio, h: canvas.height * ratio };
-      }
-      const size1 = calcSize(canvas1);
-      const size2 = calcSize(canvas2);
-      const yOffset = margin + (maxHeight - Math.max(size1.h, size2.h)) / 2;
+      const currentFontSize = window.getComputedStyle(cartazObj.descricaoOutput).fontSize;
+      const currentTop = window.getComputedStyle(cartazObj.descricaoOutput).top;
 
-      pdf.addImage(canvas1.toDataURL('image/png'), 'PNG', margin, yOffset, size1.w, size1.h);
-      const cartaz2X = pdfWidth - margin - size2.w + 5;
-      pdf.addImage(canvas2.toDataURL('image/png'), 'PNG', cartaz2X, yOffset, size2.w, size2.h);
-
+      // AQUI ESTÁ O TRECHO COMPLETO COM TRUE (COM IMAGEM)
       await savePdfToLocalStorage(
-        pdf,
-        `${descricaoInput1.value || ''} + ${descricaoInput2.value || ''}`,
-        `${precoOfertaInput1.value || ''} + ${precoOfertaInput2.value || ''}`
+        pdf, 
+        cartazObj.descricaoInput.value || '', 
+        cartazObj.precoOfertaInput.value || '', 
+        cartazObj.dataInicialInput.value || '', 
+        cartazObj.dataFinalInput.value || '',
+        currentFontSize,
+        currentTop,
+        cartazObj.precoAntesInput.value || '',
+        cartazObj.cadaInput.value || '',
+        true
       );
-      alert('PDF combinado salvo com sucesso! Você pode baixar pelo link na lista de cartazes salvos.');
+      alert('Cartaz com imagem salvo com sucesso!');
+    } finally {
+      hideLoading();
+    }
+  }
+
+  // Função para salvar todos os cartazes preenchidos de uma só vez (Sem Imagem)
+  async function salvarTodosCartazesPreenchidos() {
+    const cartazesParaSalvar = [];
+    
+    if (cartaz1.precoOfertaInput.value.trim()) {
+      cartazesParaSalvar.push({ obj: cartaz1, nome: "Cartaz 1" });
+    }
+    if (cartaz2.precoOfertaInput.value.trim()) {
+      cartazesParaSalvar.push({ obj: cartaz2, nome: "Cartaz 2" });
+    }
+
+    if (cartazesParaSalvar.length === 0) {
+      alert("Nenhum cartaz possui preço de oferta preenchido para ser salvo.");
+      return;
+    }
+
+    showLoading();
+    try {
+      const { jsPDF } = window.jspdf;
+
+      for (const item of cartazesParaSalvar) {
+        const cartazObj = item.obj;
+        const canvas = await html2canvas(cartazObj.container, { scale: 8, useCORS: true, backgroundColor: null });
+
+        const pdf = new jsPDF({
+          unit: 'mm',
+          format: 'a4',
+          compress: true
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+        const imgWidth = canvas.width * ratio;
+        const imgHeight = canvas.height * ratio;
+        
+        const marginX = (pdfWidth - imgWidth) / 2;
+        const marginY = (pdfHeight - imgHeight) / 2 - 5;
+
+        pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+
+        const currentFontSize = window.getComputedStyle(cartazObj.descricaoOutput).fontSize;
+        const currentTop = window.getComputedStyle(cartazObj.descricaoOutput).top;
+
+        await savePdfToLocalStorage(
+          pdf, 
+          cartazObj.descricaoInput.value || '', 
+          cartazObj.precoOfertaInput.value || '', 
+          cartazObj.dataInicialInput.value || '', 
+          cartazObj.dataFinalInput.value || '',
+          currentFontSize,
+          currentTop,
+          cartazObj.precoAntesInput.value || '',
+          cartazObj.cadaInput.value || '',
+          false
+        );
+      }
+      alert(`${cartazesParaSalvar.length} cartaz(es) salvo(s) com sucesso!`);
+    } catch (erro) {
+      console.error("Erro ao salvar todos os cartazes:", erro);
+      alert("Ocorreu um erro ao salvar todos os cartazes.");
     } finally {
       hideLoading();
     }
@@ -829,27 +1256,24 @@
   const cartaz2 = setupCartaz('2');
 
   document.getElementById('save-cartaz1').addEventListener('click', async () => {
-    await saveSingleCartazToList(cartaz1.container, cartaz1.descricaoInput, cartaz1.precoOfertaInput);
+    await saveSingleCartazToList(cartaz1);
+  });
+
+  document.getElementById('save-image-cartaz1').addEventListener('click', async () => {
+    await saveSingleCartazWithImageToList(cartaz1);
   });
 
   document.getElementById('save-cartaz2').addEventListener('click', async () => {
-    await saveSingleCartazToList(cartaz2.container, cartaz2.descricaoInput, cartaz2.precoOfertaInput);
+    await saveSingleCartazToList(cartaz2);
   });
 
-  document.getElementById('save-both-combined').addEventListener('click', async () => {
-    await saveCombinedCartazToList(
-      cartaz1.container,
-      cartaz2.container,
-      cartaz1.descricaoInput,
-      cartaz1.precoOfertaInput,
-      cartaz2.descricaoInput,
-      cartaz2.precoOfertaInput
-    );
+  document.getElementById('save-image-cartaz2').addEventListener('click', async () => {
+    await saveSingleCartazWithImageToList(cartaz2);
   });
 
-  // Ensure loading overlay is hidden on page load
   window.addEventListener('load', () => {
     loadingOverlay.style.display = 'none';
+    carregarBancoProdutosTxt();
   });
 
   document.fonts && document.fonts.ready.then(() => {
@@ -857,6 +1281,119 @@
   }).catch(() => {
     loadSavedCartazes();
   });
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+  import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCmOhTHgMHh57whOPojvzNgtBlgMH9JS3I",
+    authDomain: "placa-de-ofertas.firebaseapp.com",
+    databaseURL: "https://placa-de-ofertas-default-rtdb.firebaseio.com",
+    projectId: "placa-de-ofertas",
+    storageBucket: "placa-de-ofertas.firebasestorage.app",
+    messagingSenderId: "434607179238",
+    appId: "1:434607179238:web:761b336dd551fa4ac4c227",
+    measurementId: "G-EH5X5YTTXB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getDatabase(app);
+  
+  let currentOnValueUnsubscribe = null;
+
+  function formatPathName(name) {
+    if (!name) return 'geral';
+    return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '_');
+  }
+
+  window.initFirebaseWithCategory = function(categoryName) {
+    if (currentOnValueUnsubscribe) {
+      // Remove o listener anterior para evitar duplicidade de escuta
+      currentOnValueUnsubscribe();
+    }
+
+    const categoryPath = formatPathName(categoryName);
+    const cartazesRef = ref(db, 'cartazes/' + categoryPath);
+
+    window.firebaseSaveHandler = async function(pdf, descricaoText, precoText, dataInicial = '', dataFinal = '', customFontSize = '', customTop = '', precoAntigoText = '', cadaText = '') {
+      const pdfBlob = pdf.output('blob');
+      const base64 = await blobToBase64(pdfBlob);
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('pt-BR');
+      const timeStr = now.toLocaleTimeString('pt-BR');
+      const filename = sanitizeFileName(descricaoText + '-A4', 'pdf');
+
+      await push(cartazesRef, {
+        filename,
+        base64,
+        descricaoText,
+        precoText,
+        dataInicial,
+        dataFinal,
+        customFontSize, 
+        customTop,      
+        precoAntigoText,
+        cadaText,
+        dateStr,
+        timeStr,
+        timestamp: now.getTime()
+      });
+    };
+
+    const unsubscribe = onValue(cartazesRef, (snapshot) => {
+      const pdfList = document.getElementById('pdf-list');
+      pdfList.innerHTML = '';
+
+      if (!snapshot.exists()) {
+        pdfList.innerHTML = '<li>Nenhum cartaz salvo nesta categoria.</li>';
+        return;
+      }
+
+      const data = snapshot.val();
+      const saved = Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      })).sort((a, b) => b.timestamp - a.timestamp);
+
+      saved.forEach(({ id, base64, descricaoText, precoText, dateStr, timeStr }) => {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.flexDirection = 'column';
+        li.style.gap = '4px';
+
+        const descricaoLink = document.createElement('a');
+        descricaoLink.href = base64ToBlobUrl(base64);
+        descricaoLink.target = '_blank';
+        descricaoLink.textContent = `Criado em: ${dateStr} ${timeStr} | Descrição: ${descricaoText.toUpperCase()} | Preço: R$ ${precoText}`;
+        descricaoLink.classList.add('descricao-link');
+        descricaoLink.style.textDecoration = 'none';
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '❌';
+        delBtn.style.marginLeft = '0';
+        delBtn.style.cursor = 'pointer';
+        delBtn.title = 'Remover cartaz salvo';
+        delBtn.addEventListener('click', async () => {
+          const itemRef = ref(db, `cartazes/${categoryPath}/${id}`);
+          await remove(itemRef);
+        });
+
+        li.appendChild(descricaoLink);
+        li.appendChild(delBtn);
+
+        pdfList.appendChild(li);
+      }); 
+    });
+
+    currentOnValueUnsubscribe = unsubscribe;
+  };
+
+  // Inicializa a escuta padrão do Firebase com 'geral' antes de selecionarem o popup
+  window.initFirebaseWithCategory('');
 </script>
 </body>
 </html>
