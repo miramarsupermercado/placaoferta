@@ -1286,7 +1286,7 @@ if (window.initFirebaseWithCategory) {
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-  import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCmOhTHgMHh57whOPojvzNgtBlgMH9JS3I",
@@ -1305,6 +1305,36 @@ if (window.initFirebaseWithCategory) {
   
   let currentOnValueUnsubscribe = null;
 
+  // --- LÓGICA PARA CAPTURAR IP E LOCALIZAÇÃO ---
+  window.dadosConexao = { ip: "Buscando...", localizacao: "Buscando..." };
+  async function obterIpELocalizacao() {
+    try {
+      const resposta = await fetch('https://ipapi.co/json/');
+      const dados = await resposta.json();
+      window.dadosConexao = {
+        ip: dados.ip || "Não identificado",
+        localizacao: dados.city && dados.region_code ? `${dados.city} - ${dados.region_code}` : "Desconhecida"
+      };
+    } catch (erro) {
+      console.error("Erro ao buscar geolocalização do IP:", erro);
+      window.dadosConexao = { ip: "IP Indisponível", localizacao: "Erro na consulta" };
+    }
+  }
+  obterIpELocalizacao();
+
+  // --- LÓGICA DO F5 REMOTO ---
+  const reloadRef = ref(db, 'admin/trigger_reload');
+  let primeiroCarregamento = true;
+  onValue(reloadRef, (snapshot) => {
+    if (primeiroCarregamento) {
+      primeiroCarregamento = false;
+      return;
+    }
+    if (snapshot.exists()) {
+      window.location.reload(true); // Executa o F5 forçado na página
+    }
+  });
+
   function formatPathName(name) {
     if (!name) return 'geral';
     return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '_');
@@ -1312,14 +1342,13 @@ if (window.initFirebaseWithCategory) {
 
   window.initFirebaseWithCategory = function(categoryName) {
     if (currentOnValueUnsubscribe) {
-      // Remove o listener anterior para evitar duplicidade de escuta
       currentOnValueUnsubscribe();
     }
 
     const categoryPath = formatPathName(categoryName);
     const cartazesRef = ref(db, 'cartazes/' + categoryPath);
 
-    window.firebaseSaveHandler = async function(pdf, descricaoText, precoText, dataInicial = '', dataFinal = '', customFontSize = '', customTop = '', precoAntigoText = '', cadaText = '') {
+    window.firebaseSaveHandler = async function(pdf, descricaoText, precoText, dataInicial = '', dataFinal = '', customFontSize = '', customTop = '', precoAntigoText = '', cadaText = '', comImagem = false) {
       const pdfBlob = pdf.output('blob');
       const base64 = await blobToBase64(pdfBlob);
       const now = new Date();
@@ -1327,6 +1356,7 @@ if (window.initFirebaseWithCategory) {
       const timeStr = now.toLocaleTimeString('pt-BR');
       const filename = sanitizeFileName(descricaoText + '-A4', 'pdf');
 
+      // Gravando o cartaz incluindo os dados de IP e Localização gerados no acesso
       await push(cartazesRef, {
         filename,
         base64,
@@ -1340,7 +1370,9 @@ if (window.initFirebaseWithCategory) {
         cadaText,
         dateStr,
         timeStr,
-        timestamp: now.getTime()
+        timestamp: now.getTime(),
+        salvoPorIp: window.dadosConexao.ip,
+        salvoNaLocalizacao: window.dadosConexao.localizacao
       });
     };
 
@@ -1392,7 +1424,6 @@ if (window.initFirebaseWithCategory) {
     currentOnValueUnsubscribe = unsubscribe;
   };
 
-  // Inicializa a escuta padrão do Firebase com 'geral' antes de selecionarem o popup
   window.initFirebaseWithCategory('');
 </script>
 </body>
