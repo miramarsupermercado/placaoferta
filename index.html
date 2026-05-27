@@ -479,10 +479,55 @@
     #btn-salvar-todos-congelado:hover {
       background: #d35400;
     }
+
+    /* Estilo do Botão Adicionar Mais Cartazes */
+    #btn-add-cartaz {
+      position: fixed;
+      bottom: 60px;
+      right: 10px;
+      z-index: 10002;
+      background: #27ae60;
+      color: white;
+      border: 2px solid white;
+      border-radius: 50px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-family: 'Oswald', sans-serif;
+      font-size: 24px;
+      height: 45px;
+      width: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    #btn-add-cartaz:hover {
+      width: 220px;
+      background: #2ecc71;
+    }
+    #btn-add-cartaz .texto {
+      display: inline-block;
+      font-size: 16px;
+      max-width: 0;
+      opacity: 0;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      font-weight: bold;
+    }
+    #btn-add-cartaz:hover .texto {
+      max-width: 150px;
+      opacity: 1;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
 
+  <button type="button" id="btn-add-cartaz" onclick="iniciarAdicaoCartaz()">
+    <span>+</span><span class="texto"> CRIAR OUTRA PLACA</span>
+  </button>
   <button type="button" id="btn-salvar-todos-congelado" onclick="salvarTodosCartazesPreenchidos()">💾 Salvar Todos os Cartazes</button>
 
   <button type="button" id="menu-lateral-toggle" onclick="toggleMenuLateral()" title="Menu">
@@ -590,7 +635,7 @@
         </div>
         <div class="row">
           <div class="field half">
-            <label>UND / CADA</label>
+            <label>UND / KG</label>
             <input id="cada1" type="text" maxlength="7" placeholder="" />
           </div>
           <div class="field half">
@@ -678,6 +723,11 @@
   </div>
 
 <script>
+  // Variáveis Globais de Controle de Cartazes Adicionais
+  window.contadorCartazes = 2;
+  window.cartazesAtivos = [];
+  let addingNewPoster = false;
+
   // Função para controlar a abertura/fechamento do menu lateral
   function toggleMenuLateral() {
     const container = document.getElementById('menu-lateral-container');
@@ -778,36 +828,187 @@
     }
   });
 
+  function iniciarAdicaoCartaz() {
+    addingNewPoster = true;
+    document.getElementById('popup-overlay').style.display = 'flex';
+  }
+
   function selecionarOpcaoCartaz(opcao) {
     window.opcaoCartazSelecionada = scheme => opcao; // Mantém compatibilidade com escopos
     window.opcaoCartazSelecionada = opcao;
     document.getElementById('popup-overlay').style.display = 'none';
-    document.getElementById('label-campanha-1').textContent = `(${opcao})`;
-    document.getElementById('label-campanha-2').textContent = `(${opcao})`;
+
+    // Update labels de todos os cartazes gerados até o momento
+    for (let i = 1; i <= window.contadorCartazes; i++) {
+        const labelEl = document.getElementById('label-campanha-' + i);
+        if (labelEl) labelEl.textContent = `(${opcao})`;
+    }
+    
     document.getElementById('current-category-label').textContent = opcao;
     
+    if (addingNewPoster) {
+      gerarNovoCartaz();
+      addingNewPoster = false;
+    }
+
     // Altera a imagem de fundo caso seja PREÇO AVULSO
     const cartazes = document.querySelectorAll('.cartaz');
 
-// Define a imagem baseada na opção escolhida
-if (opcao === 'PREÇO AVULSO') {
-    cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')");
-} else if (opcao === 'OFERTAS APP') {
-    cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz-app.png')");
-} else {
-    // Caso contrário, aplica o fundo padrão
-    cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz.png')");
-}
+    // Define a imagem baseada na opção escolhida
+    if (opcao === 'PREÇO AVULSO') {
+        cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')");
+    } else if (opcao === 'OFERTAS APP') {
+        cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz-app.png')");
+    } else {
+        // Caso contrário, aplica o fundo padrão
+        cartazes.forEach(c => c.style.backgroundImage = "url('fundo-cartaz.png')");
+    }
 
-// Exibe o botão de salvar todos no canto inferior direito após a escolha do cartaz
-const btnSalvar = document.getElementById('btn-salvar-todos-congelado');
-if (btnSalvar) {
-    btnSalvar.style.display = 'block';
-}
+    // Exibe o botão de salvar todos no canto inferior direito após a escolha do cartaz
+    const btnSalvar = document.getElementById('btn-salvar-todos-congelado');
+    if (btnSalvar) {
+        btnSalvar.style.display = 'block';
+    }
 
-if (window.initFirebaseWithCategory) {
-    window.initFirebaseWithCategory(opcao);
-}
+    if (window.initFirebaseWithCategory) {
+        window.initFirebaseWithCategory(opcao);
+    }
+  }
+
+  function gerarNovoCartaz() {
+    window.contadorCartazes++;
+    const id = window.contadorCartazes;
+
+    const previewsContainer = document.querySelector('.wrap > div:nth-child(1)');
+    const editorsContainer = document.querySelector('.wrap > div:nth-child(2)');
+
+    const previewHTML = `
+      <div class="preview" aria-hidden="false">
+        <div class="cartaz" id="cartaz${id}">
+          <div class="card" id="card${id}">
+            <div class="descricao" id="descricao-output${id}"></div>
+            <div class="preco-antigo" id="preco-antigo-output${id}"></div>
+            <div class="preco-area">
+              <div class="rs" id="rs-output${id}">R$</div>
+              <div class="big-value" id="reais-output${id}"></div>
+              <div class="centavos" id="centavos-output${id}"></div>
+              <div class="cada" id="cada-output${id}"></div>
+            </div>
+            <div class="rodape" id="rodape-output${id}"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    previewsContainer.insertAdjacentHTML('beforeend', previewHTML);
+
+    const editorHTML = `
+      <div class="barcode-search-area" style="margin-top: -280px;">
+        <h3>🔍 Consultar Código de Barras (Cartaz ${id})</h3>
+        <div class="field">
+          <input id="barcode-input${id}" type="text" placeholder="Digite ou passe o leitor para o Cartaz ${id}..." />
+          <div id="barcode-status${id}" class="small" style="color: gray; font-weight: bold; margin-top: 4px;">Aguardando digitação ou leitura...</div>
+        </div>
+      </div>
+
+      <div class="editor-area" role="region" aria-label="Editor Cartaz ${id}" style="margin-bottom: 20px;">
+        <h3>Editor do Cartaz ${id} <span id="label-campanha-${id}" style="color:var(--orange); font-size:12px; margin-left:5px;">(${window.opcaoCartazSelecionada})</span></h3>
+        <div class="field">
+          <label>Descrição</label>
+          <input id="descricao${id}" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL OU DESNATADO 1L" maxlength="60" />
+        </div>
+        <div class="field" style="display:flex; gap:8px; margin-bottom:10px;">
+          <button id="font-increase${id}" type="button">+ A</button>
+          <button id="font-decrease${id}" type="button">- A</button>
+          <button id="move-up${id}" type="button">▲</button>
+          <button id="move-down${id}" type="button">▼</button>
+        </div>
+        <div class="row">
+          <div class="field half">
+            <label>Preço ANTES</label>
+            <input id="preco-antigo${id}" type="text" placeholder="" />
+          </div>
+          <div class="field half">
+            <label>Preço OFERTA</label>
+            <input id="preco-oferta${id}" type="text" placeholder="" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field half">
+            <label>Data Inicial</label>
+            <input id="data-inicial${id}" type="date" />
+          </div>
+          <div class="field half">
+            <label>Data Final</label>
+            <input id="data-final${id}" type="date" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field half">
+            <label>UND / CADA</label>
+            <input id="cada${id}" type="text" maxlength="7" placeholder="" value="" />
+          </div>
+          <div class="field half">
+            <label>Observação</label>
+            <input id="rodape${id}" type="text" placeholder="Oferta válida até DD/MM/AAAA..." value="" />
+          </div>
+        </div>
+        <div style="margin-top: 10px; display: flex; gap: 8px;">
+          <button id="save-cartaz${id}" style="flex: 1; background:#4a90e2;">💾 Salvar Cartaz ${id}</button>
+          <button id="save-image-cartaz${id}" style="flex: 1; background:#2ecc71;">🖼️ Salvar com Imagem</button>
+        </div>
+      </div>
+    `;
+
+    const divSmallEnd = editorsContainer.querySelector('div.small[style="margin-top:20px"]');
+    if(divSmallEnd) {
+        divSmallEnd.insertAdjacentHTML('beforebegin', editorHTML);
+    } else {
+        editorsContainer.insertAdjacentHTML('beforeend', editorHTML);
+    }
+
+    const novoElementoCartaz = document.getElementById('cartaz' + id);
+    if (window.opcaoCartazSelecionada === 'PREÇO AVULSO') {
+        novoElementoCartaz.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')";
+    } else if (window.opcaoCartazSelecionada === 'OFERTAS APP') {
+        novoElementoCartaz.style.backgroundImage = "url('fundo-cartaz-app.png')";
+    } else {
+        novoElementoCartaz.style.backgroundImage = "url('fundo-cartaz.png')";
+    }
+
+    const novoCartaz = setupCartaz(id.toString());
+    window.cartazesAtivos.push(novoCartaz);
+
+    document.getElementById('save-cartaz' + id).addEventListener('click', async () => {
+        await saveSingleCartazToList(novoCartaz);
+    });
+    document.getElementById('save-image-cartaz' + id).addEventListener('click', async () => {
+        await saveSingleCartazWithImageToList(novoCartaz);
+    });
+
+    document.getElementById('barcode-input' + id).addEventListener('input', function(e) {
+        const eanDigitado = e.target.value.trim();
+        if (window.bancoProdutosEan && window.bancoProdutosEan[eanDigitado]) {
+            const produtoEncontrado = window.bancoProdutosEan[eanDigitado];
+            const desc = document.getElementById('descricao' + id);
+            desc.value = produtoEncontrado;
+            desc.dispatchEvent(new Event('input'));
+            document.getElementById('barcode-status' + id).textContent = `Produto encontrado: ${produtoEncontrado}`;
+            document.getElementById('barcode-status' + id).style.color = 'green';
+        } else if (eanDigitado.length > 0) {
+            document.getElementById('barcode-status' + id).textContent = 'Código não cadastrado no arquivo.';
+            document.getElementById('barcode-status' + id).style.color = '#ff8a1c';
+        } else {
+            document.getElementById('barcode-status' + id).textContent = 'Aguardando digitação ou leitura...';
+            document.getElementById('barcode-status' + id).style.color = 'gray';
+        }
+    });
+
+    setTimeout(() => {
+        const editorArea = document.getElementById('descricao' + id);
+        if (editorArea) {
+            editorArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 100);
   }
 
   function sanitizeFileName(name, ext = 'pdf') {
@@ -1042,6 +1243,11 @@ if (window.initFirebaseWithCategory) {
       descricaoOutput.style.top = (top + 5) + 'px';
     });
 
+    dataFinalInput.addEventListener('input', () => {
+        rodapeInput.disabled = !!dataFinalInput.value;
+        updatePreview();
+    });
+
     descricaoInput.addEventListener('input', () => {
       // Se o usuário apagar tudo ou redigitar, a automação volta a funcionar para recalcular
       if (idSuffix === '1') window.modificadoManualmente1 = false;
@@ -1051,13 +1257,13 @@ if (window.initFirebaseWithCategory) {
     precoAntesInput.addEventListener('input', updatePreview);
     precoOfertaInput.addEventListener('input', updatePreview);
     dataInicialInput.addEventListener('input', updatePreview);
-    dataFinalInput.addEventListener('input', updatePreview);
     cadaInput.addEventListener('input', updatePreview);
     rodapeInput.addEventListener('input', updatePreview);
 
     descricaoInput.value = descricaoOutput.textContent;
     precoAntesInput.value = '';
     precoOfertaInput.value = '';
+    rodapeInput.disabled = !!dataFinalInput.value;
     updatePreview();
 
     return {
@@ -1188,12 +1394,11 @@ if (window.initFirebaseWithCategory) {
   async function salvarTodosCartazesPreenchidos() {
     const cartazesParaSalvar = [];
     
-    if (cartaz1.precoOfertaInput.value.trim()) {
-      cartazesParaSalvar.push({ obj: cartaz1, nome: "Cartaz 1" });
-    }
-    if (cartaz2.precoOfertaInput.value.trim()) {
-      cartazesParaSalvar.push({ obj: cartaz2, nome: "Cartaz 2" });
-    }
+    window.cartazesAtivos.forEach((cartazObj, idx) => {
+        if (cartazObj.precoOfertaInput.value.trim()) {
+            cartazesParaSalvar.push({ obj: cartazObj, nome: "Cartaz " + (idx + 1) });
+        }
+    });
 
     if (cartazesParaSalvar.length === 0) {
       alert("Nenhum cartaz possui preço de oferta preenchido para ser salvo.");
@@ -1254,6 +1459,7 @@ if (window.initFirebaseWithCategory) {
 
   const cartaz1 = setupCartaz('1');
   const cartaz2 = setupCartaz('2');
+  window.cartazesAtivos = [cartaz1, cartaz2];
 
   document.getElementById('save-cartaz1').addEventListener('click', async () => {
     await saveSingleCartazToList(cartaz1);
@@ -1286,8 +1492,7 @@ if (window.initFirebaseWithCategory) {
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-  import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+import { getDatabase, ref, push, onValue, remove, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   const firebaseConfig = {
     apiKey: "AIzaSyCmOhTHgMHh57whOPojvzNgtBlgMH9JS3I",
     authDomain: "placa-de-ofertas.firebaseapp.com",
@@ -1299,41 +1504,12 @@ if (window.initFirebaseWithCategory) {
     measurementId: "G-EH5X5YTTXB"
   };
 
+
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const db = getDatabase(app);
   
   let currentOnValueUnsubscribe = null;
-
-  // --- LÓGICA PARA CAPTURAR IP E LOCALIZAÇÃO ---
-  window.dadosConexao = { ip: "Buscando...", localizacao: "Buscando..." };
-  async function obterIpELocalizacao() {
-    try {
-      const resposta = await fetch('https://ipapi.co/json/');
-      const dados = await resposta.json();
-      window.dadosConexao = {
-        ip: dados.ip || "Não identificado",
-        localizacao: dados.city && dados.region_code ? `${dados.city} - ${dados.region_code}` : "Desconhecida"
-      };
-    } catch (erro) {
-      console.error("Erro ao buscar geolocalização do IP:", erro);
-      window.dadosConexao = { ip: "IP Indisponível", localizacao: "Erro na consulta" };
-    }
-  }
-  obterIpELocalizacao();
-
-  // --- LÓGICA DO F5 REMOTO ---
-  const reloadRef = ref(db, 'admin/trigger_reload');
-  let primeiroCarregamento = true;
-  onValue(reloadRef, (snapshot) => {
-    if (primeiroCarregamento) {
-      primeiroCarregamento = false;
-      return;
-    }
-    if (snapshot.exists()) {
-      window.location.reload(true); // Executa o F5 forçado na página
-    }
-  });
 
   function formatPathName(name) {
     if (!name) return 'geral';
@@ -1342,6 +1518,7 @@ if (window.initFirebaseWithCategory) {
 
   window.initFirebaseWithCategory = function(categoryName) {
     if (currentOnValueUnsubscribe) {
+      // Remove o listener anterior para evitar duplicidade de escuta
       currentOnValueUnsubscribe();
     }
 
@@ -1356,7 +1533,6 @@ if (window.initFirebaseWithCategory) {
       const timeStr = now.toLocaleTimeString('pt-BR');
       const filename = sanitizeFileName(descricaoText + '-A4', 'pdf');
 
-      // Gravando o cartaz incluindo os dados de IP e Localização gerados no acesso
       await push(cartazesRef, {
         filename,
         base64,
@@ -1370,9 +1546,7 @@ if (window.initFirebaseWithCategory) {
         cadaText,
         dateStr,
         timeStr,
-        timestamp: now.getTime(),
-        salvoPorIp: window.dadosConexao.ip,
-        salvoNaLocalizacao: window.dadosConexao.localizacao
+        timestamp: now.getTime()
       });
     };
 
@@ -1424,7 +1598,44 @@ if (window.initFirebaseWithCategory) {
     currentOnValueUnsubscribe = unsubscribe;
   };
 
+  // Inicializa a escuta padrão do Firebase com 'geral' antes de selecionarem o popup
   window.initFirebaseWithCategory('');
+
+  // Rastreamento de IP e Comando de Atualização
+  fetch('https://api.ipify.org?format=json')
+    .then(r => r.json())
+    .then(data => {
+      const ipSafe = data.ip.replace(/\./g, '_');
+      const userRef = ref(db, 'acessos/' + ipSafe);
+      set(userRef, { lastSeen: Date.now() });
+      onDisconnect(userRef).remove();
+    });
+
+  onValue(ref(db, 'comando_atualizar'), (snapshot) => {
+    if (snapshot.val() === true) {
+      // Reseta o comando no banco de dados imediatamente antes de recarregar
+      set(ref(db, 'comando_atualizar'), false);
+      window.location.reload();
+    }
+  });
+
+  // Registrar acesso com localização
+  async function registrarAcesso() {
+    try {
+      const resp = await fetch('https://ipapi.co/json/');
+      const data = await resp.json();
+      const ipSafe = data.ip.replace(/\./g, '_');
+      const localRef = ref(db, 'acessos/' + ipSafe);
+      set(localRef, {
+        cidade: data.city || 'Desconhecido',
+        estado: data.region || 'Desconhecido',
+        timestamp: Date.now()
+      });
+    } catch (e) {
+      console.log("Erro ao obter localização");
+    }
+  }
+  registrarAcesso();
 </script>
 </body>
 </html>
