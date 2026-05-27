@@ -1099,7 +1099,7 @@ if (window.initFirebaseWithCategory) {
     try {
       const { jsPDF } = window.jspdf;
 
-      const canvas = await html2canvas(cartazObj.container, { scale: 8, useCORS: true, backgroundColor: null });
+      const canvas = await html2canvas(cartazObj.container, { scale: 3, useCORS: true, backgroundColor: null });
 
       const pdf = new jsPDF({
         unit: 'mm',
@@ -1147,7 +1147,7 @@ if (window.initFirebaseWithCategory) {
     try {
       const { jsPDF } = window.jspdf;
 
-      const canvas = await html2canvas(cartazObj.cartazCompleto, { scale: 8, useCORS: true });
+      const canvas = await html2canvas(cartazObj.cartazCompleto, { scale: 3, useCORS: true });
 
       const pdf = new jsPDF({
         unit: 'mm',
@@ -1206,7 +1206,7 @@ if (window.initFirebaseWithCategory) {
 
       for (const item of cartazesParaSalvar) {
         const cartazObj = item.obj;
-        const canvas = await html2canvas(cartazObj.container, { scale: 8, useCORS: true, backgroundColor: null });
+        const canvas = await html2canvas(cartazObj.container, { scale: 3, useCORS: true, backgroundColor: null });
 
         const pdf = new jsPDF({
           unit: 'mm',
