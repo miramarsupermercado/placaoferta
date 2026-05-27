@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alterar Datas dos Cartazes</title>
+  <link rel="icon" href="https://miramarsupermercado.com.br/wp-content/uploads/2024/10/cropped-icone.png" type="image/png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+  <style>
+    :root{
+      --blue:#213966;
+      --orange:#ff8a1c;
+      --card-bg:#ffffff;
+      --text:#222;
+    }
+    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f1f3f6;}
+    
+    .container-geral {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    h2 {
+      color: var(--blue);
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-voltar {
+      display: inline-block;
+      padding: 10px 15px;
+      background: #6c757d;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    /* Painel de Controle Superior (Inputs acima da tabela) */
+    .painel-controle {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .field-data {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 14px;
+      color: #444;
+    }
+
+    input[type=date], .input-filtro {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      width: 160px;
+    }
+
+    .btn-salvar-lote {
+      padding: 10px 24px;
+      border-radius: 6px;
+      border: none;
+      background: #63c483;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      height: 39px;
+    }
+
+    .btn-salvar-lote:hover {
+      background: #185a2e;
+    }
+
+    /* Estilização da Tabela Formato Tabulado */
+    .tabela-container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    th {
+      background-color: var(--blue);
+      color: white;
+      padding: 6px 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+
+    th.sortable:hover {
+      background-color: #2b4982;
+    }
+
+    td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #eee;
+      color: #333;
+      vertical-align: middle;
+    }
+
+    tr:hover {
+      background-color: #f9fbfd;
+    }
+
+    .col-checkbox { text-align: center; width: 60px; }
+    .col-checkbox input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
+    .col-descricao { font-weight: bold; }
+    .col-tipo { font-weight: bold; text-transform: uppercase; }
+    .col-vigencia { color: #151515; font-weight: bold; font-size: 12px; }
+    .col-preco { font-weight: bold; color: var(--blue); }
+    .col-salvo { color: #666; font-size: 11px; }
+    .col-acoes { text-align: center; width: 280px; white-space: nowrap; }
+
+    .btn-visualizar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      background-color: #4a90e2;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 13px;
+      transition: background-color 0.2s;
+      margin-right: 4px;
+    }
+
+    .btn-visualizar:hover {
+      background-color: #357abd;
+    }
+
+    .btn-editar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      background-color: #f39c12;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 13px;
+      transition: background-color 0.2s;
+      margin-right: 4px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Oswald', sans-serif;
+    }
+
+    .btn-editar:hover {
+      background-color: #d35400;
+    }
+
+    .btn-excluir {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      background-color: #c0392b;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 13px;
+      transition: background-color 0.2s;
+      border: none;
+      cursor: pointer;
+      font-family: 'Oswald', sans-serif;
+    }
+
+    .btn-excluir:hover {
+      background-color: #962d22;
+    }
+
+    #lista-vazia {
+      background: #fff;
+      padding: 30px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      font-size: 18px;
+      color: #666;
+    }
+
+    /* Área Oculta Técnica de Renderização */
+    #render-box {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+    }
+
+    .cartaz{
+      width:420px;
+      height:594px;
+      background-color: #fff;
+      background-image: url('fundo-cartaz.png');
+      background-size: contain;
+      background-position: center top;
+      background-repeat: no-repeat;
+      padding:18px;
+      box-sizing:border-box;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      color:var(--text);
+    }
+
+    .card{
+      width:100%;
+      height:100%;
+      box-sizing:border-box;
+      padding:22px 20px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      position:relative;
+      left: 5px;
+      overflow:hidden;
+    }
+
+    .descricao{
+      position: absolute;
+      top:170px;
+      left: 10px;
+      width: 100%;
+      font-family:'UturnaRoundBold';
+      text-align:center;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      line-height: 0.8;
+      color:#1a1a1a;
+      margin:20px 0 6px 0;
+      max-width:92%;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      align-items: center;
+      justify-content: center;
+      line-height: -1;
+      word-break: break-word;
+    }
+
+    .preco-antigo{
+      position: relative;
+      top:295px;
+      right: 130px;
+      color:#606060;
+      font-family:'SugoDisplay';
+      font-size:30px;
+      margin:6px 0 8px 0;
+    }
+    .preco-antigo .numeros-riscados {
+      text-decoration: line-through;
+    }
+
+    .preco-area{
+      font-family:'Yatra One', cursive;
+      width:100%;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      position:relative;
+    }
+
+    .rs{
+      font-family:'SugoDisplay';
+      font-size:42px;
+      align-self:flex-end;
+      margin-bottom:60px;
+      position:relative;
+      left:-15px
+    }
+
+    .big-value{
+      font-family:'SugoDisplay';
+      font-size:160px;
+      line-height:0.85;
+      color:#222;
+      transform-origin:top;
+      display:inline-block;
+      margin-right:6px;
+      letter-spacing: 10px;
+    }
+
+    .centavos{
+      font-family:'SugoDisplay';
+      letter-spacing:1px;
+      font-size:80px;
+      line-height:1;
+      align-self:flex-start;
+      margin-top:6px;
+      color:#222;
+    }
+
+    .cada{
+      font-family:'SugoDisplay';
+      text-transform: uppercase;
+      font-size:40px;
+      letter-spacing:1px;
+      align-self:flex-end;
+      margin-bottom:65px;
+      position: absolute;
+      left: 270px;
+      transition: left 0.3s ease, font-size 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .rodape{
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      position:absolute;
+      bottom:18px;
+      left:10px;
+      right:20px;
+      font-size:14px;
+      text-align:center;
+      color:#222;
+    }
+
+    @font-face {
+      font-family: 'UturnaRoundBold';
+      src: url('UturnaRoundBold.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'SugoDisplay';
+      src: url('SugoDisplay.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.6);
+      z-index: 9999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #loading-card {
+      background: white;
+      width: 340px;
+      height: 190px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 18px;
+      text-align: center;
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-geral">
+    <a href="index.html" class="btn-voltar">← Voltar ao Gerador</a>
+    <h2>CARTAZES SALVOS</h2>
+
+    <div class="painel-controle">
+      <div class="field-data">
+        <label for="lote-data-inicial">Nova Data Inicial (Opcional)</label>
+        <input type="date" id="lote-data-inicial">
+      </div>
+      <div class="field-data">
+        <label for="lote-data-final">Nova Data Final</label>
+        <input type="date" id="lote-data-final">
+      </div>
+      <button class="btn-salvar-lote" id="btn-salvar-lote">💾 Salvar Nova Data</button>
+      <button class="btn-salvar-lote" id="btn-unir-cartazes" style="background:#4c5058;">📄 Combinar Cartazes</button>
+      <button class="btn-salvar-lote" id="btn-juntar-todos" style="background:#979491;">📄 Juntar Todos (PDF único)</button>
+    </div>
+
+    <div class="painel-controle" style="margin-top: -10px; margin-bottom: 20px;">
+      <div class="field-data">
+        <label for="filtro-tipo">Buscar por Tipo</label>
+        <select id="filtro-tipo" class="input-filtro" style="width: 185px; height: 39px; box-sizing: border-box;">
+          <option value="">Todos os Tipos</option>
+          <option value="PREÇO AVULSO">PLACA AVULSA / PREÇO AVULSO</option>
+          <option value="ENCARTE SEMANAL">ENCARTE SEMANAL</option>
+          <option value="TERÇA DA CARNE">TERÇA DA CARNE</option>
+          <option value="QUINTA DA FEIRA">QUINTA DA FEIRA</option>
+          <option value="FINAL DE SEMANA DE OFERTAS">FINAL DE SEMANA DE OFERTAS</option>
+          <option value="FECHA MÊS">FECHA MÊS</option>
+        </select>
+      </div>
+      <div class="field-data">
+        <label for="filtro-descricao">Buscar por Descrição</label>
+        <input type="text" id="filtro-descricao" class="input-filtro" placeholder="Ex: Arroz...">
+      </div>
+      <div class="field-data">
+        <label for="filtro-preco">Buscar por Preço</label>
+        <input type="text" id="filtro-preco" class="input-filtro" placeholder="Ex: 5,99...">
+      </div>
+    </div>
+
+    <div class="tabela-container" id="tabela-container" style="display: none;">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-checkbox"><input type="checkbox" id="select-all-cartazes" title="Selecionar Todos"></th>
+            <th class="sortable" data-sort="descricao">Descrição <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="tipo">Tipo <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="vigencia">Data de Vigência <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="preco">Preço Oferta <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="salvo">Salvo em <span class="sort-icon"></span></th>
+            <th class="col-acoes">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-body-cartazes">
+        </tbody>
+      </table>
+    </div>
+
+    <div id="lista-vazia">
+      Buscando cartazes no Firebase ou nenhum item cadastrado...
+    </div>
+  </div>
+
+  <div id="render-box">
+    <div class="cartaz" id="cartaz-render">
+      <div class="card" id="card-render">
+        <div class="descricao" id="desc-render"></div>
+        <div class="preco-antigo" id="antigo-render"></div>
+        <div class="preco-area" id="area-preco-render">
+          <div class="rs" id="rs-render">R$</div>
+          <div class="big-value" id="reais-render"></div>
+          <div class="centavos" id="centavos-render"></div>
+          <div class="cada" id="cada-render"></div>
+        </div>
+        <div class="rodape" id="rodape-render"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-overlay">
+    <div id="loading-card">
+      <div id="loading-text">Processando e gerando arquivos...</div>
+      <img src="spinner.gif" alt="Carregando..." style="width:95px; height:50px; margin: 0 auto; display: block;" />
+    </div>
+  </div>
+
+<script>
+  window.listaCartazesMemoria = {};
+  // Variáveis para gerenciar o estado da ordenação
+  window.currentSortColumn = 'salvo';
+  window.currentSortDirection = 'desc';
+
+  function formatPtBrToParts(value) {
+    if (!value) return { reais: '', centavos: '' };
+    const s = String(value).replace(/[^0-9,\.]/g, '').replace(',', '.');
+    const n = parseFloat(s);
+    if (isNaN(n)) return { reais: '', centavos: '' };
+    const parts = n.toFixed(2).split('.');
+    return { reais: String(Number(parts[0])), centavos: ',' + parts[1] };
+  }
+
+  function formatStringToPtBrDate(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+
+  function sanitizeFileName(name, ext = 'pdf') {
+    if (!name) name = 'cartaz';
+    name = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    name = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const now = new Date().toISOString().replace(/[:.]/g, '-');
+    return `${name}-${now}.${ext}`;
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function base64ToBlobUrl(base64) {
+    if (!base64) return '#';
+    const parts = base64.split(',');
+    const mime = parts[0].match(/:(.*?);/)[1];
+    const bstr = atob(parts[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while(n--) u8arr[n] = bstr.charCodeAt(n);
+    const blob = new Blob([u8arr], {type:mime});
+    return URL.createObjectURL(blob);
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCmOhTHgMHh57whOPojvzNgtBlgMH9JS3I",
+    authDomain: "placa-de-ofertas.firebaseapp.com",
+    databaseURL: "https://placa-de-ofertas-default-rtdb.firebaseio.com",
+    projectId: "placa-de-ofertas",
+    storageBucket: "placa-de-ofertas.firebasestorage.app",
+    messagingSenderId: "434607179238",
+    appId: "1:434607179238:web:761b336dd551fa4ac4c227",
+    measurementId: "G-EH5X5YTTXB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const cartazesRef = ref(db, 'cartazes');
+
+  // Vincula as funções globais dos novos botões para que o HTML consiga invocá-las de dentro do módulo
+  window.editarCartazIndex = function(id) {
+  const item = window.listaCartazesMemoria[id];
+  if (!item) return;
+
+  // Extrai o tipo limpo para preencher o select da nova página
+  let tipo = "PREÇO AVULSO";
+  let descricaoLimpa = item.descricaoText || "";
+  if (descricaoLimpa.startsWith("[")) {
+    const indexFechamento = descricaoLimpa.indexOf("]");
+    if (indexFechamento !== -1) {
+      tipo = descricaoLimpa.substring(1, indexFechamento).toUpperCase();
+      descricaoLimpa = descricaoLimpa.substring(indexFechamento + 1).trim();
+    }
+  }
+
+  // Armazena no localStorage os dados capturados
+  localStorage.setItem('edit_id_firebase', id);
+  localStorage.setItem('edit_tipo_campanha', tipo);
+  localStorage.setItem('edit_descricaoText_1', descricaoLimpa);
+  localStorage.setItem('edit_precoText_1', item.precoText || '');
+  localStorage.setItem('edit_precoAntesText_1', item.precoAntigoText || '');
+  localStorage.setItem('edit_cadaText_1', item.cadaText || '');
+  localStorage.setItem('edit_dataInicial_1', item.dataInicial || '');
+  localStorage.setItem('edit_dataFinal_1', item.dataFinal || '');
+  localStorage.setItem('edit_rodapeText_1', item.rodapeText || '');
+  localStorage.setItem('edit_customFontSize_1', item.customFontSize || '36');
+  localStorage.setItem('edit_customTop_1', item.customTop || '170');
+
+  // Redireciona para a nova página de edição focada
+  localStorage.setItem('edit_comImagem', item.comImagem || false);
+  
+  window.location.href = 'editar.html';
+};
+
+  window.excluirCartazItem = function(id) {
+    if (confirm('Tem certeza absoluta que deseja excluir de forma permanente este cartaz do Firebase?')) {
+      const itemRef = ref(db, `cartazes/${id}`);
+      remove(itemRef)
+        .then(() => {
+          alert('Cartaz excluído com sucesso!');
+        })
+        .catch((err) => {
+          console.error(err);
+          alert('Erro ao tentar excluir o cartaz do banco de dados.');
+        });
+    }
+  };
+
+  // Função para renderizar a tabela com base nos dados, estado de ordenação e filtros ativos
+  function renderizarTabela() {
+    const tabelaContainer = document.getElementById('tabela-container');
+    const tabelaBody = document.getElementById('tabela-body-cartazes');
+    const vazio = document.getElementById('lista-vazia');
+    
+    tabelaBody.innerHTML = '';
+
+    if (!window.listaCartazesMemoria || Object.keys(window.listaCartazesMemoria).length === 0) {
+      tabelaContainer.style.display = 'none';
+      vazio.style.display = 'block';
+      vazio.textContent = 'Nenhum cartaz cadastrado no Firebase. Crie na página inicial!';
+      return;
+    }
+
+    // Captura os valores digitados nos inputs de filtro
+    const valFiltroTipo = document.getElementById('filtro-tipo').value.toLowerCase().trim();
+    const valFiltroDesc = document.getElementById('filtro-descricao').value.toLowerCase().trim();
+    const valFiltroPreco = document.getElementById('filtro-preco').value.toLowerCase().trim();
+
+    // Mapeia os dados processando as propriedades necessárias para ordenação
+    let itensArray = Object.keys(window.listaCartazesMemoria).map((id) => {
+      const item = window.listaCartazesMemoria[id];
+      
+      // Extrai o Tipo de Cartaz se houver colchetes na descrição
+      let tipo = "PREÇO AVULSO";
+      let descricaoLimpa = item.descricaoText || "";
+      if (descricaoLimpa.startsWith("[")) {
+        const indexFechamento = descricaoLimpa.indexOf("]");
+        if (indexFechamento !== -1) {
+          tipo = descricaoLimpa.substring(1, indexFechamento).toUpperCase();
+          descricaoLimpa = descricaoLimpa.substring(indexFechamento + 1).trim();
+        }
+      }
+      
+      if (tipo === "PLACA AVULSA") {
+        tipo = "PREÇO AVULSO";
+      }
+
+      // Monta a string de vigência
+      let vigenciaExibicao = "";
+      if (item.dataInicial && item.dataFinal) {
+        vigenciaExibicao = `${formatStringToPtBrDate(item.dataInicial)} À ${formatStringToPtBrDate(item.dataFinal)}`;
+      } else if (item.dataFinal) {
+        vigenciaExibicao = `ATÉ ${formatStringToPtBrDate(item.dataFinal)}`;
+      } else {
+        vigenciaExibicao = item.rodapeText || item.rodapeOutput || "Não informada";
+      }
+
+      // Converte preço para float para ordenação numérica precisa
+      let precoNum = 0;
+      if (item.precoText) {
+        precoNum = parseFloat(String(item.precoText).replace(/[^0-9,\.]/g, '').replace(',', '.')) || 0;
+      }
+
+      return {
+        id,
+        itemOriginal: item,
+        descricao: descricaoLimpa.toUpperCase(),
+        tipo: tipo,
+        vigencia: vigenciaExibicao.toUpperCase(),
+        precoTexto: item.precoText ? 'R$ ' + item.precoText : 'Em branco',
+        precoValor: precoNum,
+        salvoTexto: `${item.dateStr} às ${item.timeStr}`,
+        timestamp: item.timestamp || 0,
+        base64: item.base64
+      };
+    });
+
+    // Aplica o filtro de pesquisa dinamicamente se houver dados digitados
+    itensArray = itensArray.filter(row => {
+      let matchTipo = true;
+      if (valFiltroTipo) {
+        if (valFiltroTipo === "preço avulso") {
+          matchTipo = row.tipo.toLowerCase().includes("preço avulso") || row.tipo.toLowerCase().includes("placa avulsa");
+        } else {
+          matchTipo = row.tipo.toLowerCase().includes(valFiltroTipo);
+        }
+      }
+      const matchDesc = !valFiltroDesc || row.descricao.toLowerCase().includes(valFiltroDesc);
+      const matchPreco = !valFiltroPreco || row.precoTexto.toLowerCase().includes(valFiltroPreco);
+      return matchTipo && matchDesc && matchPreco;
+    });
+
+    if (itensArray.length === 0) {
+      tabelaContainer.style.display = 'none';
+      vazio.style.display = 'block';
+      vazio.textContent = 'Nenhum resultado corresponde aos filtros aplicados.';
+      return;
+    }
+
+    vazio.style.display = 'none';
+    tabelaContainer.style.display = 'block';
+
+    // Executa a ordenação com base na coluna e direção activa
+    itensArray.sort((a, b) => {
+      let comparison = 0;
+      if (window.currentSortColumn === 'descricao') {
+        comparison = a.descricao.localeCompare(b.descricao);
+      } else if (window.currentSortColumn === 'tipo') {
+        comparison = a.tipo.localeCompare(b.tipo);
+      } else if (window.currentSortColumn === 'vigencia') {
+        comparison = a.vigencia.localeCompare(b.vigencia);
+      } else if (window.currentSortColumn === 'preco') {
+        comparison = a.precoValor - b.precoValor;
+      } else if (window.currentSortColumn === 'salvo') {
+        comparison = a.timestamp - b.timestamp;
+      }
+      return window.currentSortDirection === 'asc' ? comparison : -comparison;
+    });
+
+    // Atualiza os indicadores visuais nos cabeçalhos
+    document.querySelectorAll('th.sortable').forEach(th => {
+      const iconSpan = th.querySelector('.sort-icon');
+      const colName = th.getAttribute('data-sort');
+      if (colName === window.currentSortColumn) {
+        iconSpan.textContent = window.currentSortDirection === 'asc' ? ' ▲' : ' ▼';
+      } else {
+        iconSpan.textContent = '';
+      }
+    });
+
+    // Renderiza as linhas na tabela
+    itensArray.forEach((row) => {
+      const tr = document.createElement('tr');
+      const pdfUrl = base64ToBlobUrl(row.base64);
+
+      // Define a cor de texto correspondente a cada tipo de cartaz solicitado
+      let corDoTipo = "black";
+      const tUpper = row.tipo.toUpperCase();
+      if (tUpper.includes("ENCARTE SEMANAL")) corDoTipo = "gray";
+      else if (tUpper.includes("TERÇA DA CARNE")) corDoTipo = "red";
+      else if (tUpper.includes("QUINTA DA FEIRA")) corDoTipo = "green";
+      else if (tUpper.includes("FINAL DE SEMANA DE OFERTAS")) corDoTipo = "orange";
+      else if (tUpper.includes("FECHA MÊS")) corDoTipo = "blue";
+      else if (tUpper.includes("PREÇO AVULSO") || tUpper.includes("PLACA AVULSA")) corDoTipo = "black";
+
+      tr.innerHTML = `
+        <td class="col-checkbox"><input type="checkbox" class="cartaz-select-item" data-id="${row.id}"></td>
+        <td class="col-descricao">${row.descricao}</td>
+        <td class="col-tipo" style="color: ${corDoTipo};">${row.tipo === "PREÇO AVULSO" ? "PLACA AVULSA" : row.tipo}</td>
+        <td class="col-vigencia">${row.vigencia}</td>
+        <td class="col-preco">${row.precoTexto}</td>
+        <td class="col-salvo">${row.salvoTexto}</td>
+        <td class="col-acoes">
+          <a href="${pdfUrl}" target="_blank" class="btn-visualizar">👁️ Visualizar</a>
+          <button onclick="window.editarCartazIndex('${row.id}')" class="btn-editar">✏️ Editar</button>
+          <button onclick="window.excluirCartazItem('${row.id}')" class="btn-excluir">❌ Excluir</button>
+        </td>
+      `;
+
+      tabelaBody.appendChild(tr);
+    });
+  }
+
+  // Ouvintes de evento de digitação para disparar os filtros de busca
+  document.getElementById('filtro-tipo').addEventListener('change', renderizarTabela);
+  document.getElementById('filtro-descricao').addEventListener('input', renderizarTabela);
+  document.getElementById('filtro-preco').addEventListener('input', renderizarTabela);
+
+  // Carrega e atualiza a tabela em tempo real varrendo os nós aninhados de cada categoria
+  onValue(cartazesRef, (snapshot) => {
+    if (!snapshot.exists()) {
+      window.listaCartazesMemoria = {};
+    } else {
+      const rawData = snapshot.val();
+      const flattenedData = {};
+      
+      // Itera recursivamente para capturar itens independentemente se estão na raiz ou aninhados por tipo
+      Object.keys(rawData).forEach(key => {
+        if (rawData[key] && rawData[key].base64) {
+          flattenedData[key] = rawData[key];
+        } else if (typeof rawData[key] === 'object') {
+          Object.keys(rawData[key]).forEach(subKey => {
+            if (rawData[key][subKey] && rawData[key][subKey].base64) {
+              // Constrói o caminho completo da chave para preservação e salvamento corretos
+              flattenedData[`${key}/${subKey}`] = rawData[key][subKey];
+            }
+          });
+        }
+      });
+      window.listaCartazesMemoria = flattenedData;
+    }
+    renderizarTabela();
+  });
+
+  // Configura os ouvintes de clique nos cabeçalhos ordenáveis
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.getAttribute('data-sort');
+      if (window.currentSortColumn === col) {
+        window.currentSortDirection = window.currentSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        window.currentSortColumn = col;
+        window.currentSortDirection = 'asc';
+      }
+      renderizarTabela();
+    });
+  });
+
+  // Evento do Checkbox de "Selecionar Todos"
+  document.getElementById('select-all-cartazes').addEventListener('change', (e) => {
+    const checkboxes = document.querySelectorAll('.cartaz-select-item');
+    checkboxes.forEach(cb => cb.checked = e.target.checked);
+  });
+
+  // Ação de salvamento em lote dos itens selecionados
+  document.getElementById('btn-salvar-lote').addEventListener('click', async () => {
+    const selecionados = document.querySelectorAll('.cartaz-select-item:checked');
+    
+    if (selecionados.length === 0) {
+      alert('Por favor, selecione ao menos um cartaz na tabela usando o checkbox!');
+      return;
+    }
+
+    const inputIni = document.getElementById('lote-data-inicial').value;
+    const inputFim = document.getElementById('lote-data-final').value;
+
+    if (!inputFim) {
+      alert('A Nova Data Final é obrigatória para processar a alteração.');
+      return;
+    }
+
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    loadingOverlay.style.display = 'flex';
+
+    // Elementos do Box Oculto de Renderização Técnica
+    const dOut = document.getElementById('desc-render');
+    const pAntigoOut = document.getElementById('antigo-render');
+    const rsOut = document.getElementById('rs-render');
+    const rOut = document.getElementById('reais-render');
+    const cOut = document.getElementById('centavos-render');
+    const cadaOut = document.getElementById('cada-render');
+    const rodOut = document.getElementById('rodape-render');
+    const areaPreco = document.getElementById('area-preco-render');
+
+    try {
+      let contador = 0;
+      
+      // Processa em loop sequencial cada um dos cartazes marcados
+      for (const cb of selecionados) {
+        contador++;
+        const id = cb.getAttribute('data-id');
+        const item = window.listaCartazesMemoria[id];
+
+        loadingText.textContent = `Atualizando cartaz ${contador} de ${selecionados.length}...`;
+
+        // 1. Remove os colchetes com tipo do produto para não incluí-los no PDF
+        let descricaoLimpa = item.descricaoText || "";
+        if (descricaoLimpa.startsWith("[")) {
+          const indexFechamento = descricaoLimpa.indexOf("]");
+          if (indexFechamento !== -1) {
+            descricaoLimpa = descricaoLimpa.substring(indexFechamento + 1).trim();
+          }
+        }
+        dOut.textContent = descricaoLimpa.toUpperCase();
+        
+        if (item.customFontSize && item.customTop) {
+          dOut.style.fontSize = item.customFontSize;
+          dOut.style.top = item.customTop;
+        } else {
+          const len = dOut.textContent.length;
+          let fontSize = 40;
+          if (len <= 10) fontSize = 120;
+          else if (len <= 15) fontSize = 100;
+          else if (len <= 25) fontSize = 70;
+          else if (len <= 35) fontSize = 55;
+          else if (len <= 60) fontSize = 45;
+          dOut.style.fontSize = fontSize + 'px';
+          dOut.style.top = '170px';
+        }
+
+        // 2. Lógica do Cifrão R$ e Formatação de Preço de Oferta
+        const precoOfertaValor = item.precoText || '';
+        if (!precoOfertaValor.trim()) {
+          rsOut.style.display = 'none';
+          rOut.textContent = '';
+          cOut.textContent = '';
+        } else {
+          rsOut.style.display = '';
+          const parts = formatPtBrToParts(precoOfertaValor);
+          rOut.textContent = parts.reais;
+          cOut.textContent = parts.centavos;
+
+          if (parts.reais.length >= 3) {
+            rOut.style.fontSize = '220px';
+            rOut.style.transform = 'scaleY(1.2)';
+          } else {
+            rOut.style.fontSize = '260px';
+            rOut.style.transform = 'scaleY(1)';
+          }
+        }
+
+        // 3. Re-equalização Fiel do Preço Antigo (Espelhamento do index.html)
+        const precoAntesValor = item.precoAntigoText || item.precoAntesText || '';
+        if (precoAntesValor.trim()) {
+          const vAntes = Number(String(precoAntesValor).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+          const parteInteira = precoOfertaValor.split(',')[0].replace(/\D/g, '');
+          const charsLeftOfComma = parteInteira.length;
+
+          if (!isNaN(vAntes)) {
+            const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            if (charsLeftOfComma >= 3) {
+              pAntigoOut.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
+              pAntigoOut.style.display = '';
+              pAntigoOut.style.position = 'relative';
+              pAntigoOut.style.top = '275px';
+              pAntigoOut.style.right = '0';
+              pAntigoOut.style.color = '#606060';
+              pAntigoOut.style.fontFamily = "'SugoDisplay'";
+              pAntigoOut.style.fontSize = '30px';
+              pAntigoOut.style.margin = '6px 0 8px 0';
+
+              areaPreco.style.top = '260px';
+            } else {
+              pAntigoOut.innerHTML = `DE <br> <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>  POR:`;   
+              pAntigoOut.style.display = '';
+              pAntigoOut.style.position = 'relative';
+              pAntigoOut.style.top = '295px';
+
+              if (charsLeftOfComma === 1) {
+                pAntigoOut.style.right = '130px';
+              } else {
+                pAntigoOut.style.right = '150px';
+              }
+
+              pAntigoOut.style.color = '';
+              pAntigoOut.style.fontFamily = '';
+              pAntigoOut.style.fontSize = '';
+              pAntigoOut.style.margin = '6px 0 8px 0';
+
+              areaPreco.style.top = '190px';
+            }
+          }
+        } else {
+          pAntigoOut.style.display = 'none';
+          areaPreco.style.top = '290px';
+        }
+
+        // 4. Lógica de Posição e Fonte Dinâmica do elemento .cada
+        const textoCada = item.cadaText || item.cadaOutput || '';
+        cadaOut.textContent = textoCada;
+        const lenCada = textoCada.length;
+        if (lenCada > 4 && lenCada <= 7) {
+          cadaOut.style.fontSize = '35px';
+          const deslocamento = Math.min((lenCada - 4) * 10, 30);
+          cadaOut.style.left = (270 - deslocamento) + 'px';
+        } else {
+          cadaOut.style.fontSize = '40px';
+          if (lenCada > 7) {
+            const deslocamento = 60;
+            cadaOut.style.left = (270 - deslocamento) + 'px';
+          } else {
+            cadaOut.style.left = '270px';
+          }
+        }
+
+        // 5. Aplica as regras condicionais das novas datas no rodapé
+        let novoRodapeTexto = '';
+        if (inputIni && inputFim) {
+          const di = inputIni.split('-');
+          const df = inputFim.split('-');
+          novoRodapeTexto = `OFERTA VÁLIDA DE ${di[2]} À ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+        } else if (!inputIni && inputFim) {
+          const df = inputFim.split('-');
+          novoRodapeTexto = `OFERTA VÁLIDA ATÉ ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+        }
+        rodOut.textContent = novoRodapeTexto;
+
+        // 6. Renderiza de forma invisível via html2canvas e cria o PDF A4
+        const containerRender = document.getElementById('card-render');
+        const { jsPDF } = window.jspdf;
+
+        const canvas = await html2canvas(containerRender, { scale: 8, useCORS: true, backgroundColor: null });
+        const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+        const imgWidth = canvas.width * ratio;
+        const imgHeight = canvas.height * ratio;
+        
+        const marginX = (pdfWidth - imgWidth) / 2;
+        const marginY = (pdfHeight - imgHeight) / 2 - 5;
+
+        pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+
+        // 7. Converte para Base64 e updates no Firebase
+        const pdfBlob = pdf.output('blob');
+        const novaBase64 = await blobToBase64(pdfBlob);
+        
+        const now = new Date();
+        const itemRef = ref(db, `cartazes/${id}`);
+
+        await update(itemRef, {
+          base64: novaBase64,
+          rodapeText: novoRodapeTexto,
+          rodapeOutput: novoRodapeTexto,
+          dataInicial: inputIni, 
+          dataFinal: inputFim,   
+          dateStr: now.toLocaleDateString('pt-BR'),
+          timeStr: now.toLocaleTimeString('pt-BR'),
+          timestamp: now.getTime()
+        });
+      }
+
+      alert('Todos os cartazes selecionados foram updated e salvos com sucesso no Firebase!');
+      document.getElementById('select-all-cartazes').checked = false;
+      document.getElementById('lote-data-inicial').value = '';
+      document.getElementById('lote-data-final').value = '';
+      
+    } catch (err) {
+      console.error(err);
+      alert('Ocorreu um erro crítico durante o processamento em lote dos cartazes.');
+    } finally {
+      loadingOverlay.style.display = 'none';
+    }
+  });
+
+  // Ouvinte de evento para unir exatamente 2 cartazes selecionados em formato paisagem (A4) side-by-side
+  document.getElementById('btn-unir-cartazes').addEventListener('click', async () => {
+    const selecionados = document.querySelectorAll('.cartaz-select-item:checked');
+    
+    if (selecionados.length !== 2) {
+      alert('Por favor, selecione exatamente 2 cartazes para realizar a união lado a lado.');
+      return;
+    }
+
+    const inputIni = document.getElementById('lote-data-inicial').value;
+    const inputFim = document.getElementById('lote-data-final').value;
+
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    loadingOverlay.style.display = 'flex';
+    loadingText.textContent = 'Gerando união dos cartazes...';
+
+    const dOut = document.getElementById('desc-render');
+    const pAntigoOut = document.getElementById('antigo-render');
+    const rsOut = document.getElementById('rs-render');
+    const rOut = document.getElementById('reais-render');
+    const cOut = document.getElementById('centavos-render');
+    const cadaOut = document.getElementById('cada-render');
+    const rodOut = document.getElementById('rodape-render');
+    const areaPreco = document.getElementById('area-preco-render');
+    const containerRender = document.getElementById('card-render');
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const canvases = [];
+      const infoCartazes = [];
+
+      // Renderiza temporariamente cada um dos dois cartazes selecionados
+      for (const cb of selecionados) {
+        const id = cb.getAttribute('data-id');
+        const item = window.listaCartazesMemoria[id];
+        infoCartazes.push(item);
+
+        // Remove os colchetes com tipo do produto para união dos cartazes
+        let descricaoLimpa = item.descricaoText || "";
+        if (descricaoLimpa.startsWith("[")) {
+          const indexFechamento = descricaoLimpa.indexOf("]");
+          if (indexFechamento !== -1) {
+            descricaoLimpa = descricaoLimpa.substring(indexFechamento + 1).trim();
+          }
+        }
+        dOut.textContent = descricaoLimpa.toUpperCase();
+        
+        if (item.customFontSize && item.customTop) {
+          dOut.style.fontSize = item.customFontSize;
+          dOut.style.top = item.customTop;
+        } else {
+          const len = dOut.textContent.length;
+          let fontSize = 40;
+          if (len <= 10) fontSize = 120;
+          else if (len <= 15) fontSize = 100;
+          else if (len <= 25) fontSize = 70;
+          else if (len <= 35) fontSize = 55;
+          else if (len <= 60) fontSize = 45;
+          dOut.style.fontSize = fontSize + 'px';
+          dOut.style.top = '170px';
+        }
+
+        const precoOfertaValor = item.precoText || '';
+        if (!precoOfertaValor.trim()) {
+          rsOut.style.display = 'none';
+          rOut.textContent = '';
+          cOut.textContent = '';
+        } else {
+          rsOut.style.display = '';
+          const parts = formatPtBrToParts(precoOfertaValor);
+          rOut.textContent = parts.reais;
+          cOut.textContent = parts.centavos;
+
+          if (parts.reais.length >= 3) {
+            rOut.style.fontSize = '220px';
+            rOut.style.transform = 'scaleY(1.2)';
+          } else {
+            rOut.style.fontSize = '260px';
+            rOut.style.transform = 'scaleY(1)';
+          }
+        }
+
+        const precoAntesValor = item.precoAntigoText || item.precoAntesText || '';
+        if (precoAntesValor.trim()) {
+          const vAntes = Number(String(precoAntesValor).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+          const parteInteira = precoOfertaValor.split(',')[0].replace(/\D/g, '');
+          const charsLeftOfComma = parteInteira.length;
+
+          if (!isNaN(vAntes)) {
+            const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            if (charsLeftOfComma >= 3) {
+              pAntigoOut.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
+              pAntigoOut.style.display = '';
+              pAntigoOut.style.position = 'relative';
+              pAntigoOut.style.top = '275px';
+              pAntigoOut.style.right = '0';
+              pAntigoOut.style.color = '#606060';
+              pAntigoOut.style.fontFamily = "'SugoDisplay'";
+              pAntigoOut.style.fontSize = '30px';
+              pAntigoOut.style.margin = '6px 0 8px 0';
+
+              areaPreco.style.top = '260px';
+            } else {
+              pAntigoOut.innerHTML = `DE <br> <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>  POR:`;   
+              pAntigoOut.style.display = '';
+              pAntigoOut.style.position = 'relative';
+              pAntigoOut.style.top = '295px';
+
+              if (charsLeftOfComma === 1) {
+                pAntigoOut.style.right = '130px';
+              } else {
+                pAntigoOut.style.right = '150px';
+              }
+
+              pAntigoOut.style.color = '';
+              pAntigoOut.style.fontFamily = '';
+              pAntigoOut.style.fontSize = '';
+              pAntigoOut.style.margin = '6px 0 8px 0';
+
+              areaPreco.style.top = '190px';
+            }
+          }
+        } else {
+          pAntigoOut.style.display = 'none';
+          areaPreco.style.top = '290px';
+        }
+
+        const textoCada = item.cadaText || item.cadaOutput || '';
+        cadaOut.textContent = textoCada;
+        const lenCada = textoCada.length;
+        if (lenCada > 4 && lenCada <= 7) {
+          cadaOut.style.fontSize = '35px';
+          const deslocamento = Math.min((lenCada - 4) * 10, 30);
+          cadaOut.style.left = (270 - deslocamento) + 'px';
+        } else {
+          cadaOut.style.fontSize = '40px';
+          if (lenCada > 7) {
+            const deslocamento = 60;
+            cadaOut.style.left = (270 - deslocamento) + 'px';
+          } else {
+            cadaOut.style.left = '270px';
+          }
+        }
+
+        // Lógica do rodapé corrigida para usar as novas datas se existirem
+        const fIni = inputIni || item.dataInicial || '';
+        const fFim = inputFim || item.dataFinal || '';
+        let novoRodapeTexto = '';
+        if (fIni && fFim) {
+          const di = fIni.split('-');
+          const df = fFim.split('-');
+          novoRodapeTexto = `OFERTA VÁLIDA DE ${di[2]} À ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+        } else if (fFim) {
+          const df = fFim.split('-');
+          novoRodapeTexto = `OFERTA VÁLIDA ATÉ ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+        } else {
+          novoRodapeTexto = item.rodapeText || item.rodapeOutput || '';
+        }
+        rodOut.textContent = novoRodapeTexto;
+
+        // Cria o canvas individual usando escala idêntica à do index.html para união combinada
+        const canvasItem = await html2canvas(containerRender, { scale: 4, useCORS: true, backgroundColor: null });
+        canvases.push(canvasItem);
+      }
+
+      // Inicializa documento em modo Paisagem (Landscape)
+      const pdf = new jsPDF({
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'landscape',
+        compress: true
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const margin = 10;
+      const maxHeight = pdfHeight - 2 * margin;
+      const halfWidth = (pdfWidth - 3 * margin) / 2;
+
+      function calcSize(canvas) {
+        const ratio = Math.min(halfWidth / canvas.width, maxHeight / canvas.height);
+        return { w: canvas.width * ratio, h: canvas.height * ratio };
+      }
+
+      const size1 = calcSize(canvases[0]);
+      const size2 = calcSize(canvases[1]);
+      const yOffset = margin + (maxHeight - Math.max(size1.h, size2.h)) / 2;
+
+      pdf.addImage(canvases[0].toDataURL('image/png'), 'PNG', margin, yOffset, size1.w, size1.h);
+      const cartaz2X = pdfWidth - margin - size2.w + 5;
+      pdf.addImage(canvases[1].toDataURL('image/png'), 'PNG', cartaz2X, yOffset, size2.w, size2.h);
+
+      // Dispara o download automático do PDF combinado gerado
+      const nomeArquivoCombinado = sanitizeFileName((infoCartazes[0].descricaoText || '').replace(/\[.*?\]/g, '').trim() + '-e-' + (infoCartazes[1].descricaoText || '').replace(/\[.*?\]/g, '').trim(), 'pdf');
+      pdf.save(nomeArquivoCombinado);
+      
+      alert('PDF combinado gerado e baixado com sucesso!');
+    } catch (err) {
+      console.error(err);
+      alert('Ocorreu um erro ao tentar unir os cartazes selecionados.');
+    } finally {
+      loadingOverlay.style.display = 'none';
+    }
+  });
+
+  // Ouvinte de evento para juntar TODOS os cartazes selecionados em um ÚNICO arquivo PDF (Uma página por cartaz)
+  document.getElementById('btn-juntar-todos').addEventListener('click', async () => {
+    const selecionados = document.querySelectorAll('.cartaz-select-item:checked');
+    
+    if (selecionados.length === 0) {
+      alert('Por favor, selecione ao menos um cartaz na tabela usando o checkbox para juntar.');
+      return;
+    }
+
+    const inputIni = document.getElementById('lote-data-inicial').value;
+    const inputFim = document.getElementById('lote-data-final').value;
+
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    loadingOverlay.style.display = 'flex';
+
+    const dOut = document.getElementById('desc-render');
+    const pAntigoOut = document.getElementById('antigo-render');
+    const rsOut = document.getElementById('rs-render');
+    const rOut = document.getElementById('reais-render');
+    const cOut = document.getElementById('centavos-render');
+    const cadaOut = document.getElementById('cada-render');
+    const rodOut = document.getElementById('rodape-render');
+    const areaPreco = document.getElementById('area-preco-render');
+    const containerRender = document.getElementById('card-render');
+
+    try {
+      const { jsPDF } = window.jspdf;
+      let pdf = null;
+      let index = 0;
+
+      for (const cb of selecionados) {
+        index++;
+        const id = cb.getAttribute('data-id');
+        const item = window.listaCartazesMemoria[id];
+        
+        loadingText.textContent = `Processando cartaz ${index} de ${selecionados.length} para o PDF único...`;
+
+        // Remove os colchetes com tipo do produto para renderização do cartaz
+        let descricaoLimpa = item.descricaoText || "";
+        if (descricaoLimpa.startsWith("[")) {
+          const indexFechamento = descricaoLimpa.indexOf("]");
+          if (indexFechamento !== -1) {
+            descricaoLimpa = descricaoLimpa.substring(indexFechamento + 1).trim();
+          }
+        }
+        dOut.textContent = descricaoLimpa.toUpperCase();
+        
+        if (item.customFontSize && item.customTop) {
+          dOut.style.fontSize = item.customFontSize;
+          dOut.style.top = item.customTop;
+        } else {
+          const len = dOut.textContent.length;
+          let fontSize = 40;
+          if (len <= 10) fontSize = 120;
+          else if (len <= 15) fontSize = 100;
+          else if (len <= 25) fontSize = 70;
+          else if (len <= 35) fontSize = 55;
+          else if (len <= 60) fontSize = 45;
+          dOut.style.fontSize = fontSize + 'px';
+          dOut.style.top = '170px';
+        }
+
+        const precoOfertaValor = item.precoText || '';
+        if (!precoOfertaValor.trim()) {
+          rsOut.style.display = 'none';
+          rOut.textContent = '';
+          cOut.textContent = '';
+        } else {
+          rsOut.style.display = '';
+          const parts = formatPtBrToParts(precoOfertaValor);
+          rOut.textContent = parts.reais;
+          cOut.textContent = parts.centavos;
+
+          if (parts.reais.length >= 3) {
+            rOut.style.fontSize = '220px';
+            rOut.style.transform = 'scaleY(1.2)';
+          } else {
+            rOut.style.fontSize = '260px';
+            rOut.style.transform = 'scaleY(1)';
+          }
+        }
+
+        const precoAntesValor = item.precoAntigoText || item.precoAntesText || '';
+        if (precoAntesValor.trim()) {
+          const vAntes = Number(String(precoAntesValor).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+          const parteInteira = precoOfertaValor.split(',')[0].replace(/\D/g, '');
+          const charsLeftOfComma = parteInteira.length;
+
+          if (!isNaN(vAntes)) {
+            const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            if (charsLeftOfComma >= 3) {
+              pAntigoOut.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
+              pAntigoOut.style.display = '';
+              pAntigoOut.style.position = 'relative';
+              pAntigoOut.style.top = '275px';
+              pAntigoOut.style.right = '0';
+              pAntigoOut.style.color = '#606060';
+              pAntigoOut.style.fontFamily = "'SugoDisplay'";
+              pAntigoOut.style.fontSize = '30px';
+              pAntigoOut.style.margin = '6px 0 8px 0';
+
+              areaPreco.style.top = '260px';
+            } else {
+              pAntigoOut.innerHTML = `DE <br> <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>  POR:`;   
+              pAntigoOut.style.display = '';
+              pAntigoOut.style.position = 'relative';
+              pAntigoOut.style.top = '295px';
+
+              if (charsLeftOfComma === 1) {
+                pAntigoOut.style.right = '130px';
+              } else {
+                pAntigoOut.style.right = '150px';
+              }
+
+              pAntigoOut.style.color = '';
+              pAntigoOut.style.fontFamily = '';
+              pAntigoOut.style.fontSize = '';
+              pAntigoOut.style.margin = '6px 0 8px 0';
+
+              areaPreco.style.top = '190px';
+            }
+          }
+        } else {
+          pAntigoOut.style.display = 'none';
+          areaPreco.style.top = '290px';
+        }
+
+        const textoCada = item.cadaText || item.cadaOutput || '';
+        cadaOut.textContent = textoCada;
+        const lenCada = textoCada.length;
+        if (lenCada > 4 && lenCada <= 7) {
+          cadaOut.style.fontSize = '35px';
+          const deslocamento = Math.min((lenCada - 4) * 10, 30);
+          cadaOut.style.left = (270 - deslocamento) + 'px';
+        } else {
+          cadaOut.style.fontSize = '40px';
+          if (lenCada > 7) {
+            const deslocamento = 60;
+            cadaOut.style.left = (270 - deslocamento) + 'px';
+          } else {
+            cadaOut.style.left = '270px';
+          }
+        }
+
+        // Lógica do rodapé corrigida para usar as novas datas se existirem
+        const fIni = inputIni || item.dataInicial || '';
+        const fFim = inputFim || item.dataFinal || '';
+        let novoRodapeTexto = '';
+        if (fIni && fFim) {
+          const di = fIni.split('-');
+          const df = fFim.split('-');
+          novoRodapeTexto = `OFERTA VÁLIDA DE ${di[2]} À ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+        } else if (fFim) {
+          const df = fFim.split('-');
+          novoRodapeTexto = `OFERTA VÁLIDA ATÉ ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+        } else {
+          novoRodapeTexto = item.rodapeText || item.rodapeOutput || '';
+        }
+        rodOut.textContent = novoRodapeTexto;
+
+        // Gera o canvas da página corrente
+        const canvas = await html2canvas(containerRender, { scale: 6, useCORS: true, backgroundColor: null });
+        const imgData = canvas.toDataURL('image/png');
+
+        if (pdf === null) {
+          // Inicializa o PDF na primeira página
+          pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+        } else {
+          // Adiciona uma nova página subsequente
+          pdf.addPage();
+        }
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+        const imgWidth = canvas.width * ratio;
+        const imgHeight = canvas.height * ratio;
+        
+        const marginX = (pdfWidth - imgWidth) / 2;
+        const marginY = (pdfHeight - imgHeight) / 2 - 5;
+
+        pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+      }
+
+      if (pdf) {
+        pdf.save(sanitizeFileName('todos-cartazes-selecionados', 'pdf'));
+        alert('PDF contendo todos os cartazes selecionados foi gerado com sucesso!');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Ocorreu um erro ao tentar juntar todos os cartazes selecionados.');
+    } finally {
+      loadingOverlay.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>

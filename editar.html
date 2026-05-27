@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Editar Cartaz Miramar</title>
+  <link rel="icon" href="https://miramarsupermercado.com.br/wp-content/uploads/2024/10/cropped-icone.png" type="image/png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+  <style>
+    :root{
+      --blue:#213966;
+      --orange:#ff8a1c;
+      --card-bg:#ffffff;
+      --text:#222;
+    }
+    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f1f3f6;}
+    .wrap{
+      display:flex;
+      gap:20px;
+      padding:10px;
+      box-sizing:border-box;
+      align-items:flex-start;
+      flex-wrap: wrap;
+      background-color: lightslategray;
+    }
+    @media(max-width:900px){ .wrap{flex-direction:column;} .editor-area{width:100%} }
+
+    .preview{
+      width:420px;
+      box-sizing:border-box;
+      margin-bottom: 20px;
+    }
+
+    .cartaz{
+      width:420px;
+      height:594px;
+      background-color: #fff;
+      background-image: url('fundo-cartaz.png');
+      background-size: contain;
+      background-position: center top;
+      background-repeat: no-repeat;
+      padding:18px;
+      box-sizing:border-box;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      color:var(--text);
+      box-shadow:0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .card{
+      width:100%;
+      height:100%;
+      box-sizing:border-box;
+      padding:22px 20px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      position:relative;
+      left: 5px;
+      overflow:hidden;
+    }
+
+    .descricao{
+      position: absolute;
+      top:170px;
+      left: 10px;
+      width: 100%;
+      font-family:'UturnaRoundBold';
+      text-align:center;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      line-height: 0.8;
+      color:#1a1a1a;
+      margin:20px 0 6px 0;
+      max-width:92%;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      align-items: center;
+      justify-content: center;
+      line-height: -1;
+      word-break: break-word;
+    }
+
+    .preco-antigo{
+      position: relative;
+      top:295px;
+      right: 130px;
+      color:#606060;
+      font-family:'SugoDisplay';
+      font-size:30px;
+      margin:6px 0 8px 0;
+    }
+    .preco-antigo .numeros-riscados {
+      text-decoration: line-through;
+    }
+    .de-texto, .por-texto {
+      font-size: 18px;
+      font-weight: normal;
+      margin: 4px 0;
+    }
+
+    .preco-area{
+      font-family:'Yatra One', cursive;
+      width:100%;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      position:relative;
+    }
+
+    .rs{
+      font-family:'SugoDisplay';
+      font-size:42px;
+      align-self:flex-end;
+      margin-bottom:60px;
+      position:relative;
+      left:-15px
+    }
+
+    .big-value{
+      font-family:'SugoDisplay';
+      font-size:160px;
+      line-height:0.85;
+      color:#222;
+      transform-origin:top;
+      display:inline-block;
+      margin-right:6px;
+      letter-spacing: 10px;
+    }
+
+    .centavos{
+      font-family:'SugoDisplay';
+      letter-spacing:1px;
+      font-size:80px;
+      line-height:1;
+      align-self:flex-start;
+      margin-top:6px;
+      color:#222;
+    }
+
+    .cada{
+      font-family:'SugoDisplay';
+      text-transform: uppercase;
+      font-size:40px;
+      letter-spacing:1px;
+      align-self:flex-end;
+      margin-bottom:65px;
+      position: absolute;
+      left: 270px;
+      transition: left 0.3s ease, font-size 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .rodape{
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      position:absolute;
+      bottom:18px;
+      left:10px;
+      right:20px;
+      font-size:14px;
+      text-align:center;
+      color:#222;
+    }
+
+    .card::before{
+      content:'';
+      position:absolute; inset:0;
+      border-radius:20px;
+      pointer-events:none;
+      box-shadow: inset 0 0 0 14px rgba(33,57,102,0.0);
+    }
+
+    .editor-area{
+      width:360px;
+      background:#fff;
+      border-radius:10px;
+      padding:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      box-sizing:border-box;
+      font-size:14px;
+      position: relative;
+      top: 65px;
+      margin-bottom: 295px;
+    }
+    .editor-area h3{margin:0 0 8px 0;font-size:16px}
+    .field{margin-bottom:10px}
+    label{display:block;font-weight:700;margin-bottom:6px}
+    input[type=text], input[type=date], textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ddd;box-sizing:border-box;font-size:14px}
+    textarea{resize:vertical}
+    .row{display:flex;gap:8px}
+    .half{flex:1}
+    button{padding:10px;border-radius:6px;border:none;background:#213966;color:#fff;font-weight:700;cursor:pointer}
+    .btn-ghost{background:#f3f4f6;color:#213966;border:1px solid #ddd}
+    .small{font-size:12px;color:#666;margin-top:6px}
+
+    @font-face {
+      font-family: 'UturnaRoundBold';
+      src: url('UturnaRoundBold.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'SugoDisplay';
+      src: url('SugoDisplay.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.6);
+      z-index: 9999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    #loading-card {
+      background: white;
+      width: 300px;
+      height: 190px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+      font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 20px;
+      text-align: center;
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 6px solid #ccc;
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .barcode-search-area {
+      width: 360px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-sizing: border-box;
+      font-size: 14px;
+      position: relative;
+      top: 65px;
+      margin-bottom: 15px;
+      border: 2px solid var(--blue);
+    }
+    .barcode-search-area h3 { margin:0 0 8px 0; font-size:16px; color: var(--blue); }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div>
+      <a href="datas.html" style="display:inline-block; margin-bottom:10px; padding:8px 14px; background:#6c757d; color:#fff; text-decoration:none; border-radius:6px; font-weight:700;">← Voltar para Datas</a>
+      <h3>Visualização do Cartaz em Edição</h3>
+      <div class="preview" aria-hidden="false">
+        <div class="cartaz" id="cartaz1">
+          <div class="card" id="card1">
+            <div class="descricao" id="descricao-output1"></div>
+            <div class="preco-antigo" id="preco-antigo-output1"></div>
+            <div class="preco-area">
+              <div class="rs" id="rs-output1">R$</div>
+              <div class="big-value" id="reais-output1"></div>
+              <div class="centavar-wrapper" style="display: contents;">
+                <div class="centavos" id="centavos-output1"></div>
+                <div class="cada" id="cada-output1"></div>
+              </div>
+            </div>
+            <div class="rodape" id="rodape-output1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="barcode-search-area">
+        <h3>🔍 Consultar Código de Barras</h3>
+        <div class="field">
+          <input id="barcode-input1" type="text" placeholder="Digite ou passe o leitor..." autofocus />
+          <div id="barcode-status1" class="small" style="color: gray; font-weight: bold; margin-top: 4px;">Carregando banco de produtos...</div>
+        </div>
+      </div>
+
+      <div class="editor-area" role="region" aria-label="Editor Cartaz">
+        <h3>Corrigir Cartaz <span id="label-campanha-1" style="color:var(--orange); font-size:12px; margin-left:5px;"></span></h3>
+        
+        <div class="field">
+          <label>Campanha / Tipo do Cartaz</label>
+          <select id="tipo-campanha-select" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ddd; font-family:'Oswald'; font-size:14px;">
+            <option value="ENCARTE SEMANAL">ENCARTE SEMANAL</option>
+            <option value="TERÇA DA CARNE">TERÇA DA CARNE</option>
+            <option value="QUINTA DA FEIRA">QUINTA DA FEIRA</option>
+            <option value="FINAL DE SEMANA DE OFERTAS">FINAL DE SEMANA DE OFERTAS</option>
+            <option value="FECHA MÊS">FECHA MÊS</option>
+            <option value="PREÇO AVULSO">PREÇO AVULSO</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Descrição</label>
+          <input id="descricao1" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL 1L" maxlength="60" />
+        </div>
+        
+        <div class="field" style="display:flex; gap:8px; margin-bottom:10px;">
+          <button id="font-increase1" type="button">+ A</button>
+          <button id="font-decrease1" type="button">- A</button>
+          <button id="move-up1" type="button">▲</button>
+          <button id="move-down1" type="button">▼</button>
+        </div>
+
+        <div class="row">
+          <div class="field half">
+            <label>Preço ANTES</label>
+            <input id="preco-antigo1" type="text" placeholder="" />
+          </div>
+          <div class="field half">
+            <label>Preço OFERTA</label>
+            <input id="preco-oferta1" type="text" placeholder="" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field half">
+            <label>Data Inicial</label>
+            <input id="data-inicial1" type="date" />
+          </div>
+          <div class="field half">
+            <label>Data Final</label>
+            <input id="data-final1" type="date" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field half">
+            <label>UND / CADA</label>
+            <input id="cada1" type="text" maxlength="7" placeholder="" />
+          </div>
+          <div class="field half">
+            <label>Observação</label>
+            <input id="rodape1" type="text" placeholder="Oferta válida até..." value="" />
+          </div>
+        </div>
+
+        <div style="margin-top: 10px; display: flex; gap: 8px;">
+          <button id="save-cartaz1" style="flex: 1; background:#217c3f;">💾 Atualizar e Salvar Alterações</button>
+          <button id="download-pdf1" class="btn-ghost">Baixar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-overlay">
+    <div id="loading-card">
+      <div id="loading-text">Gerando documento...</div>
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <script>
+    window.campanhaGlobal = "PREÇO AVULSO";
+    window.customFontSize1 = 36;
+    window.customTop1 = 170;
+    window.modificadoManualmente1 = false;
+
+    function formatPtBrToParts(value) {
+      if(!value) return { reais: '', centavos: '' };
+      const s = String(value).replace(/[^0-9,\.]/g, '').replace(',', '.');
+      const n = parseFloat(s);
+      if(isNaN(n)) return { reais: '', centavos: '' };
+      const parts = n.toFixed(2).split('.');
+      return { reais: String(Number(parts[0])), centavos: ',' + parts[1] };
+    }
+
+    function sanitizeFileName(name, ext='pdf') {
+      if(!name) name='cartaz';
+      name = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      name = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      return `${name}.${ext}`;
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    function ajustarCadaPosicaoEFonte() {
+      const cadaOutput = document.getElementById('cada-output1');
+      const texto = cadaOutput.textContent || '';
+      const len = texto.length;
+      if (len > 4 && len <= 7) {
+        cadaOutput.style.fontSize = '35px';
+        const deslocamento = Math.min((len - 4) * 10, 30);
+        cadaOutput.style.left = (270 - deslocamento) + 'px';
+      } else {
+        cadaOutput.style.fontSize = '40px';
+        if (len > 7) {
+          const deslocamento = 60;
+          cadaOutput.style.left = (270 - deslocamento) + 'px';
+        } else {
+          cadaOutput.style.left = '270px';
+        }
+      }
+    }
+
+    function adjustDescricaoFontSize() {
+      if (window.modificadoManualmente1) return;
+
+      const el = document.getElementById('descricao-output1');
+      const textLength = el.textContent.length;
+
+      let fontSize;
+      if (textLength <= 10) {
+        fontSize = 120;
+      } else if (textLength <= 15) {
+        fontSize = 100;
+      } else if (textLength <= 25) {
+        fontSize = 70;
+      } else if (textLength <= 35) {
+        fontSize = 55;
+      } else if (textLength <= 60) {
+        fontSize = 45;
+      } else {
+        fontSize = 40;
+      }
+
+      el.style.fontSize = fontSize + 'px';
+      el.style.top = '170px';
+    }
+
+    function updatePreview() {
+      const descInput = document.getElementById('descricao1').value || '';
+      const precoAntigoInput = document.getElementById('preco-antigo1').value || '';
+      const precoOfertaInput = document.getElementById('preco-oferta1').value || '';
+      const cadaInput = document.getElementById('cada1').value || '';
+      const rodapeInput = document.getElementById('rodape1').value || '';
+      const tipoCampanha = document.getElementById('tipo-campanha-select').value;
+
+      window.campanhaGlobal = tipoCampanha;
+      document.getElementById('label-campanha-1').textContent = `(${tipoCampanha})`;
+
+      // Descrição
+      const descOut = document.getElementById('descricao-output1');
+      descOut.textContent = descInput.toUpperCase();
+      adjustDescricaoFontSize();
+
+      // Preço antigo lógico nativo idêntico ao index.html
+      const antigoOut = document.getElementById('preco-antigo-output1');
+      if (precoAntigoInput.trim()) {
+        const vAntes = Number(String(precoAntigoInput).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+        const parteInteira = precoOfertaInput.split(',')[0].replace(/\D/g, '');
+        const charsLeftOfComma = parteInteira.length;
+
+        if (!isNaN(vAntes)) {
+          const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+          if (charsLeftOfComma >= 3) {
+            antigoOut.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
+            antigoOut.style.display = '';
+            antigoOut.style.position = 'relative';
+            antigoOut.style.top = '275px';
+            antigoOut.style.right = '0';
+            antigoOut.style.color = '#606060';
+            antigoOut.style.fontFamily = "'SugoDisplay'";
+            antigoOut.style.fontSize = '30px';
+            antigoOut.style.margin = '6px 0 8px 0';
+            document.querySelector('.preco-area').style.top = '260px';
+          } else {
+            antigoOut.innerHTML = `DE <br> <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>  POR:`;   
+            antigoOut.style.display = '';
+            antigoOut.style.position = 'relative';
+            antigoOut.style.top = '295px';
+            antigoOut.style.right = (charsLeftOfComma === 1) ? '130px' : '150px';
+            antigoOut.style.color = '';
+            antigoOut.style.fontFamily = '';
+            antigoOut.style.fontSize = '';
+            antigoOut.style.margin = '6px 0 8px 0';
+            document.querySelector('.preco-area').style.top = '190px';
+          }
+        }
+      } else {
+        antigoOut.style.display = 'none';
+        document.querySelector('.preco-area').style.top = '290px';
+      }
+
+      // Preço Oferta
+      const parts = formatPtBrToParts(precoOfertaInput);
+      const reaisOutput = document.getElementById('reais-output1');
+      reaisOutput.textContent = parts.reais;
+      document.getElementById('centavos-output1').textContent = parts.centavos;
+
+      const rsOut = document.getElementById('rs-output1');
+      rsOut.style.display = precoOfertaInput.trim() ? '' : 'none';
+
+      if ((parts.reais || '').length >= 3) {
+        reaisOutput.style.fontSize = '220px';
+        reaisOutput.style.transform = 'scaleY(1.2)';
+      } else {
+        reaisOutput.style.fontSize = '260px';
+        reaisOutput.style.transform = 'scaleY(1)';
+      }
+
+      // Cada / Unidade
+      document.getElementById('cada-output1').textContent = cadaInput;
+      ajustarCadaPosicaoEFonte();
+
+      // Rodapé Dinâmico
+      const dataInicialInput = document.getElementById('data-inicial1').value;
+      const dataFinalInput = document.getElementById('data-final1').value;
+      const rodapeOutput = document.getElementById('rodape-output1');
+
+      if (dataInicialInput && dataFinalInput) {
+        const di = dataInicialInput.split('-');
+        const df = dataFinalInput.split('-');
+        rodapeOutput.textContent = `OFERTA VÁLIDA DE ${di[2]} À ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+      } else if (!dataInicialInput && dataFinalInput) {
+        const df = dataFinalInput.split('-');
+        rodapeOutput.textContent = `OFERTA VÁLIDA ATÉ ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+      } else {
+        rodapeOutput.textContent = rodapeInput;
+      }
+    }
+
+    document.getElementById('descricao1').addEventListener('input', () => { window.modificadoManualmente1 = false; updatePreview(); });
+    document.getElementById('preco-antigo1').addEventListener('input', updatePreview);
+    document.getElementById('preco-oferta1').addEventListener('input', updatePreview);
+    document.getElementById('cada1').addEventListener('input', updatePreview);
+    document.getElementById('rodape1').addEventListener('input', updatePreview);
+    document.getElementById('tipo-campanha-select').addEventListener('change', updatePreview);
+    document.getElementById('data-inicial1').addEventListener('input', updatePreview);
+    document.getElementById('data-final1').addEventListener('input', updatePreview);
+
+    document.getElementById('font-increase1').addEventListener('click', () => { 
+      window.modificadoManualmente1 = true;
+      const el = document.getElementById('descricao-output1');
+      const style = window.getComputedStyle(el);
+      el.style.fontSize = Math.min(parseFloat(style.fontSize) + 5, 120) + 'px';
+    });
+    document.getElementById('font-decrease1').addEventListener('click', () => { 
+      window.modificadoManualmente1 = true;
+      const el = document.getElementById('descricao-output1');
+      const style = window.getComputedStyle(el);
+      el.style.fontSize = Math.max(parseFloat(style.fontSize) - 5, 10) + 'px';
+    });
+    document.getElementById('move-up1').addEventListener('click', () => { 
+      const el = document.getElementById('descricao-output1');
+      el.style.top = (parseFloat(window.getComputedStyle(el).top) - 5) + 'px';
+    });
+    document.getElementById('move-down1').addEventListener('click', () => { 
+      const el = document.getElementById('descricao-output1');
+      el.style.top = (parseFloat(window.getComputedStyle(el).top) + 5) + 'px';
+    });
+
+    document.getElementById('download-pdf1').addEventListener('click', async () => {
+      const overlay = document.getElementById('loading-overlay');
+      overlay.style.display = 'flex';
+      try {
+        const element = document.getElementById('cartaz1');
+        const canvas = await html2canvas(element, { scale: 6, useCORS: true, backgroundColor: null });
+        const imgData = canvas.toDataURL('image/png');
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+        const imgWidth = canvas.width * ratio;
+        const imgHeight = canvas.height * ratio;
+        
+        const marginX = (pdfWidth - imgWidth) / 2;
+        const marginY = (pdfHeight - imgHeight) / 2 - 5;
+        
+        pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+        const descName = document.getElementById('descricao1').value || 'cartaz';
+        pdf.save(sanitizeFileName(descName, 'pdf'));
+      } catch(err) {
+        console.error(err);
+        alert('Erro ao gerar o PDF');
+      } finally {
+        overlay.style.display = 'none';
+      }
+    });
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmOhTHgMHh57whOPojvzNgtBlgMH9JS3I",
+      authDomain: "placa-de-ofertas.firebaseapp.com",
+      databaseURL: "https://placa-de-ofertas-default-rtdb.firebaseio.com",
+      projectId: "placa-de-ofertas",
+      storageBucket: "placa-de-ofertas.firebasestorage.app",
+      messagingSenderId: "434607179238",
+      appId: "1:434607179238:web:761b336dd551fa4ac4c227",
+      measurementId: "G-EH5X5YTTXB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      window.cartazIdFirebase = localStorage.getItem('edit_id_firebase') || '';
+
+      const desc = localStorage.getItem('edit_descricaoText_1') || '';
+      const preco = localStorage.getItem('edit_precoText_1') || '';
+      const precoAntes = localStorage.getItem('edit_precoAntesText_1') || '';
+      const cada = localStorage.getItem('edit_cadaText_1') || '';
+      const dtIni = localStorage.getItem('edit_dataInicial_1') || '';
+      const dtFim = localStorage.getItem('edit_dataFinal_1') || '';
+      const rdp = localStorage.getItem('edit_rodapeText_1') || '';
+      const fSize = localStorage.getItem('edit_customFontSize_1');
+      const cTop = localStorage.getItem('edit_customTop_1');
+      const tipoCartaz = localStorage.getItem('edit_tipo_campanha') || 'PREÇO AVULSO';
+
+      document.getElementById('tipo-campanha-select').value = tipoCartaz;
+      document.getElementById('descricao1').value = desc;
+      document.getElementById('preco-antigo1').value = precoAntes;
+      document.getElementById('preco-oferta1').value = preco;
+      document.getElementById('data-inicial1').value = dtIni;
+      document.getElementById('data-final1').value = dtFim;
+      document.getElementById('cada1').value = cada;
+      document.getElementById('rodape1').value = rdp;
+
+      if(fSize) {
+        document.getElementById('descricao-output1').style.fontSize = fSize;
+        window.modificadoManualmente1 = true;
+      }
+      if(cTop) document.getElementById('descricao-output1').style.top = cTop;
+
+      updatePreview();
+      carregarBancoProdutos();
+    });
+
+    document.getElementById('save-cartaz1').addEventListener('click', async () => {
+  if (!window.cartazIdFirebase) {
+    alert("Erro técnico: O ID de referência do Firebase não foi localizado.");
+    return;
+  }
+
+  const overlay = document.getElementById('loading-overlay');
+  const loadingText = document.getElementById('loading-text');
+  overlay.style.display = 'flex';
+  loadingText.textContent = "Atualizando no formato original...";
+
+  try {
+    // 1. Verifica o formato original salvo no localStorage
+    const eraComImagem = localStorage.getItem('edit_comImagem') === 'true';
+    
+    // 2. Define o alvo da captura (cartaz = fundo+texto | card = apenas texto)
+    const elementoParaCapturar = eraComImagem ? 
+      document.getElementById('cartaz1') : 
+      document.getElementById('card1');
+
+    // 3. Gera o Canvas com alta qualidade
+    const canvas = await html2canvas(elementoParaCapturar, { 
+      scale: 6, 
+      useCORS: true, 
+      backgroundColor: eraComImagem ? null : null 
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+    const imgData = canvas.toDataURL('image/png');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    // 4. Monta o PDF seguindo a lógica original do index.html
+    if (eraComImagem) {
+      // Preenche a folha A4 inteira
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    } else {
+      // Centraliza com margens
+      const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+      const imgWidth = canvas.width * ratio;
+      const imgHeight = canvas.height * ratio;
+      const marginX = (pdfWidth - imgWidth) / 2;
+      const marginY = (pdfHeight - imgHeight) / 2 - 5;
+      pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+    }
+
+    const pdfBlob = pdf.output('blob');
+    const base64Data = await blobToBase64(pdfBlob);
+
+    // 5. Prepara os dados para o Firebase
+    const descVal = document.getElementById('descricao1').value;
+    const tipoCampanha = document.getElementById('tipo-campanha-select').value;
+    const now = new Date();
+    
+    const currentFontSize = window.getComputedStyle(document.getElementById('descricao-output1')).fontSize;
+    const currentTop = window.getComputedStyle(document.getElementById('descricao-output1')).top;
+
+    const dadosAtualizados = {
+      descricaoText: descVal.toUpperCase().startsWith("[") ? descVal : `[${tipoCampanha}] ${descVal}`,
+      precoText: document.getElementById('preco-oferta1').value,
+      precoAntigoText: document.getElementById('preco-antigo1').value,
+      cadaText: document.getElementById('cada1').value,
+      dataInicial: document.getElementById('data-inicial1').value,
+      dataFinal: document.getElementById('data-final1').value,
+      rodapeText: document.getElementById('rodape-output1').textContent,
+      customFontSize: currentFontSize,
+      customTop: currentTop,
+      base64: base64Data,
+      comImagem: eraComImagem, // Mantém a flag do formato
+      dateStr: now.toLocaleDateString('pt-BR'),
+      timeStr: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      timestamp: Date.now()
+    };
+
+    // 6. Lógica de salvamento para evitar duplicidade de pasta
+    const novaCategoriaRef = tipoCampanha.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '_');
+    const partes = window.cartazIdFirebase.split('/');
+    const idUnico = partes.length > 1 ? partes[1] : partes[0];
+    const categoriaAntiga = partes.length > 1 ? partes[0] : '';
+
+    if (categoriaAntiga && categoriaAntiga !== novaCategoriaRef) {
+      // Se mudou a categoria, remove o antigo e cria no novo local
+      await remove(ref(db, `cartazes/${window.cartazIdFirebase}`));
+      await update(ref(db, `cartazes/${novaCategoriaRef}/${idUnico}`), dadosAtualizados);
+    } else {
+      // Apenas atualiza
+      await update(ref(db, `cartazes/${novaCategoriaRef}/${idUnico}`), dadosAtualizados);
+    }
+
+    alert('Cartaz atualizado com sucesso no formato original!');
+    window.location.href = 'datas.html';
+
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao tentar salvar as alterações.');
+  } finally {
+    overlay.style.display = 'none';
+  }
+});
+
+    function carregarBancoProdutos() {
+      const status = document.getElementById('barcode-status1');
+      fetch('codigo-prod-emb.json')
+        .then(res => res.json())
+        .then(data => {
+          window.bancoProdutos = data;
+          status.textContent = "Banco de produtos carregado!";
+          status.style.color = "green";
+        })
+        .catch(() => {
+          status.textContent = "Aviso: Usando produtos offline local.";
+          status.style.color = "orange";
+        });
+    }
+
+    document.getElementById('barcode-input1').addEventListener('input', function(e) {
+      const code = this.value.trim();
+      if(window.bancoProdutos && window.bancoProdutos[code]) {
+        document.getElementById('descricao1').value = window.bancoProdutos[code].toUpperCase();
+        window.modificadoManualmente1 = false;
+        updatePreview();
+      }
+    });
+  </script>
+</body>
+</html>
