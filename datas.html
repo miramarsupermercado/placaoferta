@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Visualizar e Editar Placas</title>
+  <title>Alterar Datas dos Cartazes</title>
   <link rel="icon" href="https://miramarsupermercado.com.br/wp-content/uploads/2024/10/cropped-icone.png" type="image/png">
 
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
@@ -349,6 +349,7 @@
 
     .rodape{
       font-family: Arial, sans-serif;
+      letter-spacing: -0.5px;
       font-weight: bold;
       position:absolute;
       bottom:18px;
@@ -466,7 +467,8 @@
     </div>
 
     <div id="lista-vazia">
-      Buscando cartazes no Firebase ou nenhum item cadastrado...
+      Buscando cartazes...
+      <img src="spinner.gif" alt="Carregando..." style="width:95px; height:50px; margin: 0 auto; display: block;" />
     </div>
   </div>
 
@@ -559,6 +561,7 @@
     appId: "1:434607179238:web:761b336dd551fa4ac4c227",
     measurementId: "G-EH5X5YTTXB"
   };
+
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
@@ -977,10 +980,10 @@
         if (inputIni && inputFim) {
           const di = inputIni.split('-');
           const df = inputFim.split('-');
-          novoRodapeTexto = `OFERTA VÁLIDA DE ${di[2]} À ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+          novoRodapeTexto = `Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
         } else if (!inputIni && inputFim) {
           const df = inputFim.split('-');
-          novoRodapeTexto = `OFERTA VÁLIDA ATÉ ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+          novoRodapeTexto = `Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
         }
         rodOut.textContent = novoRodapeTexto;
 
@@ -988,7 +991,7 @@
         const containerRender = document.getElementById('card-render');
         const { jsPDF } = window.jspdf;
 
-        const canvas = await html2canvas(containerRender, { scale: 8, useCORS: true, backgroundColor: null });
+        const canvas = await html2canvas(containerRender, { scale: 3, useCORS: true, backgroundColor: null });
         const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
 
         const imgData = canvas.toDataURL('image/png');
@@ -999,7 +1002,7 @@
         const imgWidth = canvas.width * ratio;
         const imgHeight = canvas.height * ratio;
         
-        const marginX = (pdfWidth - imgWidth) / 2;
+        const marginX = ((pdfWidth - imgWidth) / 2) + 3
         const marginY = (pdfHeight - imgHeight) / 2 - 5;
 
         pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
@@ -1187,19 +1190,20 @@
         const fFim = inputFim || item.dataFinal || '';
         let novoRodapeTexto = '';
         if (fIni && fFim) {
+            
           const di = fIni.split('-');
           const df = fFim.split('-');
-          novoRodapeTexto = `OFERTA VÁLIDA DE ${di[2]} À ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+          novoRodapeTexto = `Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
         } else if (fFim) {
           const df = fFim.split('-');
-          novoRodapeTexto = `OFERTA VÁLIDA ATÉ ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+          novoRodapeTexto = `Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
         } else {
           novoRodapeTexto = item.rodapeText || item.rodapeOutput || '';
         }
         rodOut.textContent = novoRodapeTexto;
 
         // Cria o canvas individual usando escala idêntica à do index.html para união combinada
-        const canvasItem = await html2canvas(containerRender, { scale: 4, useCORS: true, backgroundColor: null });
+        const canvasItem = await html2canvas(containerRender, { scale: 3, useCORS: true, backgroundColor: null });
         canvases.push(canvasItem);
       }
 
@@ -1397,17 +1401,17 @@
         if (fIni && fFim) {
           const di = fIni.split('-');
           const df = fFim.split('-');
-          novoRodapeTexto = `OFERTA VÁLIDA DE ${di[2]} À ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+          novoRodapeTexto = `Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
         } else if (fFim) {
           const df = fFim.split('-');
-          novoRodapeTexto = `OFERTA VÁLIDA ATÉ ${df[2]}/${df[1]}/${df[0]} OU ENQUANTO DURAR O ESTOQUE`;
+          novoRodapeTexto = `Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
         } else {
           novoRodapeTexto = item.rodapeText || item.rodapeOutput || '';
         }
         rodOut.textContent = novoRodapeTexto;
 
         // Gera o canvas da página corrente
-        const canvas = await html2canvas(containerRender, { scale: 6, useCORS: true, backgroundColor: null });
+        const canvas = await html2canvas(containerRender, { scale: 3, useCORS: true, backgroundColor: null });
         const imgData = canvas.toDataURL('image/png');
 
         if (pdf === null) {
@@ -1425,7 +1429,7 @@
         const imgWidth = canvas.width * ratio;
         const imgHeight = canvas.height * ratio;
         
-        const marginX = (pdfWidth - imgWidth) / 2;
+        const marginX = ((pdfWidth - imgWidth) / 2) + 3
         const marginY = (pdfHeight - imgHeight) / 2 - 5;
 
         pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
