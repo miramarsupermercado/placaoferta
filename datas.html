@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cartazes Salvos</title>
+  <title>Alterar Datas dos Cartazes</title>
   <link rel="icon" href="https://miramarsupermercado.com.br/wp-content/uploads/2024/10/cropped-icone.png" type="image/png">
 
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
@@ -1268,20 +1268,25 @@
         }
 
         // Lógica do rodapé corrigida para usar as novas datas se existirem
+                // Lógica do rodapé corrigida e mais robusta
         const fIni = inputIni || item.dataInicial || '';
         const fFim = inputFim || item.dataFinal || '';
         let novoRodapeTexto = '';
-        if (fIni && fFim) {
-            
-          const di = fIni.split('-');
+
+        // Só tenta formatar se a data final (obrigatória para o formato de data) tiver o formato correto
+        if (fFim && fFim.includes('-')) {
           const df = fFim.split('-');
-          novoRodapeTexto = `Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
-        } else if (fFim) {
-          const df = fFim.split('-');
-          novoRodapeTexto = `Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+          if (fIni && fIni.includes('-')) {
+            const di = fIni.split('-');
+            novoRodapeTexto = `Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+          } else {
+            novoRodapeTexto = `Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+          }
         } else {
-          novoRodapeTexto = item.rodapeText || item.rodapeOutput || '';
+          // Fallback: busca em todas as propriedades possíveis onde o rodapé pode ter sido salvo
+          novoRodapeTexto = item.rodapeText || item.rodapeOutput || item.rodape || '';
         }
+        
         rodOut.textContent = novoRodapeTexto;
 
         // Cria o canvas individual usando escala idêntica à do index.html para união combinada
