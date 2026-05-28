@@ -162,6 +162,7 @@
 
     .rodape{
       font-family: Arial, sans-serif;
+      letter-spacing: -0.4px;
       font-weight: bold;
       position:absolute;
       bottom:18px;
@@ -184,14 +185,23 @@
       width:360px;
       background:#fff;
       border-radius:10px;
-      padding:14px;
+      padding:17.8px;
       box-shadow:0 6px 18px rgba(0,0,0,0.06);
       box-sizing:border-box;
       font-size:14px;
       position: relative;
-      margin-bottom: 295px;
+      margin-bottom: 20px; /* Ajustado para espaçamento natural */
     }
-    .editor-area h3{margin:0 0 8px 0;font-size:16px}
+
+    .editor-area h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      color: var(--blue); /* Garante a mesma cor do título da busca */
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex; /* Permite alinhar o label da campanha lado a lado */
+      align-items: center;
+    }
     .field{margin-bottom:10px}
     label{display:block;font-weight:700;margin-bottom:6px}
     input[type=text], input[type=date], textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ddd;box-sizing:border-box;font-size:14px}
@@ -383,10 +393,16 @@
       box-sizing: border-box;
       font-size: 14px;
       position: relative;
-      margin-bottom: 15px;
+      margin-bottom: 10px; /* Espaço entre a busca e o editor */
       border: 2px solid var(--blue);
     }
-    .barcode-search-area h3 { margin:0 0 8px 0; font-size:16px; color: var(--blue); }
+    .barcode-search-area h3 {
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      color: var(--blue);
+      text-transform: uppercase; /* Opcional: padroniza a leitura */
+      letter-spacing: 0.5px;
+    }
 
     /* Estilos da Guia Lateral Oculta */
     #menu-lateral-toggle {
@@ -434,6 +450,7 @@
       right: 250px;
     }
     .btn-menu-lateral {
+      font-family: Calibri;
       margin-top: -35%;
       display: block;
       width: 100%;
@@ -467,11 +484,10 @@
       bottom: 10px;
       right: 10px;
       z-index: 10002;
-      background: #e67e22;
+      background: #545060;
       color: white;
       border: 2px solid white;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      font-family: 'Oswald', sans-serif;
       font-size: 14px;
       padding: 10px 15px;
       display: none; /* Oculto inicialmente */
@@ -486,7 +502,7 @@
       bottom: 60px;
       right: 10px;
       z-index: 10002;
-      background: #27ae60;
+      background: #2a5cb7;
       color: white;
       border: 2px solid white;
       border-radius: 50px;
@@ -495,7 +511,7 @@
       font-size: 24px;
       height: 45px;
       width: 45px;
-      display: flex;
+      display: none; /* Modificado para ocultar inicialmente */
       align-items: center;
       justify-content: center;
       cursor: pointer;
@@ -505,7 +521,7 @@
     }
     #btn-add-cartaz:hover {
       width: 220px;
-      background: #2ecc71;
+      background: #2a5cb7;
     }
     #btn-add-cartaz .texto {
       display: inline-block;
@@ -526,7 +542,7 @@
 <body>
 
   <button type="button" id="btn-add-cartaz" onclick="iniciarAdicaoCartaz()">
-    <span>+</span><span class="texto"> CRIAR OUTRA PLACA</span>
+    <span>+</span><span class="texto"> ADICIONAR PLACA</span>
   </button>
   <button type="button" id="btn-salvar-todos-congelado" onclick="salvarTodosCartazesPreenchidos()">💾 Salvar Todos os Cartazes</button>
 
@@ -649,7 +665,7 @@
         </div>
       </div>
 
-      <div class="barcode-search-area" style="margin-top: -280px;">
+      <div class="barcode-search-area">
         <h3>🔍 Consultar Código de Barras (Cartaz 2)</h3>
         <div class="field">
           <input id="barcode-input2" type="text" placeholder="Digite ou passe o leitor para o Cartaz 2..." />
@@ -691,7 +707,7 @@
         </div>
         <div class="row">
           <div class="field half">
-            <label>UND / CADA</label>
+            <label>UND / KG</label>
             <input id="cada2" type="text" maxlength="7" placeholder="" value="" />
           </div>
           <div class="field half">
@@ -829,11 +845,22 @@
   });
 
   function iniciarAdicaoCartaz() {
-    addingNewPoster = true;
-    document.getElementById('popup-overlay').style.display = 'flex';
+    if (window.opcaoCartazSelecionada !== "") {
+      addingNewPoster = true;
+      document.getElementById('popup-overlay').style.display = 'flex';
+    } else {
+      addingNewPoster = true;
+      document.getElementById('popup-overlay').style.display = 'flex';
+    }
   }
 
   function selecionarOpcaoCartaz(opcao) {
+    if (addingNewPoster) {
+      window.ultimoEncarteAdicionado = opcao;
+      gerarNovoCartaz();
+      addingNewPoster = false;
+      return;
+    }
     window.opcaoCartazSelecionada = scheme => opcao; // Mantém compatibilidade com escopos
     window.opcaoCartazSelecionada = opcao;
     document.getElementById('popup-overlay').style.display = 'none';
@@ -844,13 +871,6 @@
         if (labelEl) labelEl.textContent = `(${opcao})`;
     }
     
-    document.getElementById('current-category-label').textContent = opcao;
-    
-    if (addingNewPoster) {
-      gerarNovoCartaz();
-      addingNewPoster = false;
-    }
-
     // Altera a imagem de fundo caso seja PREÇO AVULSO
     const cartazes = document.querySelectorAll('.cartaz');
 
@@ -870,12 +890,27 @@
         btnSalvar.style.display = 'block';
     }
 
+    // Exibe o botão de Adicionar Cartaz após a primeira escolha
+    const btnAddCartaz = document.getElementById('btn-add-cartaz');
+    if (btnAddCartaz) {
+        btnAddCartaz.style.display = 'flex';
+    }
+
     if (window.initFirebaseWithCategory) {
         window.initFirebaseWithCategory(opcao);
+    }
+    
+    if (addingNewPoster) {
+      gerarNovoCartaz();
+      addingNewPoster = false;
     }
   }
 
   function gerarNovoCartaz() {
+    const encarteDoCartaz = window.ultimoEncarteAdicionado || window.opcaoCartazSelecionada || 'GERAL';
+    window.ultimoEncarteAdicionado = null;
+    document.getElementById('popup-overlay').style.display = 'none';
+
     window.contadorCartazes++;
     const id = window.contadorCartazes;
 
@@ -902,7 +937,7 @@
     previewsContainer.insertAdjacentHTML('beforeend', previewHTML);
 
     const editorHTML = `
-      <div class="barcode-search-area" style="margin-top: -280px;">
+      <div class="barcode-search-area">
         <h3>🔍 Consultar Código de Barras (Cartaz ${id})</h3>
         <div class="field">
           <input id="barcode-input${id}" type="text" placeholder="Digite ou passe o leitor para o Cartaz ${id}..." />
@@ -910,8 +945,8 @@
         </div>
       </div>
 
-      <div class="editor-area" role="region" aria-label="Editor Cartaz ${id}" style="margin-bottom: 20px;">
-        <h3>Editor do Cartaz ${id} <span id="label-campanha-${id}" style="color:var(--orange); font-size:12px; margin-left:5px;">(${window.opcaoCartazSelecionada})</span></h3>
+      <div class="editor-area" role="region" aria-label="Editor Cartaz ${id}">
+        <h3>Editor do Cartaz ${id} <span id="label-campanha-${id}" style="color:var(--orange); font-size:12px; margin-left:5px;">(${encarteDoCartaz})</span></h3>
         <div class="field">
           <label>Descrição</label>
           <input id="descricao${id}" type="text" placeholder="Ex: LEITE UHT BETÂNIA INTEGRAL OU DESNATADO 1L" maxlength="60" />
@@ -944,7 +979,7 @@
         </div>
         <div class="row">
           <div class="field half">
-            <label>UND / CADA</label>
+            <label>UND / KG</label>
             <input id="cada${id}" type="text" maxlength="7" placeholder="" value="" />
           </div>
           <div class="field half">
@@ -967,15 +1002,16 @@
     }
 
     const novoElementoCartaz = document.getElementById('cartaz' + id);
-    if (window.opcaoCartazSelecionada === 'PREÇO AVULSO') {
+    if (encarteDoCartaz === 'PREÇO AVULSO') {
         novoElementoCartaz.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')";
-    } else if (window.opcaoCartazSelecionada === 'OFERTAS APP') {
+    } else if (encarteDoCartaz === 'OFERTAS APP') {
         novoElementoCartaz.style.backgroundImage = "url('fundo-cartaz-app.png')";
     } else {
         novoElementoCartaz.style.backgroundImage = "url('fundo-cartaz.png')";
     }
 
     const novoCartaz = setupCartaz(id.toString());
+    novoCartaz.encarteExclusivo = encarteDoCartaz;
     window.cartazesAtivos.push(novoCartaz);
 
     document.getElementById('save-cartaz' + id).addEventListener('click', async () => {
@@ -1205,11 +1241,11 @@
         const df = dataFinalInput.value.split('-');
         const diaInicial = di[2];
         const dataFinalFormatada = `${df[2]}/${df[1]}/${df[0]}`;
-        rodapeOutput.textContent = `OFERTA VÁLIDA DE ${diaInicial} À ${dataFinalFormatada} OU ENQUANTO DURAR O ESTOQUE`;
+        rodapeOutput.textContent = `Oferta válida de ${diaInicial} à ${dataFinalFormatada} ou enquanto durar o estoque`;
       } else if (!dataInicialInput.value && dataFinalInput.value) {
         const df = dataFinalInput.value.split('-');
         const dataFinalFormatada = `${df[2]}/${df[1]}/${df[0]}`;
-        rodapeOutput.textContent = `OFERTA VÁLIDA ATÉ ${dataFinalFormatada} OU ENQUANTO DURAR O ESTOQUE`;
+        rodapeOutput.textContent = `Oferta válida até ${dataFinalFormatada} ou enquanto durar o estoque`;
       } else {
         rodapeOutput.textContent = rodapeInput.value || '';
       }
@@ -1321,7 +1357,7 @@
       const imgWidth = canvas.width * ratio;
       const imgHeight = canvas.height * ratio;
       
-      const marginX = (pdfWidth - imgWidth) / 2;
+      const marginX = ((pdfWidth - imgWidth) / 2) + 3
       const marginY = (pdfHeight - imgHeight) / 2 - 5;
 
       pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
@@ -1329,19 +1365,25 @@
       const currentFontSize = window.getComputedStyle(cartazObj.descricaoOutput).fontSize;
       const currentTop = window.getComputedStyle(cartazObj.descricaoOutput).top;
 
+      const encarteAtual = cartazObj.encarteExclusivo || window.opcaoCartazSelecionada || 'GERAL';
+
       // AQUI ESTÁ O TRECHO COMPLETO COM FALSE (SEM IMAGEM)
-      await savePdfToLocalStorage(
-        pdf, 
-        cartazObj.descricaoInput.value || '', 
-        cartazObj.precoOfertaInput.value || '', 
-        cartazObj.dataInicialInput.value || '', 
-        cartazObj.dataFinalInput.value || '',
-        currentFontSize,
-        currentTop,
-        cartazObj.precoAntesInput.value || '',
-        cartazObj.cadaInput.value || '',
-        false
-      );
+      if (window.firebaseSaveHandlerCustom) {
+        await window.firebaseSaveHandlerCustom(pdf, cartazObj.descricaoInput.value || '', cartazObj.precoOfertaInput.value || '', cartazObj.dataInicialInput.value || '', cartazObj.dataFinalInput.value || '', currentFontSize, currentTop, cartazObj.precoAntesInput.value || '', cartazObj.cadaInput.value || '', false, encarteAtual);
+      } else {
+        await savePdfToLocalStorage(
+          pdf, 
+          cartazObj.descricaoInput.value || '', 
+          cartazObj.precoOfertaInput.value || '', 
+          cartazObj.dataInicialInput.value || '', 
+          cartazObj.dataFinalInput.value || '',
+          currentFontSize,
+          currentTop,
+          cartazObj.precoAntesInput.value || '',
+          cartazObj.cadaInput.value || '',
+          false
+        );
+      }
       alert('Cartaz salvo com sucesso!');
     } finally {
       hideLoading();
@@ -1371,19 +1413,25 @@
       const currentFontSize = window.getComputedStyle(cartazObj.descricaoOutput).fontSize;
       const currentTop = window.getComputedStyle(cartazObj.descricaoOutput).top;
 
+      const encarteAtual = cartazObj.encarteExclusivo || window.opcaoCartazSelecionada || 'GERAL';
+
       // AQUI ESTÁ O TRECHO COMPLETO COM TRUE (COM IMAGEM)
-      await savePdfToLocalStorage(
-        pdf, 
-        cartazObj.descricaoInput.value || '', 
-        cartazObj.precoOfertaInput.value || '', 
-        cartazObj.dataInicialInput.value || '', 
-        cartazObj.dataFinalInput.value || '',
-        currentFontSize,
-        currentTop,
-        cartazObj.precoAntesInput.value || '',
-        cartazObj.cadaInput.value || '',
-        true
-      );
+      if (window.firebaseSaveHandlerCustom) {
+        await window.firebaseSaveHandlerCustom(pdf, cartazObj.descricaoInput.value || '', cartazObj.precoOfertaInput.value || '', cartazObj.dataInicialInput.value || '', cartazObj.dataFinalInput.value || '', currentFontSize, currentTop, cartazObj.precoAntesInput.value || '', cartazObj.cadaInput.value || '', true, encarteAtual);
+      } else {
+        await savePdfToLocalStorage(
+          pdf, 
+          cartazObj.descricaoInput.value || '', 
+          cartazObj.precoOfertaInput.value || '', 
+          cartazObj.dataInicialInput.value || '', 
+          cartazObj.dataFinalInput.value || '',
+          currentFontSize,
+          currentTop,
+          cartazObj.precoAntesInput.value || '',
+          cartazObj.cadaInput.value || '',
+          true
+        );
+      }
       alert('Cartaz com imagem salvo com sucesso!');
     } finally {
       hideLoading();
@@ -1427,7 +1475,7 @@
         const imgWidth = canvas.width * ratio;
         const imgHeight = canvas.height * ratio;
         
-        const marginX = (pdfWidth - imgWidth) / 2;
+        const marginX = ((pdfWidth - imgWidth) / 2) + 3
         const marginY = (pdfHeight - imgHeight) / 2 - 5;
 
         pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
@@ -1435,18 +1483,24 @@
         const currentFontSize = window.getComputedStyle(cartazObj.descricaoOutput).fontSize;
         const currentTop = window.getComputedStyle(cartazObj.descricaoOutput).top;
 
-        await savePdfToLocalStorage(
-          pdf, 
-          cartazObj.descricaoInput.value || '', 
-          cartazObj.precoOfertaInput.value || '', 
-          cartazObj.dataInicialInput.value || '', 
-          cartazObj.dataFinalInput.value || '',
-          currentFontSize,
-          currentTop,
-          cartazObj.precoAntesInput.value || '',
-          cartazObj.cadaInput.value || '',
-          false
-        );
+        const encarteAtual = cartazObj.encarteExclusivo || window.opcaoCartazSelecionada || 'GERAL';
+
+        if (window.firebaseSaveHandlerCustom) {
+          await window.firebaseSaveHandlerCustom(pdf, cartazObj.descricaoInput.value || '', cartazObj.precoOfertaInput.value || '', cartazObj.dataInicialInput.value || '', cartazObj.dataFinalInput.value || '', currentFontSize, currentTop, cartazObj.precoAntesInput.value || '', cartazObj.cadaInput.value || '', false, encarteAtual);
+        } else {
+          await savePdfToLocalStorage(
+            pdf, 
+            cartazObj.descricaoInput.value || '', 
+            cartazObj.precoOfertaInput.value || '', 
+            cartazObj.dataInicialInput.value || '', 
+            cartazObj.dataFinalInput.value || '',
+            currentFontSize,
+            currentTop,
+            cartazObj.precoAntesInput.value || '',
+            cartazObj.cadaInput.value || '',
+            false
+          );
+        }
       }
       alert(`${cartazesParaSalvar.length} cartaz(es) salvo(s) com sucesso!`);
     } catch (erro) {
@@ -1492,7 +1546,8 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-import { getDatabase, ref, push, onValue, remove, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getDatabase, ref, push, onValue, remove, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  
   const firebaseConfig = {
     apiKey: "AIzaSyCmOhTHgMHh57whOPojvzNgtBlgMH9JS3I",
     authDomain: "placa-de-ofertas.firebaseapp.com",
@@ -1504,12 +1559,111 @@ import { getDatabase, ref, push, onValue, remove, set, onDisconnect } from "http
     measurementId: "G-EH5X5YTTXB"
   };
 
-
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const db = getDatabase(app);
   
   let currentOnValueUnsubscribe = null;
+
+  // Estado Local (apenas cartazes salvos durante a sessão atual)
+  window.sessionSavedPosters = {};
+
+  window.renderLocalSavedPosters = function() {
+    const pdfList = document.getElementById('pdf-list');
+    if (!pdfList) return;
+    pdfList.innerHTML = '';
+
+    const label = document.getElementById('current-category-label');
+    if (label) label.textContent = 'Sessão Atual';
+
+    const categories = Object.keys(window.sessionSavedPosters);
+    let totalPosters = 0;
+    categories.forEach(cat => totalPosters += window.sessionSavedPosters[cat].length);
+
+    if (totalPosters === 0) {
+      pdfList.innerHTML = '<li>Nenhum cartaz salvo nesta sessão.</li>';
+      return;
+    }
+
+    categories.forEach(category => {
+      const posters = window.sessionSavedPosters[category];
+      if (posters.length === 0) return;
+
+      const headerLi = document.createElement('li');
+headerLi.style.cursor = 'pointer';
+headerLi.style.backgroundColor = '#f3f4f6';
+headerLi.style.padding = '3px';
+headerLi.style.borderRadius = '6px';
+headerLi.style.fontWeight = 'bold';
+headerLi.style.display = 'block';
+headerLi.style.justifyContent = 'space-between';
+headerLi.style.alignItems = 'center'; // <--- ADICIONE ESTA LINHA AQUI
+headerLi.style.color = 'var(--blue)';
+headerLi.style.marginBottom = '5px';
+headerLi.style.border = '1px solid #ddd';
+headerLi.innerHTML = `<span>${category} (${posters.length})</span> <span>▼</span>`;
+
+      const contentLi = document.createElement('li');
+      contentLi.style.display = 'none';
+      contentLi.style.flexDirection = 'column';
+      contentLi.style.gap = '10px';
+      contentLi.style.padding = '5px 10px 10px 10px';
+      contentLi.style.borderLeft = '2px solid var(--blue)';
+      contentLi.style.marginLeft = '5px';
+      contentLi.style.marginBottom = '10px';
+
+      headerLi.addEventListener('click', () => {
+        const isHidden = contentLi.style.display === 'none';
+        contentLi.style.display = isHidden ? 'flex' : 'none';
+        headerLi.querySelector('span:last-child').textContent = isHidden ? '▲' : '▼';
+      });
+
+      posters.forEach(poster => {
+        const itemDiv = document.createElement('div');
+        itemDiv.style.display = 'flex';
+        itemDiv.style.flexDirection = 'column';
+        itemDiv.style.gap = '4px';
+        itemDiv.style.marginBottom = '8px';
+
+        const descricaoLink = document.createElement('a');
+        descricaoLink.href = base64ToBlobUrl(poster.base64);
+        descricaoLink.target = '_blank';
+        descricaoLink.textContent = `Criado em: ${poster.dateStr} ${poster.timeStr} | Descrição: ${poster.descricaoText.toUpperCase()} | Preço: R$ ${poster.precoText}`;
+        descricaoLink.classList.add('descricao-link');
+        descricaoLink.style.textDecoration = 'none';
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '❌ Remover desta sessão';
+        delBtn.style.marginLeft = '0';
+        delBtn.style.cursor = 'pointer';
+        delBtn.style.fontSize = '12px';
+        delBtn.style.color = '#c00';
+        delBtn.style.background = 'none';
+        delBtn.style.border = 'none';
+        delBtn.style.textAlign = 'left';
+        delBtn.title = 'Remover cartaz salvo';
+        delBtn.addEventListener('click', async () => {
+          // Remove localmente
+          window.sessionSavedPosters[category] = window.sessionSavedPosters[category].filter(p => p.id !== poster.id);
+          window.renderLocalSavedPosters();
+          
+          // Tenta remover do firebase para manter sincronia se ele estiver salvo
+          if (poster.id) {
+              const path = formatPathName(category);
+              const itemRef = ref(db, `cartazes/${path}/${poster.id}`);
+              try { await remove(itemRef); } catch(e) {}
+          }
+        });
+
+        itemDiv.appendChild(descricaoLink);
+        itemDiv.appendChild(delBtn);
+        contentLi.appendChild(itemDiv);
+      });
+
+      pdfList.appendChild(headerLi);
+      pdfList.appendChild(contentLi);
+    });
+  };
 
   function formatPathName(name) {
     if (!name) return 'geral';
@@ -1525,18 +1679,28 @@ import { getDatabase, ref, push, onValue, remove, set, onDisconnect } from "http
     const categoryPath = formatPathName(categoryName);
     const cartazesRef = ref(db, 'cartazes/' + categoryPath);
 
-    window.firebaseSaveHandler = async function(pdf, descricaoText, precoText, dataInicial = '', dataFinal = '', customFontSize = '', customTop = '', precoAntigoText = '', cadaText = '', comImagem = false) {
+    window.firebaseSaveHandlerCustom = async function(pdf, descricaoText, precoText, dataInicial = '', dataFinal = '', customFontSize = '', customTop = '', precoAntigoText = '', cadaText = '', comImagem = false, encarteCustom) {
       const pdfBlob = pdf.output('blob');
       const base64 = await blobToBase64(pdfBlob);
       const now = new Date();
       const dateStr = now.toLocaleDateString('pt-BR');
       const timeStr = now.toLocaleTimeString('pt-BR');
-      const filename = sanitizeFileName(descricaoText + '-A4', 'pdf');
+      
+      let descricaoComCampanha = descricaoText;
+      if (encarteCustom) {
+        if (!descricaoText.toUpperCase().startsWith(`[${encarteCustom}]`)) {
+          descricaoComCampanha = `[${encarteCustom}] ${descricaoText}`;
+        }
+      }
+      const filename = sanitizeFileName(descricaoComCampanha + '-A4', 'pdf');
 
-      await push(cartazesRef, {
+      const customCategoryPath = formatPathName(encarteCustom);
+      const customCartazesRef = ref(db, 'cartazes/' + customCategoryPath);
+
+      const newPosterRef = await push(customCartazesRef, {
         filename,
         base64,
-        descricaoText,
+        descricaoText: descricaoComCampanha,
         precoText,
         dataInicial,
         dataFinal,
@@ -1548,54 +1712,39 @@ import { getDatabase, ref, push, onValue, remove, set, onDisconnect } from "http
         timeStr,
         timestamp: now.getTime()
       });
+
+      const cat = encarteCustom || 'GERAL';
+      if (!window.sessionSavedPosters[cat]) {
+        window.sessionSavedPosters[cat] = [];
+      }
+      
+      window.sessionSavedPosters[cat].push({
+        id: newPosterRef.key,
+        base64,
+        descricaoText: descricaoComCampanha,
+        precoText,
+        dateStr,
+        timeStr
+      });
+
+      window.renderLocalSavedPosters();
+    };
+
+    window.firebaseSaveHandler = async function(pdf, descricaoText, precoText, dataInicial = '', dataFinal = '', customFontSize = '', customTop = '', precoAntigoText = '', cadaText = '', comImagem = false) {
+      const currentEncarte = window.opcaoCartazSelecionada || 'GERAL';
+      await window.firebaseSaveHandlerCustom(pdf, descricaoText, precoText, dataInicial, dataFinal, customFontSize, customTop, precoAntigoText, cadaText, comImagem, currentEncarte);
     };
 
     const unsubscribe = onValue(cartazesRef, (snapshot) => {
-      const pdfList = document.getElementById('pdf-list');
-      pdfList.innerHTML = '';
-
-      if (!snapshot.exists()) {
-        pdfList.innerHTML = '<li>Nenhum cartaz salvo nesta categoria.</li>';
-        return;
-      }
-
-      const data = snapshot.val();
-      const saved = Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      })).sort((a, b) => b.timestamp - a.timestamp);
-
-      saved.forEach(({ id, base64, descricaoText, precoText, dateStr, timeStr }) => {
-        const li = document.createElement('li');
-        li.style.display = 'flex';
-        li.style.flexDirection = 'column';
-        li.style.gap = '4px';
-
-        const descricaoLink = document.createElement('a');
-        descricaoLink.href = base64ToBlobUrl(base64);
-        descricaoLink.target = '_blank';
-        descricaoLink.textContent = `Criado em: ${dateStr} ${timeStr} | Descrição: ${descricaoText.toUpperCase()} | Preço: R$ ${precoText}`;
-        descricaoLink.classList.add('descricao-link');
-        descricaoLink.style.textDecoration = 'none';
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '❌';
-        delBtn.style.marginLeft = '0';
-        delBtn.style.cursor = 'pointer';
-        delBtn.title = 'Remover cartaz salvo';
-        delBtn.addEventListener('click', async () => {
-          const itemRef = ref(db, `cartazes/${categoryPath}/${id}`);
-          await remove(itemRef);
-        });
-
-        li.appendChild(descricaoLink);
-        li.appendChild(delBtn);
-
-        pdfList.appendChild(li);
-      }); 
+      // Intencionalmente mantido para possíveis futuros usos de escuta,
+      // Mas o #saved-list deixará de puxar do firebase e mostrará apenas 
+      // a listagem da sessão local independente.
     });
 
     currentOnValueUnsubscribe = unsubscribe;
+    
+    // Atualiza a visualização local para refletir a sessão independentemente da categoria
+    window.renderLocalSavedPosters();
   };
 
   // Inicializa a escuta padrão do Firebase com 'geral' antes de selecionarem o popup
