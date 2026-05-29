@@ -496,6 +496,22 @@
         <label for="filtro-preco">Buscar por Preço</label>
         <input type="text" id="filtro-preco" class="input-filtro" placeholder="Ex: 5,99...">
       </div>
+      <div class="field-data">
+  <label for="filtro-loja">Buscar por Loja</label>
+  <select id="filtro-loja" class="input-filtro" style="width: 160px;">
+    <option value="">Todas as Lojas</option>
+    <option value="Loja 1">Loja 1</option>
+    <option value="Loja 2">Loja 2</option>
+    <option value="Loja 3">Loja 3</option>
+    <option value="Loja 4">Loja 4</option>
+    <option value="Loja 5">Loja 5</option>
+    <option value="Loja 6">Loja 6</option>
+    <option value="Loja 7">Loja 7</option>
+    <option value="Loja 8">Loja 8</option>
+    <option value="Loja 9">Loja 9</option>
+    <option value="Loja 10">Loja 10</option>
+  </select>
+</div>
       <button class="btn-salvar-lote" id="btn-excluir-selecionados" style="background:#c0392b; height: 39px; margin-right: auto;">🗑️ Excluir Selecionados</button>
     </div>
     
@@ -509,6 +525,7 @@
             <th class="sortable" data-sort="tipo">Tipo <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="vigencia">Data de Vigência <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="preco">Preço Oferta <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="loja">Loja <span class="sort-icon"></span></th> <!-- Nova Coluna -->
             <th class="sortable" data-sort="salvo">Salvo em <span class="sort-icon"></span></th>
             <th class="col-acoes">Ações</th>
           </tr>
@@ -726,6 +743,7 @@
     const valFiltroTipo = document.getElementById('filtro-tipo').value.toLowerCase().trim();
     const valFiltroDesc = document.getElementById('filtro-descricao').value.toLowerCase().trim();
     const valFiltroPreco = document.getElementById('filtro-preco').value.toLowerCase().trim();
+    const valFiltroLoja = document.getElementById('filtro-loja').value.toLowerCase().trim();
 
     // Mapeia os dados processando as propriedades necessárias para ordenação
     let itensArray = Object.keys(window.listaCartazesMemoria).map((id) => {
@@ -770,6 +788,7 @@
         vigencia: vigenciaExibicao.toUpperCase(),
         precoTexto: item.precoText ? 'R$ ' + item.precoText : 'Em branco',
         precoValor: precoNum,
+        loja: item.lojaText || 'Não informada', // Captura o campo salvo pelo index.html
         salvoTexto: `${item.dateStr} às ${item.timeStr}`,
         timestamp: item.timestamp || 0,
         base64: item.base64
@@ -778,17 +797,19 @@
 
     // Aplica o filtro de pesquisa dinamicamente se houver dados digitados
     itensArray = itensArray.filter(row => {
-      let matchTipo = true;
-      if (valFiltroTipo) {
-        if (valFiltroTipo === "preço avulso") {
-          matchTipo = row.tipo.toLowerCase().includes("preço avulso") || row.tipo.toLowerCase().includes("placa avulsa");
-        } else {
-          matchTipo = row.tipo.toLowerCase().includes(valFiltroTipo);
-        }
-      }
+  let matchTipo = true;
+  if (valFiltroTipo) {
+    if (valFiltroTipo === "preço avulso") {
+      matchTipo = row.tipo.toLowerCase().includes("preço avulso") || row.tipo.toLowerCase().includes("placa avulsa");
+    } else {
+      matchTipo = row.tipo.toLowerCase().includes(valFiltroTipo);
+    }
+  }
       const matchDesc = !valFiltroDesc || row.descricao.toLowerCase().includes(valFiltroDesc);
       const matchPreco = !valFiltroPreco || row.precoTexto.toLowerCase().includes(valFiltroPreco);
-      return matchTipo && matchDesc && matchPreco;
+        const matchLoja = !valFiltroLoja || row.loja.toLowerCase().includes(valFiltroLoja); // Nova condição
+
+      return matchTipo && matchDesc && matchPreco && matchLoja;
     });
 
     if (itensArray.length === 0) {
@@ -806,8 +827,10 @@
     itensArray.sort((a, b) => {
       let comparison = 0;
       if (window.currentSortColumn === 'descricao') {
-        comparison = a.descricao.localeCompare(b.descricao);
-      } else if (window.currentSortColumn === 'tipo') {
+  comparison = a.descricao.localeCompare(b.descricao);
+} else if (window.currentSortColumn === 'loja') { // Adicione esta condição
+  comparison = a.loja.localeCompare(b.loja);
+} else if (window.currentSortColumn === 'tipo') {
         comparison = a.tipo.localeCompare(b.tipo);
       } else if (window.currentSortColumn === 'vigencia') {
         comparison = a.vigencia.localeCompare(b.vigencia);
@@ -873,6 +896,7 @@
         <td class="col-tipo" style="color: ${corDoTipo};">${row.tipo === "PREÇO AVULSO" ? "PLACA AVULSA" : row.tipo}</td>
         <td class="col-vigencia">${row.vigencia}</td>
         <td class="col-preco">${row.precoTexto}</td>
+        <td class="col-loja" style="font-weight: bold; color: #555;">${row.loja}</td> <!-- Nova Célula -->
         <td class="col-salvo">${row.salvoTexto}</td>
         <td class="col-acoes">
           <a href="${pdfUrl}" target="_blank" class="btn-visualizar" title="Visualizar">
@@ -912,6 +936,7 @@
   document.getElementById('filtro-tipo').addEventListener('change', () => { window.paginaAtual = 1; renderizarTabela(); });
   document.getElementById('filtro-descricao').addEventListener('input', () => { window.paginaAtual = 1; renderizarTabela(); });
   document.getElementById('filtro-preco').addEventListener('input', () => { window.paginaAtual = 1; renderizarTabela(); });
+  document.getElementById('filtro-loja').addEventListener('change', () => { window.paginaAtual = 1; renderizarTabela(); });
 
   // Eventos dos botões de paginação
   document.getElementById('prev-page').addEventListener('click', () => {
