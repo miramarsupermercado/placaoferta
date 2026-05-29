@@ -576,6 +576,61 @@
       display: inline-block;
       animation: anim-down 0.25s ease-out;
     }
+
+    /* Estilos do Pop-up de Seleção de Loja */
+    #popup-loja-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 10001;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+    #popup-loja-container {
+      background: white;
+      width: 450px;
+      max-width: 90%;
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+      padding: 25px;
+      box-sizing: border-box;
+      text-align: center;
+      font-family: 'Oswald', sans-serif;
+    }
+    #popup-loja-container h2 {
+      margin-top: 0;
+      color: var(--blue);
+      font-size: 24px;
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .loja-options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .popup-btn-loja {
+      padding: 12px;
+      background: var(--blue);
+      color: white;
+      font-family: 'Oswald', sans-serif;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .popup-btn-loja:hover {
+      background: var(--orange);
+      transform: scale(1.03);
+    }
   </style>
 </head>
 <body>
@@ -608,6 +663,24 @@
         <button type="button" class="popup-btn-option" style="background-image: url('capa-fds.png');" onclick="selecionarOpcaoCartaz('FDS DE OFERTAS')"></button>
         <button type="button" class="popup-btn-option" style="background-image: url('capa-fecha mês.png');" onclick="selecionarOpcaoCartaz('FECHA MÊS')"></button>
         <button type="button" class="popup-btn-option" style="background-image: url('capa-preço avulso.png'); background-color: #f3f4f6;" onclick="selecionarOpcaoCartaz('PREÇO AVULSO')"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="popup-loja-overlay">
+    <div id="popup-loja-container">
+      <h2>Selecione a Loja</h2>
+      <div class="loja-options-grid">
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 1')">Loja 1</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 2')">Loja 2</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 3')">Loja 3</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 4')">Loja 4</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 5')">Loja 5</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 6')">Loja 6</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 7')">Loja 7</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 8')">Loja 8</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 9')">Loja 9</button>
+        <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 10')">Loja 10</button>
       </div>
     </div>
   </div>
@@ -783,6 +856,9 @@
   window.cartazesAtivos = [];
   let addingNewPoster = false;
 
+  // Variável global para armazenar a loja selecionada na sessão
+  window.lojaSelecionadaSessao = "";
+
   // Função para controlar a abertura/fechamento do menu lateral
   function toggleMenuLateral() {
     const container = document.getElementById('menu-lateral-container');
@@ -904,6 +980,9 @@
     window.opcaoCartazSelecionada = opcao;
     document.getElementById('popup-overlay').style.display = 'none';
 
+    // Apresenta o pop-up de selecionar a LOJA após selecionar o encarte
+    document.getElementById('popup-loja-overlay').style.display = 'flex';
+
     // Update labels de todos os cartazes gerados até o momento
     for (let i = 1; i <= window.contadorCartazes; i++) {
         const labelEl = document.getElementById('label-campanha-' + i);
@@ -943,6 +1022,12 @@
       gerarNovoCartaz();
       addingNewPoster = false;
     }
+  }
+
+  // Função para salvar a escolha da loja na sessão atual
+  function selecionarLoja(loja) {
+    window.lojaSelecionadaSessao = loja;
+    document.getElementById('popup-loja-overlay').style.display = 'none';
   }
 
   function gerarNovoCartaz() {
@@ -1710,7 +1795,7 @@
         const descricaoLink = document.createElement('a');
         descricaoLink.href = base64ToBlobUrl(poster.base64);
         descricaoLink.target = '_blank';
-        descricaoLink.textContent = `Criado em: ${poster.dateStr} ${poster.timeStr} | Descrição: ${poster.descricaoText.toUpperCase()} | Preço: R$ ${poster.precoText}`;
+        descricaoLink.textContent = `Criado em: ${poster.dateStr} ${poster.timeStr} | Loja: ${poster.lojaText || 'Não informada'} | Descrição: ${poster.descricaoText.toUpperCase()} | Preço: R$ ${poster.precoText}`;
         descricaoLink.classList.add('descricao-link');
         descricaoLink.style.textDecoration = 'none';
 
@@ -1791,6 +1876,7 @@
         rodapeText,
         dateStr,
         timeStr,
+        lojaText: window.lojaSelecionadaSessao || 'Não informada',
         timestamp: now.getTime()
       });
 
@@ -1806,6 +1892,7 @@
         precoText,
         dateStr,
         timeStr,
+        lojaText: window.lojaSelecionadaSessao || 'Não informada',
         rodapeText
       });
 
