@@ -6,7 +6,7 @@
   <title>Visualizar e Editar Cartazes</title>
   <link rel="icon" href="https://miramarsupermercado.com.br/wp-content/uploads/2024/10/cropped-icone.png" type="image/png">
 
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@800&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -18,8 +18,7 @@
       --card-bg:#ffffff;
       --text:#222;
     }
-    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f1f3f6;}
-    
+    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f1f3f6;}\n    
     .container-geral {
       max-width: 1150px;
       margin: 0 auto;
@@ -445,7 +444,7 @@
       font-weight: bold;
     }
     .btn-paginacao:disabled {
-      background: #ccc;
+       background: #ccc;
       cursor: not-allowed;
     }
     #info-paginacao {
@@ -453,6 +452,22 @@
       color: var(--blue);
       font-size: 14px;
     }
+
+    /* REGRAS ADICIONADAS PARA SUPORTE EXCLUSIVO AO MODO APP E OFERTA DIA (FIDELIDADE INDEX.HTML) */
+    .price-stack { display: contents; }
+    .cartaz.app-mode .descricao { font-family: 'Baloo 2', sans-serif; letter-spacing: -1px; max-width: 95%; }
+    .cartaz.app-mode .preco-antigo { font-family: 'Baloo 2', sans-serif; font-weight: 800; letter-spacing: -1px; color: #1a1a1ad1 }
+    .cartaz.app-mode .preco-area { font-family: 'Baloo 2', sans-serif; font-weight: 800; left: -3px; letter-spacing: -1px;}
+    .cartaz.app-mode .rs { font-family: 'Baloo 2', sans-serif; left: -15px; }
+    .cartaz.app-mode .big-value { font-family: 'Baloo 2', sans-serif; letter-spacing: 10px; }
+    .cartaz.app-mode .price-stack { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
+    .cartaz.app-mode .centavos { font-family: 'Baloo 2', sans-serif; letter-spacing: -3px; font-size: 80px; margin-top: 6px; }
+    .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -5px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
+    .cartaz.app-mode .rodape { font-family: Arial, sans-serif; letter-spacing: -0.4px; position:absolute; bottom:-1px; left:10px; right:20px; font-size:14px; text-align:center; color:#222; font-weight: normal; }
+    .cartaz.oferta-dia-mode { background-image: url('fundo-ofertadia.png'); }
+    .cartaz.oferta-dia-mode .descricao { color: #000000; top: 115px; font-family:'UturnaRoundBold'; }
+    .cartaz.oferta-dia-mode .preco-antigo { color: #313131 !important; }
+    .cartaz.oferta-dia-mode .big-value, .cartaz.oferta-dia-mode .centavos, .cartaz.oferta-dia-mode .rs { color: #101010; }
   </style>
 </head>
 <body>
@@ -525,8 +540,7 @@
             <th class="sortable" data-sort="tipo">Tipo <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="vigencia">Data de Vigência <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="preco">Preço Oferta <span class="sort-icon"></span></th>
-            <th class="sortable" data-sort="loja">Loja <span class="sort-icon"></span></th> <!-- Nova Coluna -->
-            <th class="sortable" data-sort="salvo">Salvo em <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="loja">Loja <span class="sort-icon"></span></th> <th class="sortable" data-sort="salvo">Salvo em <span class="sort-icon"></span></th>
             <th class="col-acoes">Ações</th>
           </tr>
         </thead>
@@ -555,8 +569,10 @@
         <div class="preco-area" id="area-preco-render">
           <div class="rs" id="rs-render">R$</div>
           <div class="big-value" id="reais-render"></div>
-          <div class="centavos" id="centavos-render"></div>
-          <div class="cada" id="cada-render"></div>
+          <div class="price-stack" id="price-stack-render">
+            <div class="centavos" id="centavos-render"></div>
+            <div class="cada" id="cada-render"></div>
+          </div>
         </div>
         <div class="rodape" id="rodape-render"></div>
       </div>
@@ -713,7 +729,7 @@
           const itemRef = ref(db, `cartazes/${id}`);
           await remove(itemRef);
         }
-        document.getElementById('select-all-cartazes').checked = false;
+        document.getElementById('select-all-cartazes').checked = false;      
       } catch (err) {
         console.error(err);
         alert('Ocorreu um erro ao tentar excluir os cartazes selecionados.');
@@ -792,8 +808,8 @@
         salvoTexto: `${item.dateStr} às ${item.timeStr}`,
         timestamp: item.timestamp || 0,
         base64: item.base64
-      };
-    });
+      }
+        });
 
     // Aplica o filtro de pesquisa dinamicamente se houver dados digitados
     itensArray = itensArray.filter(row => {
@@ -896,8 +912,7 @@
         <td class="col-tipo" style="color: ${corDoTipo};">${row.tipo === "PREÇO AVULSO" ? "PLACA AVULSA" : row.tipo}</td>
         <td class="col-vigencia">${row.vigencia}</td>
         <td class="col-preco">${row.precoTexto}</td>
-        <td class="col-loja" style="font-weight: bold; color: #555;">${row.loja}</td> <!-- Nova Célula -->
-        <td class="col-salvo">${row.salvoTexto}</td>
+        <td class="col-loja" style="font-weight: bold; color: #555;">${row.loja}</td> <td class="col-salvo">${row.salvoTexto}</td>
         <td class="col-acoes">
           <a href="${pdfUrl}" target="_blank" class="btn-visualizar" title="Visualizar">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -914,8 +929,7 @@
 <a href="${pdfUrl}" download="${nomeParaDownload}" class="btn-baixar" title="Baixar">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
+        <polyline points="7 10 12 15 17 10"></polyline>\n        <line x1="12" y1="15" x2="12" y2="3"></line>
     </svg>
 </a>
 <button onclick="window.excluirCartazItem('${row.id}')" class="btn-excluir" title="Excluir">
@@ -1168,6 +1182,239 @@
         }
         rodOut.textContent = novoRodapeTexto;
 
+        // --- INÍCIO DA FIDELIDADE VISUAL (APP MODE E OFERTA DO DIA) ---
+        let encarteAtual = "GERAL";
+        let descricaoParaEncarte = item.descricaoText || "";
+        if (descricaoParaEncarte.startsWith("[")) {
+          const idx = descricaoParaEncarte.indexOf("]");
+          if (idx !== -1) {
+            encarteAtual = descricaoParaEncarte.substring(1, idx).toUpperCase();
+          }
+        }
+
+        const cartazRender = document.getElementById('cartaz-render');
+        const appMode = (encarteAtual === 'OFERTAS APP');
+        const isOfertaDoDia = (encarteAtual === 'OFERTA DO DIA');
+        const stackRender = document.getElementById('price-stack-render');
+
+        if (encarteAtual === 'PREÇO AVULSO' || encarteAtual === 'PLACA AVULSA') {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')";
+        } else if (appMode) {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz-app.png')";
+        } else if (isOfertaDoDia) {
+            cartazRender.style.backgroundImage = "url('fundo-ofertadia.png')";
+        } else {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz.png')";
+        }
+
+        if (appMode) {
+            cartazRender.classList.add('app-mode');
+            cartazRender.classList.remove('oferta-dia-mode');
+            rsOut.textContent = 'POR: R$';
+        } else if (isOfertaDoDia) {
+            cartazRender.classList.remove('app-mode');
+            cartazRender.classList.add('oferta-dia-mode');
+            rsOut.textContent = 'R$';
+        } else {
+            cartazRender.classList.remove('app-mode');
+            cartazRender.classList.remove('oferta-dia-mode');
+            rsOut.textContent = 'R$';
+        }
+
+        const textLength = dOut.textContent.length;
+        if (!item.customFontSize || !item.customTop) { 
+            if (appMode) {
+                let fs;
+                if (textLength <= 10) fs = 100;
+                else if (textLength <= 15) fs = 80;
+                else if (textLength <= 25) fs = 50;
+                else if (textLength <= 35) fs = 45;
+                else fs = 40;
+                dOut.style.fontSize = fs + 'px';
+                dOut.style.top = '235px';
+            } else {
+                if (isOfertaDoDia) {
+                    dOut.style.top = '115px';
+                } else {
+                    dOut.style.top = '170px';
+                }
+            }
+        }
+
+        const precoOfertaVal = item.precoText || '';
+        const parts = formatPtBrToParts(precoOfertaVal);
+        if (appMode) {
+            if (parts.reais.length >= 3) {
+                rOut.style.fontSize = '95px';
+                rOut.style.transform = 'scaleY(1.5)';
+                rOut.style.letterSpacing = '-4px';
+                rOut.style.marginTop = '20px';
+                cOut.style.fontSize = '50px';
+                if(stackRender) stackRender.style.marginTop = '20px';
+                rsOut.style.left = '-10px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                rOut.style.top = '';
+            } else if (parts.reais.length === 2) {
+                rOut.style.fontSize = '170px';
+                rOut.style.transform = 'scaleY(1)';
+                rOut.style.letterSpacing = '-8px';
+                rOut.style.marginTop = '0px';
+                cOut.style.fontSize = '80px';
+                if(stackRender) stackRender.style.marginTop = '0px';
+                rsOut.style.left = '-1px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                rOut.style.top = '';
+            } else {
+                rOut.style.fontSize = '190px';
+                rOut.style.transform = 'scaleY(1)';
+                rsOut.style.left = '-1px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                cOut.style.fontSize = '80px';
+                rOut.style.letterSpacing = '';
+                if(stackRender) stackRender.style.marginTop = '0px';
+                rOut.style.top = '270px';
+            }
+        } else if (isOfertaDoDia) {
+            rOut.style.letterSpacing = '5px';
+            rOut.style.marginTop = '5px';
+            cOut.style.fontSize = '70px';
+            if(stackRender) stackRender.style.marginTop = '5px';
+            rsOut.style.left = '-20px';
+            rsOut.style.fontSize = '32px';
+            rOut.style.top = '170px';
+            if (parts.reais.length >= 3) {
+                rOut.style.fontSize = '200px';
+                rOut.style.transform = 'scaleY(1.1)';
+                rsOut.style.top = '20px';
+            } else {
+                rOut.style.fontSize = '240px';
+                rOut.style.transform = 'scaleY(1)';
+            }
+        } else {
+            rOut.style.letterSpacing = '';
+            rOut.style.marginTop = '';
+            rOut.style.top = '';
+            cOut.style.fontSize = '';
+            if(stackRender) stackRender.style.marginTop = '';
+            rsOut.style.left = '';
+            rsOut.style.marginTop = '';
+            rsOut.style.fontSize = '';
+            rsOut.style.top = '';
+        }
+
+        const precoAntesVal = item.precoAntigoText || item.precoAntesText || '';
+        if (precoAntesVal.trim()) {
+            const vAntes = Number(String(precoAntesVal).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+            const parteInteira = precoOfertaVal.split(',')[0].replace(/\D/g, '');
+            const charsLeftOfComma = parteInteira.length;
+            if (!isNaN(vAntes)) {
+                const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                if (appMode) {
+                    if (charsLeftOfComma >= 3) {
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.style.position = 'relative';
+                        pAntigoOut.style.top = '315px';
+                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.color = '#1a1a1ad1';
+                        pAntigoOut.style.fontFamily = "'Baloo 2'";
+                        pAntigoOut.style.fontSize = '30px';
+                        pAntigoOut.style.margin = '6px 0 8px 0';
+                        areaPreco.style.top = '290px';
+                    } else {
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.style.position = 'relative';
+                        pAntigoOut.style.top = '315px';
+                        pAntigoOut.style.right = '110px';
+                        if (charsLeftOfComma === 1) {
+                            areaPreco.style.top = '285px';
+                        } else {
+                            areaPreco.style.top = '290px';
+                        }
+                        pAntigoOut.style.color = '';
+                        pAntigoOut.style.fontFamily = '';
+                        pAntigoOut.style.fontSize = '';
+                        pAntigoOut.style.margin = '6px 0 8px 0';
+                    }
+                } else if (isOfertaDoDia) {
+                    pAntigoOut.innerHTML = `DE<br><span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>POR:`;
+                    pAntigoOut.style.color = '#ff0000';
+                    pAntigoOut.style.fontFamily = "'SugoDisplay'";
+                    pAntigoOut.style.fontSize = '28px';
+                    pAntigoOut.style.margin = '5px 0';
+                    if (charsLeftOfComma === 1 || charsLeftOfComma === 2) {
+                        pAntigoOut.style.top = '250px'; 
+                        pAntigoOut.style.right = '140px';
+                        areaPreco.style.top = '130px';
+                    } else {
+                        pAntigoOut.style.top = '210px';
+                        pAntigoOut.style.right = '0px';
+                        pAntigoOut.innerHTML = `DE <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span> POR:`;
+                        areaPreco.style.top = '190px';
+                    }
+                }
+            }
+        } else {
+            if (appMode) {
+                areaPreco.style.top = '345px';
+            } else if (isOfertaDoDia) {
+                areaPreco.style.top = '210px';
+            } else {
+                areaPreco.style.top = '290px';
+            }
+        }
+
+        const textoCada2 = item.cadaText || item.cadaOutput || '';
+        const len = textoCada2.length;
+        if (appMode) {
+            if (len === 7) { cadaOut.style.fontSize = '18px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; }
+            else if (len === 6) { cadaOut.style.fontSize = '24px'; cadaOut.style.marginLeft = '20px'; cadaOut.style.left = 'auto'; }
+            else if (len === 5) { cadaOut.style.fontSize = '27px'; cadaOut.style.marginLeft = '20px'; cadaOut.style.left = 'auto'; }
+            else { cadaOut.style.fontSize = '30px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; }
+        } else {
+            cadaOut.style.marginLeft = '';
+        }
+
+        let dtIni = item.dataInicial || '';
+        let dtFim = item.dataFinal || '';
+        let rodapeDataFim = dtFim;
+        let rodapeDataIni = dtIni;
+        if (typeof inputFim !== 'undefined' && inputFim) {
+            rodapeDataFim = inputFim;
+            rodapeDataIni = inputIni || '';
+        }
+
+        if (appMode) {
+            if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
+                const di = rodapeDataIni.split('-');
+                const df = rodapeDataFim.split('-');
+                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent; 
+            } else if (!rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
+                const df = rodapeDataFim.split('-'); 
+                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            } else {
+                rodOut.innerHTML = item.rodapeText || item.rodapeOutput || '';
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            }
+        } else if (isOfertaDoDia) {
+            if (rodapeDataIni && rodapeDataIni.includes('-')) {
+                const di = rodapeDataIni.split('-');
+                rodOut.textContent = `Aproveite! Oferta exclusiva para o dia ${di[2]}/${di[1]} ou enquanto durar o estoque`;
+                rodOut.style.top ='410px';
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            } else {
+                rodOut.textContent = ``;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            }
+        } else {
+            rodOut.style.top = '';
+        }
+        // --- FIM DA FIDELIDADE VISUAL ---
+
         // 6. Renderiza de forma invisível via html2canvas e cria o PDF A4
         const containerRender = document.getElementById('card-render');
         const { jsPDF } = window.jspdf;
@@ -1391,6 +1638,239 @@
         
         rodOut.textContent = novoRodapeTexto;
 
+        // --- INÍCIO DA FIDELIDADE VISUAL (APP MODE E OFERTA DO DIA) ---
+        let encarteAtual = "GERAL";
+        let descricaoParaEncarte = item.descricaoText || "";
+        if (descricaoParaEncarte.startsWith("[")) {
+          const idx = descricaoParaEncarte.indexOf("]");
+          if (idx !== -1) {
+            encarteAtual = descricaoParaEncarte.substring(1, idx).toUpperCase();
+          }
+        }
+
+        const cartazRender = document.getElementById('cartaz-render');
+        const appMode = (encarteAtual === 'OFERTAS APP');
+        const isOfertaDoDia = (encarteAtual === 'OFERTA DO DIA');
+        const stackRender = document.getElementById('price-stack-render');
+
+        if (encarteAtual === 'PREÇO AVULSO' || encarteAtual === 'PLACA AVULSA') {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')";
+        } else if (appMode) {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz-app.png')";
+        } else if (isOfertaDoDia) {
+            cartazRender.style.backgroundImage = "url('fundo-ofertadia.png')";
+        } else {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz.png')";
+        }
+
+        if (appMode) {
+            cartazRender.classList.add('app-mode');
+            cartazRender.classList.remove('oferta-dia-mode');
+            rsOut.textContent = 'POR: R$';
+        } else if (isOfertaDoDia) {
+            cartazRender.classList.remove('app-mode');
+            cartazRender.classList.add('oferta-dia-mode');
+            rsOut.textContent = 'R$';
+        } else {
+            cartazRender.classList.remove('app-mode');
+            cartazRender.classList.remove('oferta-dia-mode');
+            rsOut.textContent = 'R$';
+        }
+
+        const textLength = dOut.textContent.length;
+        if (!item.customFontSize || !item.customTop) { 
+            if (appMode) {
+                let fs;
+                if (textLength <= 10) fs = 100;
+                else if (textLength <= 15) fs = 80;
+                else if (textLength <= 25) fs = 50;
+                else if (textLength <= 35) fs = 45;
+                else fs = 40;
+                dOut.style.fontSize = fs + 'px';
+                dOut.style.top = '235px';
+            } else {
+                if (isOfertaDoDia) {
+                    dOut.style.top = '115px';
+                } else {
+                    dOut.style.top = '170px';
+                }
+            }
+        }
+
+        const precoOfertaVal = item.precoText || '';
+        const parts = formatPtBrToParts(precoOfertaVal);
+        if (appMode) {
+            if (parts.reais.length >= 3) {
+                rOut.style.fontSize = '95px';
+                rOut.style.transform = 'scaleY(1.5)';
+                rOut.style.letterSpacing = '-4px';
+                rOut.style.marginTop = '20px';
+                cOut.style.fontSize = '50px';
+                if(stackRender) stackRender.style.marginTop = '20px';
+                rsOut.style.left = '-10px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                rOut.style.top = '';
+            } else if (parts.reais.length === 2) {
+                rOut.style.fontSize = '170px';
+                rOut.style.transform = 'scaleY(1)';
+                rOut.style.letterSpacing = '-8px';
+                rOut.style.marginTop = '0px';
+                cOut.style.fontSize = '80px';
+                if(stackRender) stackRender.style.marginTop = '0px';
+                rsOut.style.left = '-1px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                rOut.style.top = '';
+            } else {
+                rOut.style.fontSize = '190px';
+                rOut.style.transform = 'scaleY(1)';
+                rsOut.style.left = '-1px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                cOut.style.fontSize = '80px';
+                rOut.style.letterSpacing = '';
+                if(stackRender) stackRender.style.marginTop = '0px';
+                rOut.style.top = '270px';
+            }
+        } else if (isOfertaDoDia) {
+            rOut.style.letterSpacing = '5px';
+            rOut.style.marginTop = '5px';
+            cOut.style.fontSize = '70px';
+            if(stackRender) stackRender.style.marginTop = '5px';
+            rsOut.style.left = '-20px';
+            rsOut.style.fontSize = '32px';
+            rOut.style.top = '170px';
+            if (parts.reais.length >= 3) {
+                rOut.style.fontSize = '200px';
+                rOut.style.transform = 'scaleY(1.1)';
+                rsOut.style.top = '20px';
+            } else {
+                rOut.style.fontSize = '240px';
+                rOut.style.transform = 'scaleY(1)';
+            }
+        } else {
+            rOut.style.letterSpacing = '';
+            rOut.style.marginTop = '';
+            rOut.style.top = '';
+            cOut.style.fontSize = '';
+            if(stackRender) stackRender.style.marginTop = '';
+            rsOut.style.left = '';
+            rsOut.style.marginTop = '';
+            rsOut.style.fontSize = '';
+            rsOut.style.top = '';
+        }
+
+        const precoAntesVal = item.precoAntigoText || item.precoAntesText || '';
+        if (precoAntesVal.trim()) {
+            const vAntes = Number(String(precoAntesVal).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+            const parteInteira = precoOfertaVal.split(',')[0].replace(/\D/g, '');
+            const charsLeftOfComma = parteInteira.length;
+            if (!isNaN(vAntes)) {
+                const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                if (appMode) {
+                    if (charsLeftOfComma >= 3) {
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.style.position = 'relative';
+                        pAntigoOut.style.top = '315px';
+                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.color = '#1a1a1ad1';
+                        pAntigoOut.style.fontFamily = "'Baloo 2'";
+                        pAntigoOut.style.fontSize = '30px';
+                        pAntigoOut.style.margin = '6px 0 8px 0';
+                        areaPreco.style.top = '290px';
+                    } else {
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.style.position = 'relative';
+                        pAntigoOut.style.top = '315px';
+                        pAntigoOut.style.right = '110px';
+                        if (charsLeftOfComma === 1) {
+                            areaPreco.style.top = '285px';
+                        } else {
+                            areaPreco.style.top = '290px';
+                        }
+                        pAntigoOut.style.color = '';
+                        pAntigoOut.style.fontFamily = '';
+                        pAntigoOut.style.fontSize = '';
+                        pAntigoOut.style.margin = '6px 0 8px 0';
+                    }
+                } else if (isOfertaDoDia) {
+                    pAntigoOut.innerHTML = `DE<br><span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>POR:`;
+                    pAntigoOut.style.color = '#ff0000';
+                    pAntigoOut.style.fontFamily = "'SugoDisplay'";
+                    pAntigoOut.style.fontSize = '28px';
+                    pAntigoOut.style.margin = '5px 0';
+                    if (charsLeftOfComma === 1 || charsLeftOfComma === 2) {
+                        pAntigoOut.style.top = '250px'; 
+                        pAntigoOut.style.right = '140px';
+                        areaPreco.style.top = '130px';
+                    } else {
+                        pAntigoOut.style.top = '210px';
+                        pAntigoOut.style.right = '0px';
+                        pAntigoOut.innerHTML = `DE <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span> POR:`;
+                        areaPreco.style.top = '190px';
+                    }
+                }
+            }
+        } else {
+            if (appMode) {
+                areaPreco.style.top = '345px';
+            } else if (isOfertaDoDia) {
+                areaPreco.style.top = '210px';
+            } else {
+                areaPreco.style.top = '290px';
+            }
+        }
+
+        const textoCada2 = item.cadaText || item.cadaOutput || '';
+        const len = textoCada2.length;
+        if (appMode) {
+            if (len === 7) { cadaOut.style.fontSize = '18px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; }
+            else if (len === 6) { cadaOut.style.fontSize = '24px'; cadaOut.style.marginLeft = '20px'; cadaOut.style.left = 'auto'; }
+            else if (len === 5) { cadaOut.style.fontSize = '27px'; cadaOut.style.marginLeft = '20px'; cadaOut.style.left = 'auto'; }
+            else { cadaOut.style.fontSize = '30px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; }
+        } else {
+            cadaOut.style.marginLeft = '';
+        }
+
+        let dtIni = item.dataInicial || '';
+        let dtFim = item.dataFinal || '';
+        let rodapeDataFim = dtFim;
+        let rodapeDataIni = dtIni;
+        if (typeof inputFim !== 'undefined' && inputFim) {
+            rodapeDataFim = inputFim;
+            rodapeDataIni = inputIni || '';
+        }
+
+        if (appMode) {
+            if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
+                const di = rodapeDataIni.split('-');
+                const df = rodapeDataFim.split('-');
+                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent; 
+            } else if (!rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
+                const df = rodapeDataFim.split('-'); 
+                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            } else {
+                rodOut.innerHTML = item.rodapeText || item.rodapeOutput || '';
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            }
+        } else if (isOfertaDoDia) {
+            if (rodapeDataIni && rodapeDataIni.includes('-')) {
+                const di = rodapeDataIni.split('-');
+                rodOut.textContent = `Aproveite! Oferta exclusiva para o dia ${di[2]}/${di[1]} ou enquanto durar o estoque`;
+                rodOut.style.top ='410px';
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            } else {
+                rodOut.textContent = ``;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            }
+        } else {
+            rodOut.style.top = '';
+        }
+        // --- FIM DA FIDELIDADE VISUAL ---
+
         // Cria o canvas individual usando escala idêntica à do index.html para união combinada
         const canvasItem = await html2canvas(containerRender, { scale: 3, useCORS: true, backgroundColor: null });
         canvases.push(canvasItem);
@@ -1421,8 +1901,7 @@
       const yOffset = margin + (maxHeight - Math.max(size1.h, size2.h)) / 2;
 
       pdf.addImage(canvases[0].toDataURL('image/png'), 'PNG', margin, yOffset, size1.w, size1.h);
-      const cartaz2X = pdfWidth - margin - size2.w + 5;
-      pdf.addImage(canvases[1].toDataURL('image/png'), 'PNG', cartaz2X, yOffset, size2.w, size2.h);
+      const cartaz2X = pdfWidth - margin - size2.w + 5;      pdf.addImage(canvases[1].toDataURL('image/png'), 'PNG', cartaz2X, yOffset, size2.w, size2.h);
 
       // Dispara o download automático do PDF combinado gerado
       const nomeArquivoCombinado = sanitizeFileName((infoCartazes[0].descricaoText || '').replace(/\[.*?\]/g, '').trim() + '-e-' + (infoCartazes[1].descricaoText || '').replace(/\[.*?\]/g, '').trim(), 'pdf');
@@ -1607,6 +2086,239 @@
         }
         
         rodOut.textContent = novoRodapeTexto;
+
+        // --- INÍCIO DA FIDELIDADE VISUAL (APP MODE E OFERTA DO DIA) ---
+        let encarteAtual = "GERAL";
+        let descricaoParaEncarte = item.descricaoText || "";
+        if (descricaoParaEncarte.startsWith("[")) {
+          const idx = descricaoParaEncarte.indexOf("]");
+          if (idx !== -1) {
+            encarteAtual = descricaoParaEncarte.substring(1, idx).toUpperCase();
+          }
+        }
+
+        const cartazRender = document.getElementById('cartaz-render');
+        const appMode = (encarteAtual === 'OFERTAS APP');
+        const isOfertaDoDia = (encarteAtual === 'OFERTA DO DIA');
+        const stackRender = document.getElementById('price-stack-render');
+
+        if (encarteAtual === 'PREÇO AVULSO' || encarteAtual === 'PLACA AVULSA') {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')";
+        } else if (appMode) {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz-app.png')";
+        } else if (isOfertaDoDia) {
+            cartazRender.style.backgroundImage = "url('fundo-ofertadia.png')";
+        } else {
+            cartazRender.style.backgroundImage = "url('fundo-cartaz.png')";
+        }
+
+        if (appMode) {
+            cartazRender.classList.add('app-mode');
+            cartazRender.classList.remove('oferta-dia-mode');
+            rsOut.textContent = 'POR: R$';
+        } else if (isOfertaDoDia) {
+            cartazRender.classList.remove('app-mode');
+            cartazRender.classList.add('oferta-dia-mode');
+            rsOut.textContent = 'R$';
+        } else {
+            cartazRender.classList.remove('app-mode');
+            cartazRender.classList.remove('oferta-dia-mode');
+            rsOut.textContent = 'R$';
+        }
+
+        const textLength = dOut.textContent.length;
+        if (!item.customFontSize || !item.customTop) { 
+            if (appMode) {
+                let fs;
+                if (textLength <= 10) fs = 100;
+                else if (textLength <= 15) fs = 80;
+                else if (textLength <= 25) fs = 50;
+                else if (textLength <= 35) fs = 45;
+                else fs = 40;
+                dOut.style.fontSize = fs + 'px';
+                dOut.style.top = '235px';
+            } else {
+                if (isOfertaDoDia) {
+                    dOut.style.top = '115px';
+                } else {
+                    dOut.style.top = '170px';
+                }
+            }
+        }
+
+        const precoOfertaVal = item.precoText || '';
+        const parts = formatPtBrToParts(precoOfertaVal);
+        if (appMode) {
+            if (parts.reais.length >= 3) {
+                rOut.style.fontSize = '95px';
+                rOut.style.transform = 'scaleY(1.5)';
+                rOut.style.letterSpacing = '-4px';
+                rOut.style.marginTop = '20px';
+                cOut.style.fontSize = '50px';
+                if(stackRender) stackRender.style.marginTop = '20px';
+                rsOut.style.left = '-10px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                rOut.style.top = '';
+            } else if (parts.reais.length === 2) {
+                rOut.style.fontSize = '170px';
+                rOut.style.transform = 'scaleY(1)';
+                rOut.style.letterSpacing = '-8px';
+                rOut.style.marginTop = '0px';
+                cOut.style.fontSize = '80px';
+                if(stackRender) stackRender.style.marginTop = '0px';
+                rsOut.style.left = '-1px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                rOut.style.top = '';
+            } else {
+                rOut.style.fontSize = '190px';
+                rOut.style.transform = 'scaleY(1)';
+                rsOut.style.left = '-1px';
+                rsOut.style.marginTop = '10px';
+                rsOut.style.fontSize = '35px';
+                cOut.style.fontSize = '80px';
+                rOut.style.letterSpacing = '';
+                if(stackRender) stackRender.style.marginTop = '0px';
+                rOut.style.top = '270px';
+            }
+        } else if (isOfertaDoDia) {
+            rOut.style.letterSpacing = '5px';
+            rOut.style.marginTop = '5px';
+            cOut.style.fontSize = '70px';
+            if(stackRender) stackRender.style.marginTop = '5px';
+            rsOut.style.left = '-20px';
+            rsOut.style.fontSize = '32px';
+            rOut.style.top = '170px';
+            if (parts.reais.length >= 3) {
+                rOut.style.fontSize = '200px';
+                rOut.style.transform = 'scaleY(1.1)';
+                rsOut.style.top = '20px';
+            } else {
+                rOut.style.fontSize = '240px';
+                rOut.style.transform = 'scaleY(1)';
+            }
+        } else {
+            rOut.style.letterSpacing = '';
+            rOut.style.marginTop = '';
+            rOut.style.top = '';
+            cOut.style.fontSize = '';
+            if(stackRender) stackRender.style.marginTop = '';
+            rsOut.style.left = '';
+            rsOut.style.marginTop = '';
+            rsOut.style.fontSize = '';
+            rsOut.style.top = '';
+        }
+
+        const precoAntesVal = item.precoAntigoText || item.precoAntesText || '';
+        if (precoAntesVal.trim()) {
+            const vAntes = Number(String(precoAntesVal).replace(/[^0-9,\.]/g, '').replace(',', '.'));
+            const parteInteira = precoOfertaVal.split(',')[0].replace(/\D/g, '');
+            const charsLeftOfComma = parteInteira.length;
+            if (!isNaN(vAntes)) {
+                const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                if (appMode) {
+                    if (charsLeftOfComma >= 3) {
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.style.position = 'relative';
+                        pAntigoOut.style.top = '315px';
+                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.color = '#1a1a1ad1';
+                        pAntigoOut.style.fontFamily = "'Baloo 2'";
+                        pAntigoOut.style.fontSize = '30px';
+                        pAntigoOut.style.margin = '6px 0 8px 0';
+                        areaPreco.style.top = '290px';
+                    } else {
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.style.position = 'relative';
+                        pAntigoOut.style.top = '315px';
+                        pAntigoOut.style.right = '110px';
+                        if (charsLeftOfComma === 1) {
+                            areaPreco.style.top = '285px';
+                        } else {
+                            areaPreco.style.top = '290px';
+                        }
+                        pAntigoOut.style.color = '';
+                        pAntigoOut.style.fontFamily = '';
+                        pAntigoOut.style.fontSize = '';
+                        pAntigoOut.style.margin = '6px 0 8px 0';
+                    }
+                } else if (isOfertaDoDia) {
+                    pAntigoOut.innerHTML = `DE<br><span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>POR:`;
+                    pAntigoOut.style.color = '#ff0000';
+                    pAntigoOut.style.fontFamily = "'SugoDisplay'";
+                    pAntigoOut.style.fontSize = '28px';
+                    pAntigoOut.style.margin = '5px 0';
+                    if (charsLeftOfComma === 1 || charsLeftOfComma === 2) {
+                        pAntigoOut.style.top = '250px'; 
+                        pAntigoOut.style.right = '140px';
+                        areaPreco.style.top = '130px';
+                    } else {
+                        pAntigoOut.style.top = '210px';
+                        pAntigoOut.style.right = '0px';
+                        pAntigoOut.innerHTML = `DE <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span> POR:`;
+                        areaPreco.style.top = '190px';
+                    }
+                }
+            }
+        } else {
+            if (appMode) {
+                areaPreco.style.top = '345px';
+            } else if (isOfertaDoDia) {
+                areaPreco.style.top = '210px';
+            } else {
+                areaPreco.style.top = '290px';
+            }
+        }
+
+        const textoCada2 = item.cadaText || item.cadaOutput || '';
+        const len = textoCada2.length;
+        if (appMode) {
+            if (len === 7) { cadaOut.style.fontSize = '18px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; }
+            else if (len === 6) { cadaOut.style.fontSize = '24px'; cadaOut.style.marginLeft = '20px'; cadaOut.style.left = 'auto'; }
+            else if (len === 5) { cadaOut.style.fontSize = '27px'; cadaOut.style.marginLeft = '20px'; cadaOut.style.left = 'auto'; }
+            else { cadaOut.style.fontSize = '30px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; }
+        } else {
+            cadaOut.style.marginLeft = '';
+        }
+
+        let dtIni = item.dataInicial || '';
+        let dtFim = item.dataFinal || '';
+        let rodapeDataFim = dtFim;
+        let rodapeDataIni = dtIni;
+        if (typeof inputFim !== 'undefined' && inputFim) {
+            rodapeDataFim = inputFim;
+            rodapeDataIni = inputIni || '';
+        }
+
+        if (appMode) {
+            if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
+                const di = rodapeDataIni.split('-');
+                const df = rodapeDataFim.split('-');
+                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent; 
+            } else if (!rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
+                const df = rodapeDataFim.split('-'); 
+                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            } else {
+                rodOut.innerHTML = item.rodapeText || item.rodapeOutput || '';
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            }
+        } else if (isOfertaDoDia) {
+            if (rodapeDataIni && rodapeDataIni.includes('-')) {
+                const di = rodapeDataIni.split('-');
+                rodOut.textContent = `Aproveite! Oferta exclusiva para o dia ${di[2]}/${di[1]} ou enquanto durar o estoque`;
+                rodOut.style.top ='410px';
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            } else {
+                rodOut.textContent = ``;
+                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
+            }
+        } else {
+            rodOut.style.top = '';
+        }
+        // --- FIM DA FIDELIDADE VISUAL ---
 
         // Gera o canvas da página corrente
         const canvas = await html2canvas(containerRender, { scale: 3, useCORS: true, backgroundColor: null });
