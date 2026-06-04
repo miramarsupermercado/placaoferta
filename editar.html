@@ -6,7 +6,7 @@
   <title>Editar Cartaz Miramar</title>
   <link rel="icon" href="https://miramarsupermercado.com.br/wp-content/uploads/2024/10/cropped-icone.png" type="image/png">
 
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@800&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -279,13 +279,29 @@
       border: 2px solid var(--blue);
     }
     .barcode-search-area h3 { margin:0 0 8px 0; font-size:16px; color: var(--blue); }
+
+    /* REGRAS ADICIONADAS PARA FIDELIDADE VISUAL DOS MODOS APP E OFERTA DO DIA */
+    .centavar-wrapper { display: contents; }
+    .cartaz.app-mode .centavar-wrapper { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
+    .cartaz.app-mode .descricao { font-family: 'Baloo 2', sans-serif; letter-spacing: -1px; max-width: 95%; }
+    .cartaz.app-mode .preco-antigo { font-family: 'Baloo 2', sans-serif; font-weight: 800; letter-spacing: -1px; color: #1a1a1ad1 }
+    .cartaz.app-mode .preco-area { font-family: 'Baloo 2', sans-serif; font-weight: 800; left: -3px; letter-spacing: -1px;}
+    .cartaz.app-mode .rs { font-family: 'Baloo 2', sans-serif; left: -15px; }
+    .cartaz.app-mode .big-value { font-family: 'Baloo 2', sans-serif; letter-spacing: 10px; }
+    .cartaz.app-mode .centavos { font-family: 'Baloo 2', sans-serif; letter-spacing: -3px; font-size: 80px; margin-top: 6px; }
+    .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -5px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
+    .cartaz.app-mode .rodape { font-family: Arial, sans-serif; letter-spacing: -0.4px; position:absolute; bottom:-1px; left:10px; right:20px; font-size:14px; text-align:center; color:#222; font-weight: normal; }
+    
+    .cartaz.oferta-dia-mode .descricao { color: #000000; top: 115px; font-family:'UturnaRoundBold'; }
+    .cartaz.oferta-dia-mode .preco-antigo { color: #313131 !important; }
+    .cartaz.oferta-dia-mode .big-value, .cartaz.oferta-dia-mode .centavos, .cartaz.oferta-dia-mode .rs { color: #101010; }
   </style>
 </head>
 <body>
 
   <div class="wrap">
     <div>
-      <a href="datas.html" style="display:inline-block; margin-bottom:10px; padding:8px 14px; background:#6c757d; color:#fff; text-decoration:none; border-radius:6px; font-weight:700;">← Voltar para os cartazes salvos</a>
+      <a href="datas.html" style="display:inline-block; margin-bottom:10px; padding:8px 14px; background:#6c757d; color:#fff; text-decoration:none; border-radius:6px; font-weight:700;">← Voltar para Datas</a>
       <h3>Visualização do Cartaz em Edição</h3>
       <div class="preview" aria-hidden="false">
         <div class="cartaz" id="cartaz1">
@@ -295,7 +311,7 @@
             <div class="preco-area">
               <div class="rs" id="rs-output1">R$</div>
               <div class="big-value" id="reais-output1"></div>
-              <div class="centavar-wrapper" style="display: contents;">
+              <div class="centavar-wrapper" id="stack-centavos1">
                 <div class="centavos" id="centavos-output1"></div>
                 <div class="cada" id="cada-output1"></div>
               </div>
@@ -327,6 +343,8 @@
             <option value="FINAL DE SEMANA DE OFERTAS">FINAL DE SEMANA DE OFERTAS</option>
             <option value="FECHA MÊS">FECHA MÊS</option>
             <option value="PREÇO AVULSO">PREÇO AVULSO</option>
+            <option value="OFERTAS APP">OFERTAS APP</option>
+            <option value="OFERTA DO DIA">OFERTA DO DIA</option>
           </select>
         </div>
 
@@ -423,8 +441,18 @@
 
     function ajustarCadaPosicaoEFonte() {
       const cadaOutput = document.getElementById('cada-output1');
+      const tipoCampanha = document.getElementById('tipo-campaign-select')?.value || window.campanhaGlobal;
       const texto = cadaOutput.textContent || '';
       const len = texto.length;
+
+      if (tipoCampanha === 'OFERTAS APP') {
+          if (len === 7) { cadaOutput.style.fontSize = '18px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
+          else if (len === 6) { cadaOutput.style.fontSize = '24px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
+          else if (len === 5) { cadaOutput.style.fontSize = '27px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
+          else { cadaOutput.style.fontSize = '30px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
+          return;
+      }
+
       if (len > 4 && len <= 7) {
         cadaOutput.style.fontSize = '35px';
         const deslocamento = Math.min((len - 4) * 10, 30);
@@ -445,24 +473,29 @@
 
       const el = document.getElementById('descricao-output1');
       const textLength = el.textContent.length;
+      const tipoCampanha = document.getElementById('tipo-campanha-select').value;
 
       let fontSize;
-      if (textLength <= 10) {
-        fontSize = 120;
-      } else if (textLength <= 15) {
-        fontSize = 100;
-      } else if (textLength <= 25) {
-        fontSize = 70;
-      } else if (textLength <= 35) {
-        fontSize = 55;
-      } else if (textLength <= 60) {
-        fontSize = 45;
+      if (tipoCampanha === 'OFERTAS APP') {
+          if (textLength <= 10) fontSize = 100;
+          else if (textLength <= 15) fontSize = 80;
+          else if (textLength <= 25) fontSize = 50;
+          else if (textLength <= 35) fontSize = 45;
+          else fontSize = 40;
+          el.style.top = '235px';
       } else {
-        fontSize = 40;
+          if (textLength <= 10) fontSize = 120;
+          else if (textLength <= 15) fontSize = 100;
+          else if (textLength <= 25) fontSize = 70;
+          else if (textLength <= 35) fontSize = 55;
+          else if (textLength <= 60) fontSize = 45;
+          else fontSize = 40;
+          
+          if (tipoCampanha === 'OFERTA DO DIA') el.style.top = '115px';
+          else el.style.top = '170px';
       }
 
       el.style.fontSize = fontSize + 'px';
-      el.style.top = '170px';
     }
 
     function updatePreview() {
@@ -472,17 +505,45 @@
       const cadaInput = document.getElementById('cada1').value || '';
       const rodapeInput = document.getElementById('rodape1').value || '';
       const tipoCampanha = document.getElementById('tipo-campanha-select').value;
+      const cartaz1 = document.getElementById('cartaz1');
 
       window.campanhaGlobal = tipoCampanha;
       document.getElementById('label-campanha-1').textContent = `(${tipoCampanha})`;
+
+      // Identidade Visual de Encarte
+      if (tipoCampanha === 'PREÇO AVULSO') {
+          cartaz1.style.backgroundImage = "url('fundo-cartaz-preço-normal.png')";
+      } else if (tipoCampanha === 'OFERTAS APP') {
+          cartaz1.style.backgroundImage = "url('fundo-cartaz-app.png')";
+      } else if (tipoCampanha === 'OFERTA DO DIA') {
+          cartaz1.style.backgroundImage = "url('fundo-ofertadia.png')";
+      } else {
+          cartaz1.style.backgroundImage = "url('fundo-cartaz.png')";
+      }
+
+      if (tipoCampanha === 'OFERTAS APP') {
+          cartaz1.classList.add('app-mode');
+          cartaz1.classList.remove('oferta-dia-mode');
+          document.getElementById('rs-output1').textContent = 'POR: R$';
+      } else if (tipoCampanha === 'OFERTA DO DIA') {
+          cartaz1.classList.remove('app-mode');
+          cartaz1.classList.add('oferta-dia-mode');
+          document.getElementById('rs-output1').textContent = 'R$';
+      } else {
+          cartaz1.classList.remove('app-mode');
+          cartaz1.classList.remove('oferta-dia-mode');
+          document.getElementById('rs-output1').textContent = 'R$';
+      }
 
       // Descrição
       const descOut = document.getElementById('descricao-output1');
       descOut.textContent = descInput.toUpperCase();
       adjustDescricaoFontSize();
 
-      // Preço antigo lógico nativo idêntico ao index.html
+      // Preço antigo
       const antigoOut = document.getElementById('preco-antigo-output1');
+      const precoArea = document.querySelector('.preco-area');
+
       if (precoAntigoInput.trim()) {
         const vAntes = Number(String(precoAntigoInput).replace(/[^0-9,\.]/g, '').replace(',', '.'));
         const parteInteira = precoOfertaInput.split(',')[0].replace(/\D/g, '');
@@ -491,7 +552,35 @@
         if (!isNaN(vAntes)) {
           const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-          if (charsLeftOfComma >= 3) {
+          if (tipoCampanha === 'OFERTAS APP') {
+              antigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+              antigoOut.style.display = '';
+              antigoOut.style.position = 'relative';
+              antigoOut.style.top = '315px';
+              antigoOut.style.right = '110px';
+              antigoOut.style.color = '#1a1a1ad1';
+              antigoOut.style.fontFamily = "'Baloo 2'";
+              antigoOut.style.fontSize = '30px';
+              antigoOut.style.margin = '6px 0 8px 0';
+              precoArea.style.top = (charsLeftOfComma >= 3) ? '290px' : (charsLeftOfComma === 1 ? '285px' : '290px');
+          } else if (tipoCampanha === 'OFERTA DO DIA') {
+              antigoOut.innerHTML = `DE<br><span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>POR:`;
+              antigoOut.style.display = '';
+              antigoOut.style.color = '#ff0000';
+              antigoOut.style.fontFamily = "'SugoDisplay'";
+              antigoOut.style.fontSize = '28px';
+              antigoOut.style.margin = '5px 0';
+              if (charsLeftOfComma <= 2) {
+                  antigoOut.style.top = '250px'; 
+                  antigoOut.style.right = '140px';
+                  precoArea.style.top = '130px';
+              } else {
+                  antigoOut.style.top = '210px';
+                  antigoOut.style.right = '0px';
+                  antigoOut.innerHTML = `DE <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span> POR:`;
+                  precoArea.style.top = '190px';
+              }
+          } else if (charsLeftOfComma >= 3) {
             antigoOut.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
             antigoOut.style.display = '';
             antigoOut.style.position = 'relative';
@@ -501,7 +590,7 @@
             antigoOut.style.fontFamily = "'SugoDisplay'";
             antigoOut.style.fontSize = '30px';
             antigoOut.style.margin = '6px 0 8px 0';
-            document.querySelector('.preco-area').style.top = '260px';
+            precoArea.style.top = '260px';
           } else {
             antigoOut.innerHTML = `DE <br> <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>  POR:`;   
             antigoOut.style.display = '';
@@ -512,49 +601,94 @@
             antigoOut.style.fontFamily = '';
             antigoOut.style.fontSize = '';
             antigoOut.style.margin = '6px 0 8px 0';
-            document.querySelector('.preco-area').style.top = '190px';
+            precoArea.style.top = '190px';
           }
         }
       } else {
         antigoOut.style.display = 'none';
-        document.querySelector('.preco-area').style.top = '290px';
+        if (tipoCampanha === 'OFERTAS APP') precoArea.style.top = '345px';
+        else if (tipoCampanha === 'OFERTA DO DIA') precoArea.style.top = '210px';
+        else precoArea.style.top = '290px';
       }
 
       // Preço Oferta
       const parts = formatPtBrToParts(precoOfertaInput);
       const reaisOutput = document.getElementById('reais-output1');
-      reaisOutput.textContent = parts.reais;
-      document.getElementById('centavos-output1').textContent = parts.centavos;
-
+      const centavosOutput = document.getElementById('centavos-output1');
       const rsOut = document.getElementById('rs-output1');
+      
+      reaisOutput.textContent = parts.reais;
+      centavosOutput.textContent = parts.centavos;
       rsOut.style.display = precoOfertaInput.trim() ? '' : 'none';
 
-      if ((parts.reais || '').length >= 3) {
-        reaisOutput.style.fontSize = '220px';
-        reaisOutput.style.transform = 'scaleY(1.2)';
+      if (tipoCampanha === 'OFERTAS APP') {
+          if (parts.reais.length >= 3) {
+              reaisOutput.style.fontSize = '95px';
+              reaisOutput.style.transform = 'scaleY(1.5)';
+              reaisOutput.style.letterSpacing = '-4px';
+              reaisOutput.style.marginTop = '20px';
+              centavosOutput.style.fontSize = '50px';
+              rsOut.style.left = '-10px';
+              rsOut.style.fontSize = '35px';
+          } else {
+              reaisOutput.style.fontSize = parts.reais.length === 2 ? '170px' : '190px';
+              reaisOutput.style.transform = 'scaleY(1)';
+              reaisOutput.style.letterSpacing = parts.reais.length === 2 ? '-8px' : '';
+              centavosOutput.style.fontSize = '80px';
+              rsOut.style.fontSize = '35px';
+              rsOut.style.left = '-1px';
+          }
       } else {
-        reaisOutput.style.fontSize = '260px';
-        reaisOutput.style.transform = 'scaleY(1)';
+          reaisOutput.style.letterSpacing = tipoCampanha === 'OFERTA DO DIA' ? '5px' : '10px';
+          reaisOutput.style.marginTop = '';
+          centavosOutput.style.fontSize = tipoCampanha === 'OFERTA DO DIA' ? '70px' : '80px';
+          if (parts.reais.length >= 3) {
+            reaisOutput.style.fontSize = tipoCampanha === 'OFERTA DO DIA' ? '200px' : '220px';
+            reaisOutput.style.transform = 'scaleY(1.2)';
+          } else {
+            reaisOutput.style.fontSize = tipoCampanha === 'OFERTA DO DIA' ? '240px' : '260px';
+            reaisOutput.style.transform = 'scaleY(1)';
+          }
       }
 
       // Cada / Unidade
       document.getElementById('cada-output1').textContent = cadaInput;
       ajustarCadaPosicaoEFonte();
 
-      // Rodapé Dinâmico
+      // Rodapé Dinâmico com Fidelidade de Conteúdo
       const dataInicialInput = document.getElementById('data-inicial1').value;
       const dataFinalInput = document.getElementById('data-final1').value;
       const rodapeOutput = document.getElementById('rodape-output1');
 
-      if (dataInicialInput && dataFinalInput) {
+      if (tipoCampanha === 'OFERTAS APP') {
+          if (dataFinalInput) {
+              const df = dataFinalInput.split('-');
+              const di = dataInicialInput ? dataInicialInput.split('-') : null;
+              const vigenciaStr = di ? `de ${di[2]} à ${df[2]}/${df[1]}/${df[0]}` : `até ${df[2]}/${df[1]}/${df[0]}`;
+              rodapeOutput.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida ${vigenciaStr} ou enquanto durar o estoque`;
+          } else {
+              rodapeOutput.textContent = rodapeInput;
+          }
+      } else if (tipoCampanha === 'OFERTA DO DIA') {
+          if (dataInicialInput) {
+              const di = dataInicialInput.split('-');
+              rodapeOutput.textContent = `Aproveite! Oferta exclusiva para o dia ${di[2]}/${di[1]} ou enquanto durar o estoque`;
+              rodapeOutput.style.top = '410px';
+          } else {
+              rodapeOutput.textContent = "";
+          }
+      } else if (dataInicialInput && dataFinalInput) {
         const di = dataInicialInput.split('-');
         const df = dataFinalInput.split('-');
         rodapeOutput.textContent = `Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+        rodapeOutput.style.top = '';
       } else if (!dataInicialInput && dataFinalInput) {
         const df = dataFinalInput.split('-');
         rodapeOutput.textContent = `Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+        rodapeOutput.style.top = '';
       } else {
         rodapeOutput.textContent = rodapeInput;
+        rodapeOutput.style.top = '';
       }
     }
 
@@ -622,18 +756,18 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyDj7Uy4QxoOcsqaPLsepQr5SRzDXeVPmh0",
-  authDomain: "placas-ofertas.firebaseapp.com",
-  databaseURL: "https://placas-ofertas-default-rtdb.firebaseio.com",
-  projectId: "placas-ofertas",
-  storageBucket: "placas-ofertas.firebasestorage.app",
-  messagingSenderId: "952150285683",
-  appId: "1:952150285683:web:638bfe54a9b52890133906",
-  measurementId: "G-25B5FZ1CV5"
-};
+      apiKey: "AIzaSyDj7Uy4QxoOcsqaPLsepQr5SRzDXeVPmh0",
+      authDomain: "placas-ofertas.firebaseapp.com",
+      databaseURL: "https://placas-ofertas-default-rtdb.firebaseio.com",
+      projectId: "placas-ofertas",
+      storageBucket: "placas-ofertas.firebasestorage.app",
+      messagingSenderId: "952150285683",
+      appId: "1:952150285683:web:638bfe54a9b52890133906",
+      measurementId: "G-25B5FZ1CV5"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
@@ -672,105 +806,92 @@
     });
 
     document.getElementById('save-cartaz1').addEventListener('click', async () => {
-  if (!window.cartazIdFirebase) {
-    alert("Erro técnico: O ID de referência do Firebase não foi localizado.");
-    return;
-  }
+      if (!window.cartazIdFirebase) {
+        alert("Erro técnico: O ID de referência do Firebase não foi localizado.");
+        return;
+      }
 
-  const overlay = document.getElementById('loading-overlay');
-  const loadingText = document.getElementById('loading-text');
-  overlay.style.display = 'flex';
-  loadingText.textContent = "Atualizando no formato original...";
+      const overlay = document.getElementById('loading-overlay');
+      const loadingText = document.getElementById('loading-text');
+      overlay.style.display = 'flex';
+      loadingText.textContent = "Atualizando no formato original...";
 
-  try {
-    // 1. Verifica o formato original salvo no localStorage
-    const eraComImagem = localStorage.getItem('edit_comImagem') === 'true';
-    
-    // 2. Define o alvo da captura (cartaz = fundo+texto | card = apenas texto)
-    const elementoParaCapturar = eraComImagem ? 
-      document.getElementById('cartaz1') : 
-      document.getElementById('card1');
+      try {
+        const eraComImagem = localStorage.getItem('edit_comImagem') === 'true';
+        const elementoParaCapturar = eraComImagem ? document.getElementById('cartaz1') : document.getElementById('card1');
 
-    // 3. Gera o Canvas com alta qualidade
-    const canvas = await html2canvas(elementoParaCapturar, { 
-      scale: 3, 
-      useCORS: true, 
-      backgroundColor: eraComImagem ? null : null 
+        const canvas = await html2canvas(elementoParaCapturar, { 
+          scale: 3, 
+          useCORS: true, 
+          backgroundColor: eraComImagem ? null : null 
+        });
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        if (eraComImagem) {
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        } else {
+          const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+          const imgWidth = canvas.width * ratio;
+          const imgHeight = canvas.height * ratio;
+          const marginX = ((pdfWidth - imgWidth) / 2) + 3
+          const marginY = (pdfHeight - imgHeight) / 2 - 5;
+          pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+        }
+
+        const pdfBlob = pdf.output('blob');
+        const base64Data = await blobToBase64(pdfBlob);
+
+        const descVal = document.getElementById('descricao1').value;
+        const tipoCampanha = document.getElementById('tipo-campanha-select').value;
+        const now = new Date();
+        
+        const currentFontSize = window.getComputedStyle(document.getElementById('descricao-output1')).fontSize;
+        const currentTop = window.getComputedStyle(document.getElementById('descricao-output1')).top;
+
+        const dadosAtualizados = {
+          descricaoText: descVal.toUpperCase().startsWith("[") ? descVal : `[${tipoCampanha}] ${descVal}`,
+          precoText: document.getElementById('preco-oferta1').value,
+          precoAntigoText: document.getElementById('preco-antigo1').value,
+          cadaText: document.getElementById('cada1').value,
+          dataInicial: document.getElementById('data-inicial1').value,
+          dataFinal: document.getElementById('data-final1').value,
+          rodapeText: document.getElementById('rodape-output1').textContent,
+          customFontSize: currentFontSize,
+          customTop: currentTop,
+          base64: base64Data,
+          comImagem: eraComImagem,
+          dateStr: now.toLocaleDateString('pt-BR'),
+          timeStr: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          timestamp: Date.now()
+        };
+
+        const novaCategoriaRef = tipoCampanha.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '_');
+        const partes = window.cartazIdFirebase.split('/');
+        const idUnico = partes.length > 1 ? partes[1] : partes[0];
+        const categoriaAntiga = partes.length > 1 ? partes[0] : '';
+
+        if (categoriaAntiga && categoriaAntiga !== novaCategoriaRef) {
+          await remove(ref(db, `cartazes/${window.cartazIdFirebase}`));
+          await update(ref(db, `cartazes/${novaCategoriaRef}/${idUnico}`), dadosAtualizados);
+        } else {
+          await update(ref(db, `cartazes/${novaCategoriaRef}/${idUnico}`), dadosAtualizados);
+        }
+
+        alert('Cartaz atualizado com sucesso no formato original!');
+        window.location.href = 'datas.html';
+
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao tentar salvar as alterações.');
+      } finally {
+        overlay.style.display = 'none';
+      }
     });
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
-    const imgData = canvas.toDataURL('image/png');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-
-    // 4. Monta o PDF seguindo a lógica original do index.html
-    if (eraComImagem) {
-      // Preenche a folha A4 inteira
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    } else {
-      // Centraliza com margens
-      const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
-      const imgWidth = canvas.width * ratio;
-      const imgHeight = canvas.height * ratio;
-      const marginX = ((pdfWidth - imgWidth) / 2) + 3
-      const marginY = (pdfHeight - imgHeight) / 2 - 5;
-      pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
-    }
-
-    const pdfBlob = pdf.output('blob');
-    const base64Data = await blobToBase64(pdfBlob);
-
-    // 5. Prepara os dados para o Firebase
-    const descVal = document.getElementById('descricao1').value;
-    const tipoCampanha = document.getElementById('tipo-campanha-select').value;
-    const now = new Date();
-    
-    const currentFontSize = window.getComputedStyle(document.getElementById('descricao-output1')).fontSize;
-    const currentTop = window.getComputedStyle(document.getElementById('descricao-output1')).top;
-
-    const dadosAtualizados = {
-      descricaoText: descVal.toUpperCase().startsWith("[") ? descVal : `[${tipoCampanha}] ${descVal}`,
-      precoText: document.getElementById('preco-oferta1').value,
-      precoAntigoText: document.getElementById('preco-antigo1').value,
-      cadaText: document.getElementById('cada1').value,
-      dataInicial: document.getElementById('data-inicial1').value,
-      dataFinal: document.getElementById('data-final1').value,
-      rodapeText: document.getElementById('rodape-output1').textContent,
-      customFontSize: currentFontSize,
-      customTop: currentTop,
-      base64: base64Data,
-      comImagem: eraComImagem, // Mantém a flag do formato
-      dateStr: now.toLocaleDateString('pt-BR'),
-      timeStr: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-      timestamp: Date.now()
-    };
-
-    // 6. Lógica de salvamento para evitar duplicidade de pasta
-    const novaCategoriaRef = tipoCampanha.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '_');
-    const partes = window.cartazIdFirebase.split('/');
-    const idUnico = partes.length > 1 ? partes[1] : partes[0];
-    const categoriaAntiga = partes.length > 1 ? partes[0] : '';
-
-    if (categoriaAntiga && categoriaAntiga !== novaCategoriaRef) {
-      // Se mudou a categoria, remove o antigo e cria no novo local
-      await remove(ref(db, `cartazes/${window.cartazIdFirebase}`));
-      await update(ref(db, `cartazes/${novaCategoriaRef}/${idUnico}`), dadosAtualizados);
-    } else {
-      // Apenas atualiza
-      await update(ref(db, `cartazes/${novaCategoriaRef}/${idUnico}`), dadosAtualizados);
-    }
-
-    alert('Cartaz atualizado com sucesso no formato original!');
-    window.location.href = 'datas.html';
-
-  } catch (err) {
-    console.error(err);
-    alert('Erro ao tentar salvar as alterações.');
-  } finally {
-    overlay.style.display = 'none';
-  }
-});
 
     function carregarBancoProdutos() {
       const status = document.getElementById('barcode-status1');
