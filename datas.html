@@ -18,7 +18,8 @@
       --card-bg:#ffffff;
       --text:#222;
     }
-    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f1f3f6;}\n    
+    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f1f3f6;}
+    
     .container-geral {
       max-width: 1150px;
       margin: 0 auto;
@@ -494,14 +495,16 @@
       <div class="field-data">
         <label for="filtro-tipo">Buscar por Tipo</label>
         <select id="filtro-tipo" class="input-filtro" style="width: 185px; height: 39px; box-sizing: border-box;">
-          <option value="">Todos os Tipos</option>
-          <option value="PREÇO AVULSO">PLACA AVULSA</option>
-          <option value="ENCARTE SEMANAL" style="color:gray">ENCARTE SEMANAL</option>
-          <option value="TERÇA DA CARNE" style="color:red">TERÇA DA CARNE</option>
-          <option value="QUINTA DA FEIRA" style="color:green">QUINTA DA FEIRA</option>
-          <option value="FDS DE OFERTAS" style="color: orange">FDS DE OFERTAS</option>
-          <option value="FECHA MÊS" style="color:blue">FECHA MÊS</option>
-        </select>
+  <option value="">Todos os Tipos</option>
+  <option value="PREÇO AVULSO">PLACA AVULSA</option>
+  <option value="ENCARTE SEMANAL" style="color:gray">ENCARTE SEMANAL</option>
+  <option value="TERÇA DA CARNE" style="color:red">TERÇA DA CARNE</option>
+  <option value="QUINTA DA FEIRA" style="color:green">QUINTA DA FEIRA</option>
+  <option value="FDS DE OFERTAS" style="color: orange">FDS DE OFERTAS</option>
+  <option value="FECHA MÊS" style="color:blue">FECHA MÊS</option>
+  <option value="OFERTAS APP" style="color:#f86336">OFERTA APP</option>
+  <option value="OFERTA DO DIA" style="color:#835acf">OFERTA DO DIA</option>
+</select>
       </div>
       <div class="field-data">
         <label for="filtro-descricao">Buscar por Descrição</label>
@@ -823,8 +826,7 @@
   }
       const matchDesc = !valFiltroDesc || row.descricao.toLowerCase().includes(valFiltroDesc);
       const matchPreco = !valFiltroPreco || row.precoTexto.toLowerCase().includes(valFiltroPreco);
-        const matchLoja = !valFiltroLoja || row.loja.toLowerCase().includes(valFiltroLoja); // Nova condição
-
+        const matchLoja = !valFiltroLoja || row.loja.toLowerCase() === valFiltroLoja;
       return matchTipo && matchDesc && matchPreco && matchLoja;
     });
 
@@ -929,7 +931,8 @@
 <a href="${pdfUrl}" download="${nomeParaDownload}" class="btn-baixar" title="Baixar">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>\n        <line x1="12" y1="15" x2="12" y2="3"></line>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
     </svg>
 </a>
 <button onclick="window.excluirCartazItem('${row.id}')" class="btn-excluir" title="Excluir">
@@ -1387,6 +1390,8 @@
         }
 
         if (appMode) {
+          rodOut.style.top = '';
+          rodOut.style.left = '';
             if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const di = rodapeDataIni.split('-');
                 const df = rodapeDataFim.split('-');
@@ -1405,13 +1410,16 @@
                 const di = rodapeDataIni.split('-');
                 rodOut.textContent = `Aproveite! Oferta exclusiva para o dia ${di[2]}/${di[1]} ou enquanto durar o estoque`;
                 rodOut.style.top ='410px';
+                rodOut.style.left = '10px';
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.textContent = ``;
+                rodOut.style.top ='410px';
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             }
         } else {
             rodOut.style.top = '';
+            rodOut.style.left = '10px';
         }
         // --- FIM DA FIDELIDADE VISUAL ---
 
@@ -1843,6 +1851,8 @@
         }
 
         if (appMode) {
+          rodOut.style.top = '';
+          rodOut.style.left = '';
             if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const di = rodapeDataIni.split('-');
                 const df = rodapeDataFim.split('-');
@@ -1864,6 +1874,7 @@
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.textContent = ``;
+                rodOut.style.top ='410px';
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             }
         } else {
@@ -2292,6 +2303,8 @@
         }
 
         if (appMode) {
+          rodOut.style.top = '';
+          rodOut.style.left = '';
             if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const di = rodapeDataIni.split('-');
                 const df = rodapeDataFim.split('-');
@@ -2310,13 +2323,17 @@
                 const di = rodapeDataIni.split('-');
                 rodOut.textContent = `Aproveite! Oferta exclusiva para o dia ${di[2]}/${di[1]} ou enquanto durar o estoque`;
                 rodOut.style.top ='410px';
+                rodOut.style.left = '10px';
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.textContent = ``;
+                rodOut.style.top ='410px';
+                rodOut.style.left = '10px';
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             }
         } else {
             rodOut.style.top = '';
+            rodOut.style.left = '';
         }
         // --- FIM DA FIDELIDADE VISUAL ---
 
