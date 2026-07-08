@@ -667,7 +667,7 @@
     .cartaz.app-mode .big-value { font-family: 'Baloo 2', sans-serif; letter-spacing: 10px; }
     .cartaz.app-mode .price-stack { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
     .cartaz.app-mode .centavos { font-family: 'Baloo 2', sans-serif; letter-spacing: -3px; font-size: 80px; margin-top: 6px; }
-    .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -15px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
+    .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -5px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
     .cartaz.app-mode .rodape { font-family: Arial, sans-serif; letter-spacing: -0.4px; position:absolute; bottom:-1px; left:10px; right:20px; font-size:14px; text-align:center; color:#222; font-weight: normal; }
     .cartaz.oferta-dia-mode {
     background-image: url('fundo-ofertadia.png');
@@ -828,6 +828,10 @@
             <label>UND / KG</label>
             <input id="cada1" type="text" maxlength="7" placeholder="" />
           </div>
+          <div class="field half">
+            <label>Observação</label>
+            <input id="rodape1" type="text" placeholder="Oferta válida até DD/MM/AAAA..." value="" />
+          </div>
         </div>
         <div style="margin-top: 10px; display: flex; gap: 8px;">
           <button id="save-cartaz1" style="flex: 1; background:#4a90e2;">💾 Salvar Cartaz 1</button>
@@ -879,6 +883,10 @@
           <div class="field half">
             <label>UND / KG</label>
             <input id="cada2" type="text" maxlength="7" placeholder="" value="" />
+          </div>
+          <div class="field half">
+            <label>Observação</label>
+            <input id="rodape2" type="text" placeholder="Oferta válida até DD/MM/AAAA..." value="" />
           </div>
         </div>
         <div style="margin-top: 10px; display: flex; gap: 8px;">
@@ -1174,6 +1182,10 @@
             <label>UND / KG</label>
             <input id="cada${id}" type="text" maxlength="7" placeholder="" value="" />
           </div>
+          <div class="field half">
+            <label>Observação</label>
+            <input id="rodape${id}" type="text" placeholder="Oferta válida até DD/MM/AAAA..." value="" />
+          </div>
         </div>
         <div style="margin-top: 10px; display: flex; gap: 8px;">
           <button id="save-cartaz${id}" style="flex: 1; background:#4a90e2;">💾 Salvar Cartaz ${id}</button>
@@ -1285,7 +1297,7 @@
     const dataInicialInput = document.getElementById('data-inicial' + idSuffix);
     const dataFinalInput = document.getElementById('data-final' + idSuffix);
     const cadaInput = document.getElementById('cada' + idSuffix);
-    const rodapeInput = { value: "", disabled: false, addEventListener: function() {} }; // Dummy element to maintain backward compatibility safely
+    const rodapeInput = document.getElementById('rodape' + idSuffix);
 
     const descricaoOutput = document.getElementById('descricao-output' + idSuffix);
     const precoAntigoOutput = document.getElementById('preco-antigo-output' + idSuffix);
@@ -1343,10 +1355,10 @@
       const appMode = isAppMode();
       
       if (appMode) {
-        if (len === 7) { cadaOutput.style.fontSize = '18px'; cadaOutput.style.marginTop = '-12px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
+        if (len === 7) { cadaOutput.style.fontSize = '18px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
         else if (len === 6) { cadaOutput.style.fontSize = '24px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
         else if (len === 5) { cadaOutput.style.fontSize = '27px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
-        else { cadaOutput.style.marginTop = ''; cadaOutput.style.fontSize = '30px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
+        else { cadaOutput.style.fontSize = '30px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
       } else {
         cadaOutput.style.marginLeft = '';
         if (len > 4 && len <= 7) {
@@ -1376,14 +1388,14 @@
       
       const encarteAtualAttr = cartazCompletoLocal.getAttribute('data-encarte') || window.opcaoCartazSelecionada;
       const checkOfertaDoDia = (encarteAtualAttr === 'OFERTA DO DIA');
-//100,80,50,45,40
+
       let fontSize;
       if (appMode) {
-        if (textLength <= 10) { fontSize = 58; }
-        else if (textLength <= 15) { fontSize = 48; }
-        else if (textLength <= 25) { fontSize = 45; }
-        else if (textLength <= 35) { fontSize = 40; }
-        else if (textLength <= 60) { fontSize = 30; }
+        if (textLength <= 10) { fontSize = 100; }
+        else if (textLength <= 15) { fontSize = 80; }
+        else if (textLength <= 25) { fontSize = 50; }
+        else if (textLength <= 35) { fontSize = 45; }
+        else if (textLength <= 60) { fontSize = 40; }
         else { fontSize = 40; }
         el.style.fontSize = fontSize + 'px';
         el.style.top = '235px';
@@ -1416,10 +1428,10 @@
   const appMode = isAppMode();
   const encarteAtual = cartazCompletoLocal.getAttribute('data-encarte');
   const isOfertaDoDia = (encarteAtual === 'OFERTA DO DIA');
-if (appMode) {
+  if (appMode) {
     cartazCompletoLocal.classList.add('app-mode');
     cartazCompletoLocal.classList.remove('oferta-dia-mode');
-    rsOutput.innerHTML = 'POR:<br>R$';
+    rsOutput.textContent = 'POR: R$';
   } else if (isOfertaDoDia) {
     cartazCompletoLocal.classList.remove('app-mode');
     cartazCompletoLocal.classList.add('oferta-dia-mode');
@@ -1444,31 +1456,31 @@ if (appMode) {
 
       if (appMode) {
         if (charsLeftOfComma >= 3) {
-          precoAntigoOutput.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
+          precoAntigoOutput.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
           precoAntigoOutput.style.display = '';
           precoAntigoOutput.style.position = 'relative';
-          precoAntigoOutput.style.top = '290px';
-          precoAntigoOutput.style.right = '0px';
+          precoAntigoOutput.style.top = '315px';
+          precoAntigoOutput.style.right = '110px';
           precoAntigoOutput.style.color = '#1a1a1ad1';
           precoAntigoOutput.style.fontFamily = "'Baloo 2'";
-          precoAntigoOutput.style.fontSize = '50px';
+          precoAntigoOutput.style.fontSize = '30px';
           precoAntigoOutput.style.margin = '6px 0 8px 0';
-          document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '282px';
+          document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
         } else {
-          precoAntigoOutput.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
+          precoAntigoOutput.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
           precoAntigoOutput.style.display = '';
           precoAntigoOutput.style.position = 'relative';
-          precoAntigoOutput.style.top = '280px';
+          precoAntigoOutput.style.top = '315px';
           if (charsLeftOfComma === 1) {
-            precoAntigoOutput.style.right = '0px';
-            document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
+            precoAntigoOutput.style.right = '110px';
+            document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '285px';
           } else {
-            precoAntigoOutput.style.right = '0px';
+            precoAntigoOutput.style.right = '110px';
             document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
           }
           precoAntigoOutput.style.color = '';
           precoAntigoOutput.style.fontFamily = '';
-          precoAntigoOutput.style.fontSize = '55px';
+          precoAntigoOutput.style.fontSize = '';
           precoAntigoOutput.style.margin = '6px 0 8px 0';
         }
       } else if (isOfertaDoDia) {
@@ -1531,7 +1543,7 @@ if (appMode) {
   } else {
     precoAntigoOutput.style.display = 'none';
     if (appMode) {
-      document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '375px';
+      document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '345px';
     } else if (isOfertaDoDia) {
       document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '210px'; // Altura sem preço antigo na Oferta do Dia
     } else {
@@ -1566,7 +1578,7 @@ if (appMode) {
       rsOutput.style.fontSize = '35px';
       reaisOutput.style.top = '';
     } else if ((parts.reais || '').length === 2) {
-      reaisOutput.style.fontSize = '150px';
+      reaisOutput.style.fontSize = '170px';
       reaisOutput.style.transform = 'scaleY(1)';
       reaisOutput.style.letterSpacing = '-8px';
       reaisOutput.style.marginTop = '0px';
@@ -1575,21 +1587,21 @@ if (appMode) {
       if(stackEl) stackEl.style.marginTop = '0px';
       
       rsOutput.style.left = '-1px';
-      rsOutput.style.marginTop = '-10px';
+      rsOutput.style.marginTop = '10px';
       rsOutput.style.fontSize = '35px';
       reaisOutput.style.top = '';
     } else {
-      reaisOutput.style.fontSize = '140px';
+      reaisOutput.style.fontSize = '190px';
       reaisOutput.style.transform = 'scaleY(1)';
-      rsOutput.style.left = '-30px';
-      rsOutput.style.marginTop = '-10px';
+      rsOutput.style.left = '-1px';
+      rsOutput.style.marginTop = '10px';
       rsOutput.style.fontSize = '35px';
       centavosOutput.style.fontSize = '80px';
       reaisOutput.style.letterSpacing = '';
       
       if(stackEl) stackEl.style.marginTop = '0px';
       
-      reaisOutput.style.top = '290px';
+      reaisOutput.style.top = '270px';
     }
   } else if (isOfertaDoDia) {
     // ==========================================
@@ -1644,50 +1656,12 @@ if (appMode) {
       const df = dataFinalInput.value.split('-');
       const diaInicial = di[2];
       const dataFinalFormatada = `${df[2]}/${df[1]}/${df[0]}`;
-rodapeOutput.innerHTML = `
-  <div style="margin-bottom:102px; font-size:18px;">
-    <span>Oferta exclusiva para cliente cadastrado no app </span>
-    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">
-      MIRA AQUI
-      <svg xmlns="http://www.w3.org/2000/svg"
-           width="18"
-           height="18"
-           viewBox="0 0 24 24"
-           fill="none"
-           stroke="currentColor"
-           stroke-width="2.5"
-           stroke-linecap="round"
-           stroke-linejoin="round">
-        <circle cx="15" cy="21" r="1"></circle>
-        <circle cx="4" cy="21" r="1"></circle>
-        <path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path>
-      </svg>
-    </span>
-  </div>
-
-  <div>
-    Oferta válida de ${diaInicial} à ${dataFinalFormatada} ou enquanto durar o estoque
-  </div>
-`;    } else if (!dataInicialInput.value && dataFinalInput.value) {
+      rodapeOutput.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida de ${diaInicial} à ${dataFinalFormatada} ou enquanto durar o estoque`;
+    } else if (!dataInicialInput.value && dataFinalInput.value) {
       const df = dataFinalInput.value.split('-'); 
       const dataFinalFormatada = `${df[2]}/${df[1]}/${df[0]}`;
-rodapeOutput.innerHTML = `
-  <div style="margin-bottom:120px;font-size: 18px;">
-    Oferta exclusiva para cliente cadastrado no app
-    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">
-      MIRA AQUI
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">
-        <circle cx="15" cy="21" r="1"></circle>
-        <circle cx="4" cy="21" r="1"></circle>
-        <path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path>
-      </svg>
-    </span>
-  </div>
-
-  <div>
-    Oferta válida até ${dataFinalFormatada} ou enquanto durar o estoque
-  </div>
-`;    } else {
+      rodapeOutput.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida até ${dataFinalFormatada} ou enquanto durar o estoque`;
+    } else {
       rodapeOutput.textContent = rodapeInput.value || '';
     }
   } else if (isOfertaDoDia) {
@@ -1760,6 +1734,7 @@ rodapeOutput.innerHTML = `
     precoOfertaInput.addEventListener('input', updatePreview);
     dataInicialInput.addEventListener('input', updatePreview);
     cadaInput.addEventListener('input', updatePreview);
+    rodapeInput.addEventListener('input', updatePreview);
 
     descricaoInput.value = descricaoOutput.textContent;
     precoAntesInput.value = '';
@@ -1803,11 +1778,6 @@ rodapeOutput.innerHTML = `
   }
 
     async function saveSingleCartazToList(cartazObj) {
-    const encarteAtual = cartazObj.encarteExclusivo || window.opcaoCartazSelecionada || 'GERAL';
-    if (encarteAtual === 'OFERTAS APP' && !cartazObj.precoAntesInput.value.trim()) {
-      alert('Erro: Não é permitido salvar o cartaz do app com o campo do preço antigo vazio.');
-      return;
-    }
     showLoading();
     try {
       const { jsPDF } = window.jspdf;
@@ -1836,6 +1806,8 @@ rodapeOutput.innerHTML = `
       const currentFontSize = window.getComputedStyle(cartazObj.descricaoOutput).fontSize;
       const currentTop = window.getComputedStyle(cartazObj.descricaoOutput).top;
 
+      const encarteAtual = cartazObj.encarteExclusivo || window.opcaoCartazSelecionada || 'GERAL';
+
       // AQUI ESTÁ O TRECHO COMPLETO COM FALSE (SEM IMAGEM)
       if (window.firebaseSaveHandlerCustom) {
         await window.firebaseSaveHandlerCustom(pdf, cartazObj.descricaoInput.value || '', cartazObj.precoOfertaInput.value || '', cartazObj.dataInicialInput.value || '', cartazObj.dataFinalInput.value || '', currentFontSize, currentTop, cartazObj.precoAntesInput.value || '', cartazObj.cadaInput.value || '', cartazObj.rodapeInput.value || '', false, encarteAtual);
@@ -1861,11 +1833,6 @@ rodapeOutput.innerHTML = `
   }
 
     async function saveSingleCartazWithImageToList(cartazObj) {
-    const encarteAtual = cartazObj.encarteExclusivo || window.opcaoCartazSelecionada || 'GERAL';
-    if (encarteAtual === 'OFERTAS APP' && !cartazObj.precoAntesInput.value.trim()) {
-      alert('Erro: Não é permitido salvar o cartaz do app com o campo do preço antigo vazio.');
-      return;
-    }
     showLoading();
     try {
       const { jsPDF } = window.jspdf;
@@ -1887,6 +1854,8 @@ rodapeOutput.innerHTML = `
 
       const currentFontSize = window.getComputedStyle(cartazObj.descricaoOutput).fontSize;
       const currentTop = window.getComputedStyle(cartazObj.descricaoOutput).top;
+
+      const encarteAtual = cartazObj.encarteExclusivo || window.opcaoCartazSelecionada || 'GERAL';
 
       // AQUI ESTÁ O TRECHO COMPLETO COM TRUE (COM IMAGEM)
       if (window.firebaseSaveHandlerCustom) {
@@ -1925,14 +1894,6 @@ rodapeOutput.innerHTML = `
     if (cartazesParaSalvar.length === 0) {
       alert("Nenhum cartaz possui preço de oferta preenchido para ser salvo.");
       return;
-    }
-
-    for (const item of cartazesParaSalvar) {
-      const encarteAtual = item.obj.encarteExclusivo || window.opcaoCartazSelecionada || 'GERAL';
-      if (encarteAtual === 'OFERTAS APP' && !item.obj.precoAntesInput.value.trim()) {
-        alert(`Erro no ${item.nome}: Não é permitido salvar o cartaz do app com o campo do preço antigo vazio.`);
-        return;
-      }
     }
 
     showLoading();
@@ -2032,47 +1993,19 @@ rodapeOutput.innerHTML = `
   import { getDatabase, ref, push, onValue, remove, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
   
   const firebaseConfig = {
-    apiKey: "AIzaSyCmOhTHgMHh57whOPojvzNgtBlgMH9JS3I",
-    authDomain: "placa-de-ofertas.firebaseapp.com",
-    databaseURL: "https://placa-de-ofertas-default-rtdb.firebaseio.com",
-    projectId: "placa-de-ofertas",
-    storageBucket: "placa-de-ofertas.firebasestorage.app",
-    messagingSenderId: "434607179238",
-    appId: "1:434607179238:web:761b336dd551fa4ac4c227",
-    measurementId: "G-EH5X5YTTXB"
-  };
-
-  const firebaseConfig1 = {
-    apiKey: "AIzaSyCyFxX4xM7XA6Gmq_AfVl_dwzaY43wl81Y",
-    authDomain: "placa-de-ofertas-1.firebaseapp.com",
-    databaseURL: "https://placa-de-ofertas-1-default-rtdb.firebaseio.com",
-    projectId: "placa-de-ofertas-1",
-    storageBucket: "placa-de-ofertas-1.firebasestorage.app",
-    messagingSenderId: "915457021931",
-    appId: "1:915457021931:web:82b58ade66f6381070abae",
-    measurementId: "G-4D5SM0KL1H"
-  };
-
-  const firebaseConfig2 = {
-    apiKey: "AIzaSyDWba4ZeK4E_aPn8XLplknznkNXlJcpmJA",
-    authDomain: "placa-de-ofertas-2.firebaseapp.com",
-    databaseURL: "https://placa-de-ofertas-2-default-rtdb.firebaseio.com",
-    projectId: "placa-de-ofertas-2",
-    storageBucket: "placa-de-ofertas-2.firebasestorage.app",
-    messagingSenderId: "65381510124",
-    appId: "1:65381510124:web:73019c881ad43bd6ba6ec9",
-    measurementId: "G-VYNJ7QDKZP"
-  };
+  apiKey: "AIzaSyCmOhTHgMHh57whOPojvzNgtBlgMH9JS3I",
+  authDomain: "placa-de-ofertas.firebaseapp.com",
+  databaseURL: "https://placa-de-ofertas-default-rtdb.firebaseio.com",
+  projectId: "placa-de-ofertas",
+  storageBucket: "placa-de-ofertas.firebasestorage.app",
+  messagingSenderId: "434607179238",
+  appId: "1:434607179238:web:761b336dd551fa4ac4c227",
+  measurementId: "G-EH5X5YTTXB"
+};
 
   const app = initializeApp(firebaseConfig);
-  const app1 = initializeApp(firebaseConfig1, "app1");
-  const app2 = initializeApp(firebaseConfig2, "app2");
-
   const analytics = getAnalytics(app);
-  
   const db = getDatabase(app);
-  const db1 = getDatabase(app1);
-  const db2 = getDatabase(app2);
   
   let currentOnValueUnsubscribe = null;
 
@@ -2177,13 +2110,7 @@ rodapeOutput.innerHTML = `
           if (poster.id) {
               const path = formatPathName(category);
               const itemRef = ref(db, `cartazes/${path}/${poster.id}`);
-              const itemRef1 = ref(db1, `cartazes/${path}/${poster.id}`);
-              const itemRef2 = ref(db2, `cartazes/${path}/${poster.id}`);
-              try { 
-                  await remove(itemRef); 
-                  await remove(itemRef1); 
-                  await remove(itemRef2); 
-              } catch(e) {}
+              try { await remove(itemRef); } catch(e) {}
           }
         });
 
@@ -2228,8 +2155,8 @@ rodapeOutput.innerHTML = `
 
       const customCategoryPath = formatPathName(encarteCustom);
       const customCartazesRef = ref(db, 'cartazes/' + customCategoryPath);
-      
-      const dataToPush = {
+
+      const newPosterRef = await push(customCartazesRef, {
         filename,
         base64,
         descricaoText: descricaoComCampanha,
@@ -2245,13 +2172,7 @@ rodapeOutput.innerHTML = `
         timeStr,
         lojaText: window.lojaSelecionadaSessao || 'Não informada',
         timestamp: now.getTime()
-      };
-
-      const newPosterRef = await push(customCartazesRef, dataToPush);
-      const targetId = newPosterRef.key;
-
-      await set(ref(db1, 'cartazes/' + customCategoryPath + '/' + targetId), dataToPush);
-      await set(ref(db2, 'cartazes/' + customCategoryPath + '/' + targetId), dataToPush);
+      });
 
       const cat = encarteCustom || 'GERAL';
       if (!window.sessionSavedPosters[cat]) {
@@ -2259,7 +2180,7 @@ rodapeOutput.innerHTML = `
       }
       
       window.sessionSavedPosters[cat].push({
-        id: targetId,
+        id: newPosterRef.key,
         base64,
         descricaoText: descricaoComCampanha,
         precoText,
@@ -2297,26 +2218,15 @@ rodapeOutput.innerHTML = `
     .then(r => r.json())
     .then(data => {
       const ipSafe = data.ip.replace(/\./g, '_');
-      
       const userRef = ref(db, 'acessos/' + ipSafe);
       set(userRef, { lastSeen: Date.now() });
       onDisconnect(userRef).remove();
-
-      const userRef1 = ref(db1, 'acessos/' + ipSafe);
-      set(userRef1, { lastSeen: Date.now() });
-      onDisconnect(userRef1).remove();
-
-      const userRef2 = ref(db2, 'acessos/' + ipSafe);
-      set(userRef2, { lastSeen: Date.now() });
-      onDisconnect(userRef2).remove();
     });
 
   onValue(ref(db, 'comando_atualizar'), (snapshot) => {
     if (snapshot.val() === true) {
       // Reseta o comando no banco de dados imediatamente antes de recarregar
       set(ref(db, 'comando_atualizar'), false);
-      set(ref(db1, 'comando_atualizar'), false);
-      set(ref(db2, 'comando_atualizar'), false);
       window.location.reload();
     }
   });
@@ -2327,20 +2237,12 @@ rodapeOutput.innerHTML = `
       const resp = await fetch('https://ipapi.co/json/');
       const data = await resp.json();
       const ipSafe = data.ip.replace(/\./g, '_');
-      const dataToSet = {
+      const localRef = ref(db, 'acessos/' + ipSafe);
+      set(localRef, {
         cidade: data.city || 'Desconhecido',
         estado: data.region || 'Desconhecido',
         timestamp: Date.now()
-      };
-      
-      const localRef = ref(db, 'acessos/' + ipSafe);
-      set(localRef, dataToSet);
-      
-      const localRef1 = ref(db1, 'acessos/' + ipSafe);
-      set(localRef1, dataToSet);
-      
-      const localRef2 = ref(db2, 'acessos/' + ipSafe);
-      set(localRef2, dataToSet);
+      });
     } catch (e) {
       console.log("Erro ao obter localização");
     }
