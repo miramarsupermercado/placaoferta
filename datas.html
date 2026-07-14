@@ -1402,8 +1402,8 @@
             } else if (!rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const df = rodapeDataFim.split('-'); 
                 rodOut.innerHTML = `<div style="margin-bottom:120px;font-size: 18px;">
-    Oferta exclusiva para cliente cadastrado no app
-    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+    <span>Oferta exclusiva para cliente cadastrado no app </span>
+    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.innerHTML = item.rodapeText || item.rodapeOutput || '';
