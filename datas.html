@@ -1213,7 +1213,7 @@
         if (appMode) {
             cartazRender.classList.add('app-mode');
             cartazRender.classList.remove('oferta-dia-mode');
-            rsOut.textContent = 'POR: R$';
+            rsOut.innerHTML = 'POR:<br>R$';
         } else if (isOfertaDoDia) {
             cartazRender.classList.remove('app-mode');
             cartazRender.classList.add('oferta-dia-mode');
@@ -2134,7 +2134,7 @@
         if (appMode) {
             cartazRender.classList.add('app-mode');
             cartazRender.classList.remove('oferta-dia-mode');
-            rsOut.textContent = 'POR: R$';
+            rsOut.innerHTML = 'POR:<br>R$';
         } else if (isOfertaDoDia) {
             cartazRender.classList.remove('app-mode');
             cartazRender.classList.add('oferta-dia-mode');
