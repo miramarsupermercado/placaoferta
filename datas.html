@@ -463,7 +463,7 @@
     .cartaz.app-mode .big-value { font-family: 'Baloo 2', sans-serif; letter-spacing: 10px; }
     .cartaz.app-mode .price-stack { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
     .cartaz.app-mode .centavos { font-family: 'Baloo 2', sans-serif; letter-spacing: -3px; font-size: 80px; margin-top: 6px; }
-    .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -5px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
+    .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -15px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
     .cartaz.app-mode .rodape { font-family: Arial, sans-serif; letter-spacing: -0.4px; position:absolute; bottom:-1px; left:10px; right:20px; font-size:14px; text-align:center; color:#222; font-weight: normal; }
     .cartaz.oferta-dia-mode { background-image: url('fundo-ofertadia.png'); }
     .cartaz.oferta-dia-mode .descricao { color: #000000; top: 115px; font-family:'UturnaRoundBold'; }
@@ -1147,7 +1147,7 @@
               pAntigoOut.style.fontSize = '';
               pAntigoOut.style.margin = '6px 0 8px 0';
 
-              areaPreco.style.top = '190px';
+              areaPreco.style.top = '140px';
             }
           }
         } else {
@@ -1228,10 +1228,10 @@
         if (!item.customFontSize || !item.customTop) { 
             if (appMode) {
                 let fs;
-                if (textLength <= 10) fs = 100;
-                else if (textLength <= 15) fs = 80;
-                else if (textLength <= 25) fs = 50;
-                else if (textLength <= 35) fs = 45;
+                if (textLength <= 10) fs = 58;
+                else if (textLength <= 15) fs = 48;
+                else if (textLength <= 25) fs = 45;
+                else if (textLength <= 35) fs = 40;
                 else fs = 40;
                 dOut.style.fontSize = fs + 'px';
                 dOut.style.top = '235px';
@@ -1259,21 +1259,21 @@
                 rsOut.style.fontSize = '35px';
                 rOut.style.top = '';
             } else if (parts.reais.length === 2) {
-                rOut.style.fontSize = '170px';
+                rOut.style.fontSize = '150px';
                 rOut.style.transform = 'scaleY(1)';
                 rOut.style.letterSpacing = '-8px';
                 rOut.style.marginTop = '0px';
                 cOut.style.fontSize = '80px';
                 if(stackRender) stackRender.style.marginTop = '0px';
                 rsOut.style.left = '-1px';
-                rsOut.style.marginTop = '10px';
+                rsOut.style.marginTop = '-10px';
                 rsOut.style.fontSize = '35px';
                 rOut.style.top = '';
             } else {
-                rOut.style.fontSize = '190px';
+                rOut.style.fontSize = '140px';
                 rOut.style.transform = 'scaleY(1)';
-                rsOut.style.left = '-1px';
-                rsOut.style.marginTop = '10px';
+                rsOut.style.left = '-30px';
+                rsOut.style.marginTop = '-10px';
                 rsOut.style.fontSize = '35px';
                 cOut.style.fontSize = '80px';
                 rOut.style.letterSpacing = '';
@@ -1317,28 +1317,28 @@
                 const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 if (appMode) {
                     if (charsLeftOfComma >= 3) {
-                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
                         pAntigoOut.style.position = 'relative';
-                        pAntigoOut.style.top = '315px';
-                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.top = '290px';
+                        pAntigoOut.style.right = '0px';
                         pAntigoOut.style.color = '#1a1a1ad1';
                         pAntigoOut.style.fontFamily = "'Baloo 2'";
-                        pAntigoOut.style.fontSize = '30px';
+                        pAntigoOut.style.fontSize = '50px';
                         pAntigoOut.style.margin = '6px 0 8px 0';
                         areaPreco.style.top = '290px';
                     } else {
-                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
                         pAntigoOut.style.position = 'relative';
-                        pAntigoOut.style.top = '315px';
-                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.top = '280px';
+                        pAntigoOut.style.right = '0px';
                         if (charsLeftOfComma === 1) {
-                            areaPreco.style.top = '285px';
+                            areaPreco.style.top = '290px';
                         } else {
                             areaPreco.style.top = '290px';
                         }
                         pAntigoOut.style.color = '';
                         pAntigoOut.style.fontFamily = '';
-                        pAntigoOut.style.fontSize = '';
+                        pAntigoOut.style.fontSize = '55px';
                         pAntigoOut.style.margin = '6px 0 8px 0';
                     }
                 } else if (isOfertaDoDia) {
@@ -1355,7 +1355,7 @@
                         pAntigoOut.style.top = '210px';
                         pAntigoOut.style.right = '0px';
                         pAntigoOut.innerHTML = `DE <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span> POR:`;
-                        areaPreco.style.top = '190px';
+                        areaPreco.style.top = '140px';
                     }
                 }
             }
@@ -1395,11 +1395,15 @@
             if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const di = rodapeDataIni.split('-');
                 const df = rodapeDataFim.split('-');
-                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                rodOut.innerHTML = `<div style="margin-bottom:102px; font-size:18px;">
+    <span>Oferta exclusiva para cliente cadastrado no app </span>
+    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent; 
             } else if (!rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const df = rodapeDataFim.split('-'); 
-                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                rodOut.innerHTML = `<div style="margin-bottom:120px;font-size: 18px;">
+    Oferta exclusiva para cliente cadastrado no app
+    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.innerHTML = item.rodapeText || item.rodapeOutput || '';
@@ -1596,7 +1600,7 @@
               pAntigoOut.style.fontSize = '';
               pAntigoOut.style.margin = '6px 0 8px 0';
 
-              areaPreco.style.top = '190px';
+              areaPreco.style.top = '140px'; //ajustado para novo formato antes:190*
             }
           }
         } else {
@@ -1674,7 +1678,7 @@
         if (appMode) {
             cartazRender.classList.add('app-mode');
             cartazRender.classList.remove('oferta-dia-mode');
-            rsOut.textContent = 'POR: R$';
+            rsOut.innerHTML = 'POR:<br>R$';
         } else if (isOfertaDoDia) {
             cartazRender.classList.remove('app-mode');
             cartazRender.classList.add('oferta-dia-mode');
@@ -1689,10 +1693,10 @@
         if (!item.customFontSize || !item.customTop) { 
             if (appMode) {
                 let fs;
-                if (textLength <= 10) fs = 100;
-                else if (textLength <= 15) fs = 80;
-                else if (textLength <= 25) fs = 50;
-                else if (textLength <= 35) fs = 45;
+                if (textLength <= 10) fs = 58; //ajustado para novo formato*
+                else if (textLength <= 15) fs = 48; //ajustado para novo formato*
+                else if (textLength <= 25) fs = 45; //ajustado para novo formato*
+                else if (textLength <= 35) fs = 40; //ajustado para novo formato*
                 else fs = 40;
                 dOut.style.fontSize = fs + 'px';
                 dOut.style.top = '235px';
@@ -1720,21 +1724,21 @@
                 rsOut.style.fontSize = '35px';
                 rOut.style.top = '';
             } else if (parts.reais.length === 2) {
-                rOut.style.fontSize = '170px';
+                rOut.style.fontSize = '150px'; //ajustado para novo formato antes:170*
                 rOut.style.transform = 'scaleY(1)';
                 rOut.style.letterSpacing = '-8px';
                 rOut.style.marginTop = '0px';
                 cOut.style.fontSize = '80px';
                 if(stackRender) stackRender.style.marginTop = '0px';
                 rsOut.style.left = '-1px';
-                rsOut.style.marginTop = '10px';
+                rsOut.style.marginTop = '-10px'; //ajustado para novo formato antes:10*
                 rsOut.style.fontSize = '35px';
                 rOut.style.top = '';
             } else {
-                rOut.style.fontSize = '190px';
+                rOut.style.fontSize = '140px'; //ajustado para novo formato antes:190*
                 rOut.style.transform = 'scaleY(1)';
-                rsOut.style.left = '-1px';
-                rsOut.style.marginTop = '10px';
+                rsOut.style.left = '-30px'; //ajustado para novo formato antes:-1*
+                rsOut.style.marginTop = '-10px'; //ajustado para novo formato antes:10*
                 rsOut.style.fontSize = '35px';
                 cOut.style.fontSize = '80px';
                 rOut.style.letterSpacing = '';
@@ -1778,28 +1782,28 @@
                 const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 if (appMode) {
                     if (charsLeftOfComma >= 3) {
-                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
                         pAntigoOut.style.position = 'relative';
-                        pAntigoOut.style.top = '315px';
-                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.top = '290px';  //ajustado para novo formato antes:315*
+                        pAntigoOut.style.right = '0px'; //ajustado para novo formato antes:110*
                         pAntigoOut.style.color = '#1a1a1ad1';
                         pAntigoOut.style.fontFamily = "'Baloo 2'";
-                        pAntigoOut.style.fontSize = '30px';
+                        pAntigoOut.style.fontSize = '50px';
                         pAntigoOut.style.margin = '6px 0 8px 0';
                         areaPreco.style.top = '290px';
                     } else {
-                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
                         pAntigoOut.style.position = 'relative';
-                        pAntigoOut.style.top = '315px';
-                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.top = '280px'; //ajustado para novo formato antes:315*
+                        pAntigoOut.style.right = '0px'; //ajustado para novo formato antes:110*
                         if (charsLeftOfComma === 1) {
-                            areaPreco.style.top = '285px';
+                            areaPreco.style.top = '290px'; //ajustado para novo formato antes:285*
                         } else {
                             areaPreco.style.top = '290px';
                         }
                         pAntigoOut.style.color = '';
                         pAntigoOut.style.fontFamily = '';
-                        pAntigoOut.style.fontSize = '';
+                        pAntigoOut.style.fontSize = '55px'; //ajustado para novo formato antes:20px*
                         pAntigoOut.style.margin = '6px 0 8px 0';
                     }
                 } else if (isOfertaDoDia) {
@@ -1816,7 +1820,7 @@
                         pAntigoOut.style.top = '210px';
                         pAntigoOut.style.right = '0px';
                         pAntigoOut.innerHTML = `DE <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span> POR:`;
-                        areaPreco.style.top = '190px';
+                        areaPreco.style.top = '140px'; //ajustado para novo formato antes:190
                     }
                 }
             }
@@ -1833,7 +1837,7 @@
         const textoCada2 = item.cadaText || item.cadaOutput || '';
         const len = textoCada2.length;
         if (appMode) {
-            if (len === 7) { cadaOut.style.fontSize = '18px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; }
+            if (len === 7) { cadaOut.style.fontSize = '18px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; cadaOut.style.marginTop = '-12px'; }
             else if (len === 6) { cadaOut.style.fontSize = '24px'; cadaOut.style.marginLeft = '20px'; cadaOut.style.left = 'auto'; }
             else if (len === 5) { cadaOut.style.fontSize = '27px'; cadaOut.style.marginLeft = '20px'; cadaOut.style.left = 'auto'; }
             else { cadaOut.style.fontSize = '30px'; cadaOut.style.marginLeft = '30px'; cadaOut.style.left = 'auto'; }
@@ -1856,11 +1860,15 @@
             if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const di = rodapeDataIni.split('-');
                 const df = rodapeDataFim.split('-');
-                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                rodOut.innerHTML = `<div style="margin-bottom:102px; font-size:18px;">
+    <span>Oferta exclusiva para cliente cadastrado no app </span>
+    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent; 
             } else if (!rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const df = rodapeDataFim.split('-'); 
-                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                rodOut.innerHTML = `<div style="margin-bottom:120px;font-size: 18px;">
+    <span>Oferta exclusiva para cliente cadastrado no app </span>
+    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.innerHTML = item.rodapeText || item.rodapeOutput || '';
@@ -2048,7 +2056,7 @@
               pAntigoOut.style.fontSize = '';
               pAntigoOut.style.margin = '6px 0 8px 0';
 
-              areaPreco.style.top = '190px';
+              areaPreco.style.top = '140px';
             }
           }
         } else {
@@ -2141,10 +2149,10 @@
         if (!item.customFontSize || !item.customTop) { 
             if (appMode) {
                 let fs;
-                if (textLength <= 10) fs = 100;
-                else if (textLength <= 15) fs = 80;
-                else if (textLength <= 25) fs = 50;
-                else if (textLength <= 35) fs = 45;
+                if (textLength <= 10) fs = 58;
+                else if (textLength <= 15) fs = 48;
+                else if (textLength <= 25) fs = 45;
+                else if (textLength <= 35) fs = 40;
                 else fs = 40;
                 dOut.style.fontSize = fs + 'px';
                 dOut.style.top = '235px';
@@ -2172,21 +2180,21 @@
                 rsOut.style.fontSize = '35px';
                 rOut.style.top = '';
             } else if (parts.reais.length === 2) {
-                rOut.style.fontSize = '170px';
+                rOut.style.fontSize = '150px';
                 rOut.style.transform = 'scaleY(1)';
                 rOut.style.letterSpacing = '-8px';
                 rOut.style.marginTop = '0px';
                 cOut.style.fontSize = '80px';
                 if(stackRender) stackRender.style.marginTop = '0px';
                 rsOut.style.left = '-1px';
-                rsOut.style.marginTop = '10px';
+                rsOut.style.marginTop = '-10px';
                 rsOut.style.fontSize = '35px';
                 rOut.style.top = '';
             } else {
-                rOut.style.fontSize = '190px';
+                rOut.style.fontSize = '140px';
                 rOut.style.transform = 'scaleY(1)';
-                rsOut.style.left = '-1px';
-                rsOut.style.marginTop = '10px';
+                rsOut.style.left = '-30px';
+                rsOut.style.marginTop = '-10px';
                 rsOut.style.fontSize = '35px';
                 cOut.style.fontSize = '80px';
                 rOut.style.letterSpacing = '';
@@ -2230,28 +2238,28 @@
                 const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 if (appMode) {
                     if (charsLeftOfComma >= 3) {
-                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
                         pAntigoOut.style.position = 'relative';
-                        pAntigoOut.style.top = '315px';
-                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.top = '290px';
+                        pAntigoOut.style.right = '0px';
                         pAntigoOut.style.color = '#1a1a1ad1';
                         pAntigoOut.style.fontFamily = "'Baloo 2'";
-                        pAntigoOut.style.fontSize = '30px';
+                        pAntigoOut.style.fontSize = '50px';
                         pAntigoOut.style.margin = '6px 0 8px 0';
                         areaPreco.style.top = '290px';
                     } else {
-                        pAntigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+                        pAntigoOut.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
                         pAntigoOut.style.position = 'relative';
-                        pAntigoOut.style.top = '315px';
-                        pAntigoOut.style.right = '110px';
+                        pAntigoOut.style.top = '280px';
+                        pAntigoOut.style.right = '0px';
                         if (charsLeftOfComma === 1) {
-                            areaPreco.style.top = '285px';
+                            areaPreco.style.top = '290px';
                         } else {
                             areaPreco.style.top = '290px';
                         }
                         pAntigoOut.style.color = '';
                         pAntigoOut.style.fontFamily = '';
-                        pAntigoOut.style.fontSize = '';
+                        pAntigoOut.style.fontSize = '55px';
                         pAntigoOut.style.margin = '6px 0 8px 0';
                     }
                 } else if (isOfertaDoDia) {
@@ -2268,7 +2276,7 @@
                         pAntigoOut.style.top = '210px';
                         pAntigoOut.style.right = '0px';
                         pAntigoOut.innerHTML = `DE <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span> POR:`;
-                        areaPreco.style.top = '190px';
+                        areaPreco.style.top = '140px';
                     }
                 }
             }
@@ -2308,11 +2316,15 @@
             if (rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const di = rodapeDataIni.split('-');
                 const df = rodapeDataFim.split('-');
-                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                rodOut.innerHTML = `<div style="margin-bottom:102px; font-size:18px;">
+    <span>Oferta exclusiva para cliente cadastrado no app </span>
+    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent; 
             } else if (!rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const df = rodapeDataFim.split('-'); 
-                rodOut.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
+                rodOut.innerHTML = `<div style="margin-bottom:120px;font-size: 18px;">
+    <span>Oferta exclusiva para cliente cadastrado no app </span>
+    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
                 if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.innerHTML = item.rodapeText || item.rodapeOutput || '';
