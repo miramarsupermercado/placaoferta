@@ -286,10 +286,10 @@
     .cartaz.app-mode .descricao { font-family: 'Baloo 2', sans-serif; letter-spacing: -1px; max-width: 95%; }
     .cartaz.app-mode .preco-antigo { font-family: 'Baloo 2', sans-serif; font-weight: 800; letter-spacing: -1px; color: #1a1a1ad1 }
     .cartaz.app-mode .preco-area { font-family: 'Baloo 2', sans-serif; font-weight: 800; left: -3px; letter-spacing: -1px;}
-    .cartaz.app-mode .rs { font-family: 'Baloo 2', sans-serif; left: -15px; }
+    .cartaz.app-mode .rs { font-family: 'Baloo 2', sans-serif; left: -15px;}
     .cartaz.app-mode .big-value { font-family: 'Baloo 2', sans-serif; letter-spacing: 10px; }
     .cartaz.app-mode .centavos { font-family: 'Baloo 2', sans-serif; letter-spacing: -3px; font-size: 80px; margin-top: 6px; }
-    .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -5px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
+    .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -15px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
     .cartaz.app-mode .rodape { font-family: Arial, sans-serif; letter-spacing: -0.4px; position:absolute; bottom:-1px; left:10px; right:20px; font-size:14px; text-align:center; color:#222; font-weight: normal; }
     
     .cartaz.oferta-dia-mode .descricao { color: #000000; top: 115px; font-family:'UturnaRoundBold'; }
@@ -446,10 +446,10 @@
       const len = texto.length;
 
       if (tipoCampanha === 'OFERTAS APP') {
-          if (len === 7) { cadaOutput.style.fontSize = '18px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
-          else if (len === 6) { cadaOutput.style.fontSize = '24px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
-          else if (len === 5) { cadaOutput.style.fontSize = '27px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
-          else { cadaOutput.style.fontSize = '30px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
+          if (len === 7) { cadaOutput.style.fontSize = '18px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; cadaOutput.style.marginTop = '-5px'; }
+          else if (len === 6) { cadaOutput.style.fontSize = '24px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; cadaOutput.style.marginTop = '';}
+          else if (len === 5) { cadaOutput.style.fontSize = '27px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; cadaOutput.style.marginTop = ''; }
+          else { cadaOutput.style.fontSize = '30px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; cadaOutput.style.marginTop = ''; }
           return;
       }
 
@@ -477,10 +477,10 @@
 
       let fontSize;
       if (tipoCampanha === 'OFERTAS APP') {
-          if (textLength <= 10) fontSize = 100;
-          else if (textLength <= 15) fontSize = 80;
-          else if (textLength <= 25) fontSize = 50;
-          else if (textLength <= 35) fontSize = 45;
+          if (textLength <= 10) fontSize = 58;
+          else if (textLength <= 15) fontSize = 48;
+          else if (textLength <= 25) fontSize = 45;
+          else if (textLength <= 35) fontSize = 40;
           else fontSize = 40;
           el.style.top = '235px';
       } else {
@@ -524,7 +524,7 @@
       if (tipoCampanha === 'OFERTAS APP') {
           cartaz1.classList.add('app-mode');
           cartaz1.classList.remove('oferta-dia-mode');
-          document.getElementById('rs-output1').textContent = 'POR: R$';
+          document.getElementById('rs-output1').innerHTML = 'POR:<br>R$';
       } else if (tipoCampanha === 'OFERTA DO DIA') {
           cartaz1.classList.remove('app-mode');
           cartaz1.classList.add('oferta-dia-mode');
@@ -553,16 +553,16 @@
           const valorFormatadoAntes = vAntes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
           if (tipoCampanha === 'OFERTAS APP') {
-              antigoOut.innerHTML = `DE: <span style="font-size:20px;">R$ </span>${valorFormatadoAntes}`;
+              antigoOut.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
               antigoOut.style.display = '';
               antigoOut.style.position = 'relative';
-              antigoOut.style.top = '315px';
-              antigoOut.style.right = '110px';
+              antigoOut.style.top = '280px';//**315
+              antigoOut.style.right = '0px';//**110
               antigoOut.style.color = '#1a1a1ad1';
               antigoOut.style.fontFamily = "'Baloo 2'";
-              antigoOut.style.fontSize = '30px';
+              antigoOut.style.fontSize = '55px';//**30
               antigoOut.style.margin = '6px 0 8px 0';
-              precoArea.style.top = (charsLeftOfComma >= 3) ? '290px' : (charsLeftOfComma === 1 ? '285px' : '290px');
+              precoArea.style.top = (charsLeftOfComma >= 3) ? '282px' : (charsLeftOfComma === 1 ? '285px' : '290px');
           } else if (tipoCampanha === 'OFERTA DO DIA') {
               antigoOut.innerHTML = `DE<br><span class="numeros-riscados">R$ ${valorFormatadoAntes}</span><br>POR:`;
               antigoOut.style.display = '';
@@ -578,7 +578,7 @@
                   antigoOut.style.top = '210px';
                   antigoOut.style.right = '0px';
                   antigoOut.innerHTML = `DE <span class="numeros-riscados">R$ ${valorFormatadoAntes}</span> POR:`;
-                  precoArea.style.top = '190px';
+                  precoArea.style.top = '140px';
               }
           } else if (charsLeftOfComma >= 3) {
             antigoOut.innerHTML = `DE R$ <span class="numeros-riscados">${valorFormatadoAntes}</span> POR:`;
@@ -626,17 +626,18 @@
               reaisOutput.style.fontSize = '95px';
               reaisOutput.style.transform = 'scaleY(1.5)';
               reaisOutput.style.letterSpacing = '-4px';
-              reaisOutput.style.marginTop = '20px';
+              reaisOutput.style.marginTop = '10px';
               centavosOutput.style.fontSize = '50px';
               rsOut.style.left = '-10px';
               rsOut.style.fontSize = '35px';
           } else {
-              reaisOutput.style.fontSize = parts.reais.length === 2 ? '170px' : '190px';
+              reaisOutput.style.fontSize = parts.reais.length === 2 ? '150px' : '150px';
               reaisOutput.style.transform = 'scaleY(1)';
               reaisOutput.style.letterSpacing = parts.reais.length === 2 ? '-8px' : '';
               centavosOutput.style.fontSize = '80px';
               rsOut.style.fontSize = '35px';
               rsOut.style.left = '-1px';
+              reaisOutput.style.marginTop = '';
           }
       } else {
           reaisOutput.style.letterSpacing = tipoCampanha === 'OFERTA DO DIA' ? '5px' : '10px';
@@ -665,7 +666,9 @@
               const df = dataFinalInput.split('-');
               const di = dataInicialInput ? dataInicialInput.split('-') : null;
               const vigenciaStr = di ? `de ${di[2]} à ${df[2]}/${df[1]}/${df[0]}` : `até ${df[2]}/${df[1]}/${df[0]}`;
-              rodapeOutput.innerHTML = `Oferta válida para cliente cadastrado no app <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span><br>Oferta válida ${vigenciaStr} ou enquanto durar o estoque`;
+              rodapeOutput.innerHTML = `<div style="margin-bottom:108px; font-size:18px;">
+    <span>Oferta exclusiva para cliente cadastrado no app </span> 
+    <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida ${vigenciaStr} ou enquanto durar o estoque`;
           } else {
               rodapeOutput.textContent = rodapeInput;
           }
