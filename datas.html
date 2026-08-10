@@ -490,20 +490,33 @@
       <button class="btn-salvar-lote" id="btn-juntar-todos" style="background:#979491;" title="Selecione os cartazes e salve todos em PDF único">📄 Juntar Todos (PDF único)</button>
     </div>
 
-<div class="painel-controle" style="margin-top: -10px; margin-bottom: 20px;">
+    <!-- Painel para Exclusão por Intervalo de Datas -->
+    <div class="painel-controle" style="margin-top: -10px; margin-bottom: 20px; border: 1px solid #f5c6cb; background-color: #fdf7f7;">
+      <div class="field-data">
+        <label for="excluir-data-inicial" style="color: #c0392b;">Data Inicial Exclusão</label>
+        <input type="date" id="excluir-data-inicial">
+      </div>
+      <div class="field-data">
+        <label for="excluir-data-final" style="color: #c0392b;">Data Final Exclusão</label>
+        <input type="date" id="excluir-data-final">
+      </div>
+      <button class="btn-salvar-lote" id="btn-excluir-intervalo" style="background:#c0392b;" title="Excluir todos os cartazes no intervalo de datas do salvamento">🗑️ Excluir por Intervalo</button>
+    </div>
+
+    <div class="painel-controle" style="margin-top: -10px; margin-bottom: 20px;">
       <div class="field-data">
         <label for="filtro-tipo">Buscar por Tipo</label>
         <select id="filtro-tipo" class="input-filtro" style="width: 185px; height: 39px; box-sizing: border-box;">
-  <option value="">Todos os Tipos</option>
-  <option value="PREÇO AVULSO">PLACA AVULSA</option>
-  <option value="ENCARTE SEMANAL" style="color:gray">ENCARTE SEMANAL</option>
-  <option value="TERÇA DA CARNE" style="color:red">TERÇA DA CARNE</option>
-  <option value="QUINTA DA FEIRA" style="color:green">QUINTA DA FEIRA</option>
-  <option value="FDS DE OFERTAS" style="color: orange">FDS DE OFERTAS</option>
-  <option value="FECHA MÊS" style="color:blue">FECHA MÊS</option>
-  <option value="OFERTAS APP" style="color:#f86336">OFERTA APP</option>
-  <option value="OFERTA DO DIA" style="color:#835acf">OFERTA DO DIA</option>
-</select>
+          <option value="">Todos os Tipos</option>
+          <option value="PREÇO AVULSO">PLACA AVULSA</option>
+          <option value="ENCARTE SEMANAL" style="color:gray">ENCARTE SEMANAL</option>
+          <option value="TERÇA DA CARNE" style="color:red">TERÇA DA CARNE</option>
+          <option value="QUINTA DA FEIRA" style="color:green">QUINTA DA FEIRA</option>
+          <option value="FDS DE OFERTAS" style="color: orange">FDS DE OFERTAS</option>
+          <option value="FECHA MÊS" style="color:blue">FECHA MÊS</option>
+          <option value="OFERTAS APP" style="color:#f86336">OFERTA APP</option>
+          <option value="OFERTA DO DIA" style="color:#835acf">OFERTA DO DIA</option>
+        </select>
       </div>
       <div class="field-data">
         <label for="filtro-descricao">Buscar por Descrição</label>
@@ -514,21 +527,21 @@
         <input type="text" id="filtro-preco" class="input-filtro" placeholder="Ex: 5,99...">
       </div>
       <div class="field-data">
-  <label for="filtro-loja">Buscar por Loja</label>
-  <select id="filtro-loja" class="input-filtro" style="width: 160px;">
-    <option value="">Todas as Lojas</option>
-    <option value="Loja 1">Loja 1</option>
-    <option value="Loja 2">Loja 2</option>
-    <option value="Loja 3">Loja 3</option>
-    <option value="Loja 4">Loja 4</option>
-    <option value="Loja 5">Loja 5</option>
-    <option value="Loja 6">Loja 6</option>
-    <option value="Loja 7">Loja 7</option>
-    <option value="Loja 8">Loja 8</option>
-    <option value="Loja 9">Loja 9</option>
-    <option value="Loja 10">Loja 10</option>
-  </select>
-</div>
+        <label for="filtro-loja">Buscar por Loja</label>
+        <select id="filtro-loja" class="input-filtro" style="width: 160px;">
+          <option value="">Todas as Lojas</option>
+          <option value="Loja 1">Loja 1</option>
+          <option value="Loja 2">Loja 2</option>
+          <option value="Loja 3">Loja 3</option>
+          <option value="Loja 4">Loja 4</option>
+          <option value="Loja 5">Loja 5</option>
+          <option value="Loja 6">Loja 6</option>
+          <option value="Loja 7">Loja 7</option>
+          <option value="Loja 8">Loja 8</option>
+          <option value="Loja 9">Loja 9</option>
+          <option value="Loja 10">Loja 10</option>
+        </select>
+      </div>
       <button class="btn-salvar-lote" id="btn-excluir-selecionados" style="background:#c0392b; height: 39px; margin-right: auto;">🗑️ Excluir Selecionados</button>
     </div>
     
@@ -542,7 +555,8 @@
             <th class="sortable" data-sort="tipo">Tipo <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="vigencia">Data de Vigência <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="preco">Preço Oferta <span class="sort-icon"></span></th>
-            <th class="sortable" data-sort="loja">Loja <span class="sort-icon"></span></th> <th class="sortable" data-sort="salvo">Salvo em <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="loja">Loja <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="salvo">Salvo em <span class="sort-icon"></span></th>
             <th class="col-acoes">Ações</th>
           </tr>
         </thead>
@@ -659,7 +673,6 @@ const firebaseConfig = {
     measurementId: "G-EH5X5YTTXB"
   };
 
-
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const cartazesRef = ref(db, 'cartazes');
@@ -709,6 +722,75 @@ const firebaseConfig = {
         });
     }
   };
+
+  // Lógica do botão de exclusão por intervalo de datas do salvamento
+  document.getElementById('btn-excluir-intervalo').addEventListener('click', async () => {
+    const dtInicialInput = document.getElementById('excluir-data-inicial').value;
+    const dtFinalInput = document.getElementById('excluir-data-final').value;
+
+    if (!dtInicialInput || !dtFinalInput) {
+      alert('Por favor, preencha ambas as datas (Inicial e Final) para realizar a exclusão por intervalo!');
+      return;
+    }
+
+    // Define o inicio no primeiro milissegundo do dia inicial e fim no último milissegundo do dia final
+    const inicioTimeStamp = new Date(dtInicialInput + 'T00:00:00').getTime();
+    const fimTimeStamp = new Date(dtFinalInput + 'T23:59:59.999').getTime();
+
+    if (inicioTimeStamp > fimTimeStamp) {
+      alert('A Data Inicial não pode ser maior que a Data Final!');
+      return;
+    }
+
+    // Filtra os cartazes pelo campo timestamp ou dateStr
+    const cartazesParaExcluir = [];
+    Object.keys(window.listaCartazesMemoria).forEach((id) => {
+      const item = window.listaCartazesMemoria[id];
+      let tStamp = item.timestamp;
+
+      // Fallback para compor o timestamp a partir do dateStr caso o atributo timestamp não exista
+      if (!tStamp && item.dateStr) {
+        const parts = item.dateStr.split('/');
+        if (parts.length === 3) {
+          tStamp = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`).getTime();
+        }
+      }
+
+      if (tStamp && tStamp >= inicioTimeStamp && tStamp <= fimTimeStamp) {
+        cartazesParaExcluir.push(id);
+      }
+    });
+
+    if (cartazesParaExcluir.length === 0) {
+      alert('Nenhum cartaz foi encontrado no intervalo de datas selecionado.');
+      return;
+    }
+
+    const dataIniFormatada = dtInicialInput.split('-').reverse().join('/');
+    const dataFimFormatada = dtFinalInput.split('-').reverse().join('/');
+
+    if (confirm(`Tem certeza absoluta que deseja excluir de forma permanente os ${cartazesParaExcluir.length} cartazes salvos entre ${dataIniFormatada} e ${dataFimFormatada}?`)) {
+      const loadingOverlay = document.getElementById('loading-overlay');
+      const loadingText = document.getElementById('loading-text');
+      loadingOverlay.style.display = 'flex';
+      loadingText.textContent = `Excluindo ${cartazesParaExcluir.length} cartazes por intervalo...`;
+
+      try {
+        for (const id of cartazesParaExcluir) {
+          const itemRef = ref(db, `cartazes/${id}`);
+          await remove(itemRef);
+        }
+        document.getElementById('excluir-data-inicial').value = '';
+        document.getElementById('excluir-data-final').value = '';
+        alert(`${cartazesParaExcluir.length} cartazes foram excluídos com sucesso!`);
+      } catch (err) {
+        console.error(err);
+        alert('Ocorreu um erro ao tentar excluir os cartazes do intervalo selecionado.');
+      } finally {
+        loadingOverlay.style.display = 'none';
+      }
+    }
+  });
 
   // Lógica do botão de exclusão em lote de selecionados
   document.getElementById('btn-excluir-selecionados').addEventListener('click', async () => {
@@ -2318,68 +2400,52 @@ const firebaseConfig = {
                 rodOut.innerHTML = `<div style="margin-bottom:102px; font-size:18px;">
     <span>Oferta exclusiva para cliente cadastrado no app </span>
     <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida de ${di[2]} à ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
-                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent; 
             } else if (!rodapeDataIni && rodapeDataFim && rodapeDataFim.includes('-')) {
                 const df = rodapeDataFim.split('-'); 
                 rodOut.innerHTML = `<div style="margin-bottom:120px;font-size: 18px;">
     <span>Oferta exclusiva para cliente cadastrado no app </span>
     <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">MIRA AQUI <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="15" cy="21" r="1"></circle><circle cx="4" cy="21" r="1"></circle><path d="M23 1h-4l-2.68 13.39a2 2 0 0 1-2 1.61H4.6a2 2 0 0 1-2-1.61L1 6h17"></path></svg></span></div>Oferta válida até ${df[2]}/${df[1]}/${df[0]} ou enquanto durar o estoque`;
-                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.innerHTML = item.rodapeText || item.rodapeOutput || '';
-                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             }
         } else if (isOfertaDoDia) {
             if (rodapeDataIni && rodapeDataIni.includes('-')) {
                 const di = rodapeDataIni.split('-');
                 rodOut.textContent = `Aproveite! Oferta exclusiva para o dia ${di[2]}/${di[1]} ou enquanto durar o estoque`;
                 rodOut.style.top ='410px';
-                rodOut.style.left = '10px';
-                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             } else {
                 rodOut.textContent = ``;
                 rodOut.style.top ='410px';
-                rodOut.style.left = '10px';
-                if (typeof novoRodapeTexto !== 'undefined') novoRodapeTexto = rodOut.textContent;
             }
         } else {
             rodOut.style.top = '';
-            rodOut.style.left = '';
         }
-        // --- FIM DA FIDELIDADE VISUAL ---
 
-        // Gera o canvas da página corrente
         const canvas = await html2canvas(containerRender, { scale: 3, useCORS: true, backgroundColor: null });
         const imgData = canvas.toDataURL('image/png');
 
-        if (pdf === null) {
-          // Inicializa o PDF na primeira página
+        if (index === 1) {
           pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
         } else {
-          // Adiciona uma nova página subsequente
           pdf.addPage();
         }
 
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-
         const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
         const imgWidth = canvas.width * ratio;
         const imgHeight = canvas.height * ratio;
-        
-        const marginX = ((pdfWidth - imgWidth) / 2) + 3
+        const marginX = ((pdfWidth - imgWidth) / 2) + 3;
         const marginY = (pdfHeight - imgHeight) / 2 - 5;
 
         pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
       }
 
-      if (pdf) {
-        pdf.save(sanitizeFileName('todos-cartazes-selecionados', 'pdf'));
-        alert('PDF contendo todos os cartazes selecionados foi gerado com sucesso!');
-      }
+      pdf.save(sanitizeFileName('cartazes-unificados', 'pdf'));
+      alert('Todos os cartazes selecionados foram unidos em um único PDF!');
     } catch (err) {
       console.error(err);
-      alert('Ocorreu um erro ao tentar juntar todos os cartazes selecionados.');
+      alert('Ocorreu um erro ao juntar todos os cartazes.');
     } finally {
       loadingOverlay.style.display = 'none';
     }
