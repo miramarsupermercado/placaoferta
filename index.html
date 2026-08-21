@@ -2064,6 +2064,17 @@ rodapeOutput.innerHTML = `
     measurementId: "G-EH5X5YTTXB"
   };
 
+  const firebaseConfig1 = {
+  apiKey: "AIzaSyDj7Uy4QxoOcsqaPLsepQr5SRzDXeVPmh0",
+  authDomain: "placas-ofertas.firebaseapp.com",
+  databaseURL: "https://placas-ofertas-default-rtdb.firebaseio.com",
+  projectId: "placas-ofertas",
+  storageBucket: "placas-ofertas.firebasestorage.app",
+  messagingSenderId: "952150285683",
+  appId: "1:952150285683:web:638bfe54a9b52890133906",
+  measurementId: "G-25B5FZ1CV5"
+};
+
   const firebaseConfig2 = {
     apiKey: "AIzaSyCwK7ZmsjOtqGhDNy_XxVnD69dzT0_ium4",
   authDomain: "placas-de-ofertas.firebaseapp.com",
@@ -2076,11 +2087,13 @@ rodapeOutput.innerHTML = `
   };
 
   const app = initializeApp(firebaseConfig);
+  const app1 = initializeApp(firebaseConfig1, "app1");
   const app2 = initializeApp(firebaseConfig2, "app2");
 
   const analytics = getAnalytics(app);
   
   const db = getDatabase(app);
+  const db1 = getDatabase(app1);
   const db2 = getDatabase(app2);
   
   let currentOnValueUnsubscribe = null;
