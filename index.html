@@ -660,15 +660,15 @@
 
     /* REGRAS ADICIONADAS PARA SUPORTE EXCLUSIVO AO MODO APP SEM AFETAR O PADRÃO */
     .price-stack { display: contents; }
-    .cartaz.app-mode .descricao { font-family: 'Baloo 2', sans-serif; letter-spacing: -1px; max-width: 95%; }
+    .cartaz.app-mode .descricao { font-family: 'Baloo 2', sans-serif; letter-spacing: -2px; max-width: 95%; }
     .cartaz.app-mode .preco-antigo { font-family: 'Baloo 2', sans-serif; font-weight: 800; letter-spacing: -1px; color: #1a1a1ad1 }
     .cartaz.app-mode .preco-area { font-family: 'Baloo 2', sans-serif; font-weight: 800; left: -3px; letter-spacing: -1px;}
     .cartaz.app-mode .rs { font-family: 'Baloo 2', sans-serif; left: -15px; }
     .cartaz.app-mode .big-value { font-family: 'Baloo 2', sans-serif; letter-spacing: 10px; }
     .cartaz.app-mode .price-stack { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
-    .cartaz.app-mode .centavos { font-family: 'Baloo 2', sans-serif; letter-spacing: -3px; font-size: 80px; margin-top: 6px; }
+    .cartaz.app-mode .centavos { font-family: 'Baloo 2', sans-serif; letter-spacing: -3px; font-size: 60px; margin-top: 0px; }
     .cartaz.app-mode .cada { font-family: 'Baloo 2', sans-serif; text-transform: uppercase; font-size: 35px; letter-spacing: -1px; margin-top: -15px; margin-left: 30px; position: static; align-self: auto; left: auto; margin-bottom: 0; }
-    .cartaz.app-mode .rodape { font-family: Arial, sans-serif; letter-spacing: -0.4px; position:absolute; bottom:-1px; left:10px; right:20px; font-size:14px; text-align:center; color:#222; font-weight: normal; }
+    .cartaz.app-mode .rodape { font-family: Arial, sans-serif; letter-spacing: -0.4px; position:absolute; left:10px; right:20px; font-size:14px; text-align:center; color:#222; font-weight: normal;}
     .cartaz.oferta-dia-mode {
     background-image: url('fundo-ofertadia.png');
     /* Localize e substitua no seu <style> */
@@ -686,6 +686,116 @@
 .cartaz.oferta-dia-mode .rs {
     color: #101010;
 }
+
+
+    /* =========================================================
+       POP-UP DE AVISO - NOVO FORMATO DA PLACA DE OFERTAS DO APP
+       ========================================================= */
+    #popup-aviso-app-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 10003;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+      backdrop-filter: blur(4px);
+    }
+
+    #popup-aviso-app-container {
+      width: 520px;
+      max-width: 100%;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 14px 45px rgba(0,0,0,0.35);
+      padding: 30px 28px 24px;
+      box-sizing: border-box;
+      text-align: center;
+      font-family: 'Oswald', sans-serif;
+      animation: popupAvisoEntrada 0.25s ease-out;
+    }
+
+    #popup-aviso-app-container h2 {
+      margin: 0 0 18px;
+      color: var(--blue);
+      font-size: 25px;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    #popup-aviso-app-container p {
+      margin: 0 0 24px;
+      color: #333;
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    #popup-aviso-app-container .aviso-app-check {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin: 0 0 22px;
+      color: #444;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #popup-aviso-app-container .aviso-app-check input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--blue);
+    }
+
+    #btn-fechar-aviso-app {
+      min-width: 150px;
+      padding: 11px 22px;
+      border-radius: 7px;
+      border: none;
+      background: var(--blue);
+      color: #fff;
+      font-family: 'Oswald', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    #btn-fechar-aviso-app:hover {
+      background: var(--orange);
+      transform: scale(1.03);
+    }
+
+    @keyframes popupAvisoEntrada {
+      from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (max-width: 600px) {
+      #popup-aviso-app-container {
+        padding: 24px 20px 20px;
+      }
+
+      #popup-aviso-app-container h2 {
+        font-size: 21px;
+      }
+
+      #popup-aviso-app-container p {
+        font-size: 15px;
+      }
+    }
 
   </style>
 </head>
@@ -740,6 +850,22 @@
         <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 9')">Loja 9</button>
         <button type="button" class="popup-btn-loja" onclick="selecionarLoja('Loja 10')">Loja 10</button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- Aviso exibido ao abrir a página -->
+  <div id="popup-aviso-app-overlay" role="dialog" aria-modal="true" aria-labelledby="popup-aviso-app-titulo">
+    <div id="popup-aviso-app-container">
+      <h2 id="popup-aviso-app-titulo">Placa de Ofertas do APP</h2>
+      <p>PLACA DE OFERTAS DO APP CONFIGURADO PARA O NOVO FORMATO, <br> JÁ ESTÁ DISPONÍVEL!</p>
+
+      <label class="aviso-app-check">
+        <input type="checkbox" id="nao-exibir-aviso-app">
+        <span>Não exibir novamente</span>
+      </label>
+
+      <button type="button" id="btn-fechar-aviso-app">Entendi</button>
     </div>
   </div>
 
@@ -1363,10 +1489,10 @@
       const appMode = isAppMode();
       
       if (appMode) {
-        if (len === 7) { cadaOutput.style.fontSize = '18px'; cadaOutput.style.marginTop = '-12px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
-        else if (len === 6) { cadaOutput.style.fontSize = '24px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
-        else if (len === 5) { cadaOutput.style.fontSize = '27px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
-        else { cadaOutput.style.marginTop = ''; cadaOutput.style.fontSize = '30px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
+        if (len === 7) { cadaOutput.style.fontSize = '17px'; cadaOutput.style.marginTop = '-12px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
+        else if (len === 6) { cadaOutput.style.fontSize = '18px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
+        else if (len === 5) { cadaOutput.style.fontSize = '19px'; cadaOutput.style.marginLeft = '20px'; cadaOutput.style.left = 'auto'; }
+        else { cadaOutput.style.marginTop = ''; cadaOutput.style.fontSize = '20px'; cadaOutput.style.marginLeft = '30px'; cadaOutput.style.left = 'auto'; }
       } else {
         cadaOutput.style.marginLeft = '';
         if (len > 4 && len <= 7) {
@@ -1399,14 +1525,14 @@
 //100,80,50,45,40
       let fontSize;
       if (appMode) {
-        if (textLength <= 10) { fontSize = 58; }
+        if (textLength <= 10) { fontSize = 45; }
         else if (textLength <= 15) { fontSize = 48; }
         else if (textLength <= 25) { fontSize = 45; }
         else if (textLength <= 35) { fontSize = 40; }
         else if (textLength <= 60) { fontSize = 30; }
         else { fontSize = 40; }
         el.style.fontSize = fontSize + 'px';
-        el.style.top = '235px';
+        el.style.top = '275px';
       } else {
         if (textLength <= 10) {
           fontSize = 120;
@@ -1464,31 +1590,31 @@ if (appMode) {
 
       if (appMode) {
         if (charsLeftOfComma >= 3) {
-          precoAntigoOutput.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
+          precoAntigoOutput.innerHTML = `DE: <span style="font-size:25px;">R$ </span>${valorFormatadoAntes}`;
           precoAntigoOutput.style.display = '';
           precoAntigoOutput.style.position = 'relative';
-          precoAntigoOutput.style.top = '290px';
+          precoAntigoOutput.style.top = '330px';
           precoAntigoOutput.style.right = '0px';
           precoAntigoOutput.style.color = '#1a1a1ad1';
           precoAntigoOutput.style.fontFamily = "'Baloo 2'";
-          precoAntigoOutput.style.fontSize = '50px';
+          precoAntigoOutput.style.fontSize = '40px';
           precoAntigoOutput.style.margin = '6px 0 8px 0';
-          document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '282px';
+          document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '320px';
         } else {
-          precoAntigoOutput.innerHTML = `DE: <span style="font-size:30px;">R$ </span>${valorFormatadoAntes}`;
+          precoAntigoOutput.innerHTML = `DE: <span style="font-size:25px;">R$ </span>${valorFormatadoAntes}`;
           precoAntigoOutput.style.display = '';
           precoAntigoOutput.style.position = 'relative';
-          precoAntigoOutput.style.top = '280px';
+          precoAntigoOutput.style.top = '330px';
           if (charsLeftOfComma === 1) {
             precoAntigoOutput.style.right = '0px';
-            document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
+            document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '335px';
           } else {
             precoAntigoOutput.style.right = '0px';
-            document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '290px';
+            document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '335px';
           }
           precoAntigoOutput.style.color = '';
           precoAntigoOutput.style.fontFamily = '';
-          precoAntigoOutput.style.fontSize = '55px';
+          precoAntigoOutput.style.fontSize = '40px';
           precoAntigoOutput.style.margin = '6px 0 8px 0';
         }
       } else if (isOfertaDoDia) {
@@ -1551,7 +1677,7 @@ if (appMode) {
   } else {
     precoAntigoOutput.style.display = 'none';
     if (appMode) {
-      document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '375px';
+      document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '415px';
     } else if (isOfertaDoDia) {
       document.querySelector(`#cartaz${idSuffix} .preco-area`).style.top = '210px'; // Altura sem preço antigo na Oferta do Dia
     } else {
@@ -1573,38 +1699,38 @@ if (appMode) {
 
   if (appMode) {
     if ((parts.reais || '').length >= 3) {
-      reaisOutput.style.fontSize = '95px';
+      reaisOutput.style.fontSize = '60px';
       reaisOutput.style.transform = 'scaleY(1.5)';
-      reaisOutput.style.letterSpacing = '-4px';
+      reaisOutput.style.letterSpacing = '-2px';
       reaisOutput.style.marginTop = '20px';
       centavosOutput.style.fontSize = '50px';
       
       if(stackEl) stackEl.style.marginTop = '20px';
       
-      rsOutput.style.left = '-10px';
-      rsOutput.style.marginTop = '10px';
-      rsOutput.style.fontSize = '35px';
+      rsOutput.style.left = '-16px';
+      rsOutput.style.marginTop = '-1px';
+      rsOutput.style.fontSize = '30px';
       reaisOutput.style.top = '';
     } else if ((parts.reais || '').length === 2) {
-      reaisOutput.style.fontSize = '150px';
+      reaisOutput.style.fontSize = '100px';
       reaisOutput.style.transform = 'scaleY(1)';
-      reaisOutput.style.letterSpacing = '-8px';
+      reaisOutput.style.letterSpacing = '-5px';
       reaisOutput.style.marginTop = '0px';
-      centavosOutput.style.fontSize = '80px';
+      centavosOutput.style.fontSize = '60px';
       
       if(stackEl) stackEl.style.marginTop = '0px';
       
-      rsOutput.style.left = '-1px';
-      rsOutput.style.marginTop = '-10px';
-      rsOutput.style.fontSize = '35px';
+      rsOutput.style.left = '-10px';
+      rsOutput.style.marginTop = '-15px';
+      rsOutput.style.fontSize = '30px';
       reaisOutput.style.top = '';
     } else {
-      reaisOutput.style.fontSize = '140px';
+      reaisOutput.style.fontSize = '100px';
       reaisOutput.style.transform = 'scaleY(1)';
       rsOutput.style.left = '-30px';
-      rsOutput.style.marginTop = '-10px';
-      rsOutput.style.fontSize = '35px';
-      centavosOutput.style.fontSize = '80px';
+      rsOutput.style.marginTop = '-15px';
+      rsOutput.style.fontSize = '30px';
+      centavosOutput.style.fontSize = '60px';
       reaisOutput.style.letterSpacing = '';
       
       if(stackEl) stackEl.style.marginTop = '0px';
@@ -1665,7 +1791,7 @@ if (appMode) {
       const diaInicial = di[2];
       const dataFinalFormatada = `${df[2]}/${df[1]}/${df[0]}`;
 rodapeOutput.innerHTML = `
-  <div style="margin-bottom:102px; font-size:18px;">
+  <div style="margin-bottom:85px; font-size:14px;">
     <span>Oferta exclusiva para cliente cadastrado no app </span>
     <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">
       MIRA AQUI
@@ -1685,14 +1811,14 @@ rodapeOutput.innerHTML = `
     </span>
   </div>
 
-  <div>
+  <div style="font-size: 12px; position: relative; top: -10px">
     Oferta válida de ${diaInicial} à ${dataFinalFormatada} ou enquanto durar o estoque
   </div>
 `;    } else if (!dataInicialInput.value && dataFinalInput.value) {
       const df = dataFinalInput.value.split('-'); 
       const dataFinalFormatada = `${df[2]}/${df[1]}/${df[0]}`;
 rodapeOutput.innerHTML = `
-  <div style="margin-bottom:120px;font-size: 18px;">
+  <div style="margin-bottom:85px;font-size: 14px;">
     Oferta exclusiva para cliente cadastrado no app
     <span style="font-weight:bold; display:inline-flex; align-items:center; gap:4px;">
       MIRA AQUI
@@ -1704,7 +1830,7 @@ rodapeOutput.innerHTML = `
     </span>
   </div>
 
-  <div>
+  <div style="font-size: 12px; position: relative; top: -10px">
     Oferta válida até ${dataFinalFormatada} ou enquanto durar o estoque
   </div>
 `;    } else {
@@ -2045,6 +2171,53 @@ rodapeOutput.innerHTML = `
   }).catch(() => {
     loadSavedCartazes();
   });
+
+  // =========================================================
+  // AVISO INICIAL - NOVO FORMATO DA PLACA DE OFERTAS DO APP
+  // A preferência é salva somente neste navegador/dispositivo.
+  // =========================================================
+  const CHAVE_AVISO_APP = 'ocultarAvisoNovoFormatoApp';
+
+  function fecharAvisoNovoFormatoApp() {
+    const overlay = document.getElementById('popup-aviso-app-overlay');
+    const checkbox = document.getElementById('nao-exibir-aviso-app');
+
+    if (checkbox && checkbox.checked) {
+      localStorage.setItem(CHAVE_AVISO_APP, '1');
+    }
+
+    if (overlay) {
+      overlay.style.display = 'none';
+    }
+  }
+
+  function mostrarAvisoNovoFormatoApp() {
+    const overlay = document.getElementById('popup-aviso-app-overlay');
+
+    if (!overlay) return;
+
+    // Se o usuário marcou "não exibir novamente", não mostra o aviso.
+    if (localStorage.getItem(CHAVE_AVISO_APP) === '1') {
+      return;
+    }
+
+    overlay.style.display = 'flex';
+  }
+
+  document.getElementById('btn-fechar-aviso-app').addEventListener('click', fecharAvisoNovoFormatoApp);
+
+  // Permite fechar clicando fora da caixa, sem alterar a preferência.
+  document.getElementById('popup-aviso-app-overlay').addEventListener('click', function(event) {
+    if (event.target === this) {
+      fecharAvisoNovoFormatoApp();
+    }
+  });
+
+  // Mostra o aviso somente depois que a página estiver carregada.
+  window.addEventListener('load', () => {
+    setTimeout(mostrarAvisoNovoFormatoApp, 150);
+  });
+
 </script>
 
 <script type="module">
