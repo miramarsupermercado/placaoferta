@@ -2567,5 +2567,51 @@ if (appMode) {
     }
   });
 </script>
+
+
+  <!-- POP-UP DE AVISO SOBRE OS MODOS DE IMPRESSÃO -->
+  <div id="aviso-impressao-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:20000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+    <div style="width:min(550px, 90vw); background:#fff; border-radius:14px; box-shadow:0 12px 35px rgba(0,0,0,.28); padding:28px; box-sizing:border-box; text-align:center; color:#222;">
+      <div style="font-size:22px; font-weight:700; color:#213966; margin-bottom:18px;">Novidade na impressão de cartazes</div>
+
+      <div style="font-size:17px; line-height:1.5; margin-bottom:12px;">
+        Agora, você pode unir <strong>mais de 2 cartazes</strong> na função <strong>“2 páginas por folha”</strong>.
+      </div>
+
+      <div style="font-size:17px; line-height:1.5; margin-bottom:22px;">
+        Para juntar os cartazes num PDF único e imprimir cada um numa <strong>folha inteira</strong>, clique no botão <strong>“1 página por folha”</strong>.
+      </div>
+
+      <label style="display:flex; align-items:center; justify-content:center; gap:9px; font-size:14px; font-weight:600; cursor:pointer; margin-bottom:22px;">
+        <input type="checkbox" id="nao-exibir-aviso-impressao" style="width:18px; height:18px; cursor:pointer;">
+        Não exibir novamente
+      </label>
+
+      <button id="fechar-aviso-impressao" type="button" style="border:none; border-radius:7px; background:#213966; color:#fff; font-family:'Oswald',sans-serif; font-weight:700; font-size:16px; padding:10px 32px; cursor:pointer;">
+        ENTENDI
+      </button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const chaveAviso = 'naoExibirAvisoImpressaoV2';
+      const overlay = document.getElementById('aviso-impressao-overlay');
+      const checkbox = document.getElementById('nao-exibir-aviso-impressao');
+      const btnFechar = document.getElementById('fechar-aviso-impressao');
+
+      if (localStorage.getItem(chaveAviso) !== 'true') {
+        overlay.style.display = 'flex';
+      }
+
+      btnFechar.addEventListener('click', function () {
+        if (checkbox.checked) {
+          localStorage.setItem(chaveAviso, 'true');
+        }
+        overlay.style.display = 'none';
+      });
+    });
+  </script>
+
 </body>
 </html>
