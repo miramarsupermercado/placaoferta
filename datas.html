@@ -232,6 +232,71 @@
       background-color: #962d22;
     }
 
+    .input-quantidade-copias {
+      width: 48px;
+      height: 30px;
+      box-sizing: border-box;
+      margin-left: 5px;
+      padding: 3px 5px;
+      border: 1px solid #cfd4da;
+      border-radius: 4px;
+      text-align: center;
+      font-family: 'Oswald', sans-serif;
+      font-size: 13px;
+      font-weight: bold;
+      vertical-align: middle;
+      margin-top: -10px;
+    }
+
+    .input-quantidade-copias:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 2px rgba(74,144,226,.15);
+    }
+
+    /* Destaque inicial dos campos de CÓPIAS */
+@keyframes piscarCopias {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 138, 28, 0);
+        border-color: #cfd4da;
+    }
+    50% {
+        box-shadow: 0 0 0 5px rgba(255, 138, 28, 0.45);
+        border-color: #ff8a1c;
+    }
+}
+
+.input-quantidade-copias.destaque-copias {
+    animation: piscarCopias 0.8s ease-in-out infinite;
+}
+
+.dica-copias {
+    position: absolute;
+    z-index: 9999;
+    width: 250px;
+    padding: 10px 12px;
+    background: #213966;
+    color: white;
+    border-radius: 7px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    line-height: 1.3;
+    text-align: left;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    pointer-events: none;
+}
+
+.dica-copias::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent #213966 transparent transparent;
+}
+
     #lista-vazia {
       background: #fff;
       padding: 30px;
@@ -561,7 +626,12 @@
             <th class="sortable" data-sort="preco">Preço Oferta <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="loja">Loja <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="salvo">Salvo em <span class="sort-icon"></span></th>
-            <th class="col-acoes">Ações</th>
+<th class="col-acoes">
+    <div style="display:flex; align-items:center; justify-content:center;">
+        <span style="flex:1;">AÇÕES</span>
+        <span style="width:53px; text-align:center;">CÓPIAS</span>
+    </div>
+</th>
           </tr>
         </thead>
         <tbody id="tabela-body-cartazes">
@@ -608,6 +678,28 @@
 
 <script>
   window.listaCartazesMemoria = {};
+  // Mantém a seleção dos cartazes mesmo ao trocar de página/filtro/ordenação
+  window.cartazesSelecionados = new Set();
+  // Quantidade de cópias de cada cartaz nas exportações (padrão = 1)
+  window.quantidadeCopiasCartazes = {};
+
+  function obterQuantidadeCopias(id) {
+    const valor = parseInt(window.quantidadeCopiasCartazes[id], 10);
+    return Number.isFinite(valor) && valor >= 1 ? valor : 1;
+  }
+
+  function expandirSelecionadosPorQuantidade() {
+    const expandidos = [];
+    Array.from(window.cartazesSelecionados).forEach(id => {
+      const quantidade = obterQuantidadeCopias(id);
+      for (let i = 0; i < quantidade; i++) {
+        expandidos.push({
+          getAttribute: (attr) => attr === 'data-id' ? id : null
+        });
+      }
+    });
+    return expandidos;
+  }
   // Variáveis para gerenciar o estado da ordenação
   window.currentSortColumn = 'salvo';
   window.currentSortDirection = 'desc';
@@ -660,26 +752,347 @@
     const blob = new Blob([u8arr], {type:mime});
     return URL.createObjectURL(blob);
   }
+
+  let dicaCopiasJaExibida = false;
+
+function destacarInputsCopias() {
+    if (dicaCopiasJaExibida) return;
+
+    const inputs = document.querySelectorAll('.input-quantidade-copias');
+
+    if (!inputs.length) return;
+
+    dicaCopiasJaExibida = true;
+
+    // Faz TODOS os inputs piscarem
+    inputs.forEach(input => {
+        input.classList.add('destaque-copias');
+    });
+
+    // Cria apenas UMA dica, ligada ao primeiro input
+    const primeiroInput = inputs[0];
+
+    const dica = document.createElement('div');
+    dica.className = 'dica-copias';
+    dica.textContent =
+        'Se quiser clonar os cartazes digite aqui a quantidade para gerar cópias dele no PDF.';
+
+    document.body.appendChild(dica);
+
+    function posicionarDica() {
+        const rect = primeiroInput.getBoundingClientRect();
+
+        dica.style.left =
+            (rect.right + 15 + window.scrollX) + 'px';
+
+        dica.style.top =
+            (rect.top +
+             window.scrollY +
+             rect.height / 2 -
+             dica.offsetHeight / 2) + 'px';
+    }
+
+    posicionarDica();
+
+    // Para o efeito depois de 6 segundos
+    setTimeout(() => {
+        inputs.forEach(input => {
+            input.classList.remove('destaque-copias');
+        });
+
+        dica.remove();
+    }, 10000);
+}
+
 </script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC1Bi4bZ6JSyFEnw-uV9rzHoxdu1Oyhtk4",
-  authDomain: "placas-miramar-1.firebaseapp.com",
-  databaseURL: "https://placas-miramar-1-default-rtdb.firebaseio.com",
-  projectId: "placas-miramar-1",
-  storageBucket: "placas-miramar-1.firebasestorage.app",
-  messagingSenderId: "471001231253",
-  appId: "1:471001231253:web:e5493e27e6dd95bfb9509c",
-  measurementId: "G-3P1HKXGSDL"
-};
+// ============================================================
+// FIREBASE - ROTAÇÃO AUTOMÁTICA ENTRE 5 PROJETOS
+// Cada projeto permanece ativo por 168 horas (7 dias).
+// Ciclo: Projeto 1 -> 2 -> 3 -> 4 -> 5 -> 1 ...
+//
+// IMPORTANTE:
+// - O Projeto 1 abaixo é o Firebase que já existia neste HTML.
+// - Preencha apenas os Projetos 2, 3, 4 e 5.
+// - Enquanto algum projeto estiver com os campos "COLE_AQUI",
+//   o sistema usa o Projeto 1 como segurança naquele período.
+// ============================================================
 
-  const app = initializeApp(firebaseConfig);
+const PROJETOS_FIREBASE = [
+{
+      nome: "Projeto 1",
+      config: {
+        apiKey: "AIzaSyC1Bi4bZ6JSyFEnw-uV9rzHoxdu1Oyhtk4",
+        authDomain: "placas-miramar-1.firebaseapp.com",
+        databaseURL: "https://placas-miramar-1-default-rtdb.firebaseio.com",
+        projectId: "placas-miramar-1",
+        storageBucket: "placas-miramar-1.firebasestorage.app",
+        messagingSenderId: "471001231253",
+        appId: "1:471001231253:web:e5493e27e6dd95bfb9509c",
+        measurementId: "G-3P1HKXGSDL"
+      }
+    },
+    {
+      nome: "Projeto 2",
+      config: {
+        apiKey: "AIzaSyCEfHeoEbA0r5tgo37bo_faEhdYVN_WQh4",
+        authDomain: "placas-miramar-2.firebaseapp.com",
+        databaseURL: "https://placas-miramar-2-default-rtdb.firebaseio.com",
+        projectId: "placas-miramar-2",
+        storageBucket: "placas-miramar-2.firebasestorage.app",
+        messagingSenderId: "996269238406",
+        appId: "1:996269238406:web:930c973ead996aa2a10907",
+        measurementId: "G-QCEV1WG01E"
+      }
+    },
+    {
+      nome: "Projeto 3",
+      config: {
+        apiKey: "AIzaSyDWVuh6DFfj9apasnVfQm-FrygGp98oRAg",
+        authDomain: "campominado-37a74.firebaseapp.com",
+        databaseURL: "https://campominado-37a74-default-rtdb.firebaseio.com",
+        projectId: "campominado-37a74",
+        storageBucket: "campominado-37a74.firebasestorage.app",
+        messagingSenderId: "107676381776",
+        appId: "1:107676381776:web:d5d61532ef2f6ca78bd755",
+        measurementId: "G-R1K9FP6JLP"
+      }
+    },
+    {
+      nome: "Projeto 4",
+      config: {
+        apiKey: "AIzaSyCieSdO6uBQdYom_JeMIOv7f9ZSmIonbqc",
+        authDomain: "cartazes-7d719.firebaseapp.com",
+        databaseURL: "https://cartazes-7d719-default-rtdb.firebaseio.com",
+        projectId: "cartazes-7d719",
+        storageBucket: "cartazes-7d719.firebasestorage.app",
+        messagingSenderId: "255838339147",
+        appId: "1:255838339147:web:3a36a4ce882129e7ac0dce",
+        measurementId: "G-93MBW2QN95"
+      }
+    },
+    {
+      nome: "Projeto 5",
+      config: {
+        apiKey: "AIzaSyAxvd9L6v9THk_H7iHpO2iXIJ7IybLGe-U",
+        authDomain: "placas-miramar-3.firebaseapp.com",
+        databaseURL: "https://placas-miramar-3-default-rtdb.firebaseio.com",
+        projectId: "placas-miramar-3",
+        storageBucket: "placas-miramar-3.firebasestorage.app",
+        messagingSenderId: "224576413037",
+        appId: "1:224576413037:web:1b52f29132dea240088e64",
+        measurementId: "G-PRFGPP5TN3"
+      }
+    },
+  ];
+
+// 168 horas = 7 dias
+const DURACAO_PROJETO_MS = 168 * 60 * 60 * 1000;
+
+// Início do ciclo. Nesta data/hora o Projeto 1 começa seu período.
+// Para mudar quando o ciclo começa, altere somente esta data.
+const INICIO_CICLO_FIREBASE = new Date("2026-09-22T00:00:00-03:00").getTime();
+
+function projetoFirebaseEstaConfigurado(projeto) {
+  const obrigatorios = [
+    projeto.config.apiKey,
+    projeto.config.authDomain,
+    projeto.config.databaseURL,
+    projeto.config.projectId,
+    projeto.config.appId
+  ];
+
+  return obrigatorios.every(valor =>
+    typeof valor === 'string' &&
+    valor.trim() !== '' &&
+    !valor.includes('COLE_AQUI')
+  );
+}
+
+function obterProjetoFirebaseDoPeriodo() {
+  const agora = Date.now();
+  const tempoDecorrido = Math.max(0, agora - INICIO_CICLO_FIREBASE);
+  const periodoAtual = Math.floor(tempoDecorrido / DURACAO_PROJETO_MS);
+  const indiceProgramado = periodoAtual % PROJETOS_FIREBASE.length;
+  const projetoProgramado = PROJETOS_FIREBASE[indiceProgramado];
+
+  // Segurança: se o projeto do período ainda não foi preenchido,
+  // mantém o Projeto 1 para a página não parar de funcionar.
+  if (!projetoFirebaseEstaConfigurado(projetoProgramado)) {
+    console.warn(
+      `[Firebase] ${projetoProgramado.nome} ainda não foi configurado. ` +
+      `Usando temporariamente o Projeto 1.`
+    );
+    return { projeto: PROJETOS_FIREBASE[0], indice: 0, indiceProgramado };
+  }
+
+  return { projeto: projetoProgramado, indice: indiceProgramado, indiceProgramado };
+}
+
+const firebaseSelecionado = obterProjetoFirebaseDoPeriodo();
+const firebaseConfig = firebaseSelecionado.projeto.config;
+
+console.log(
+  `[Firebase] Ativo: ${firebaseSelecionado.projeto.nome} | ` +
+  `Projeto programado para este período: ${firebaseSelecionado.indiceProgramado + 1}/5 | ` +
+  `Rotação: a cada 168 horas.`
+);
+
+// Agenda a troca silenciosa exatamente na próxima virada de período.
+// Quando o tempo acabar, a página recarrega sozinha e inicializa o próximo projeto.
+function agendarTrocaAutomaticaFirebase() {
+  const agora = Date.now();
+  const tempoDecorrido = Math.max(0, agora - INICIO_CICLO_FIREBASE);
+  const tempoNoPeriodoAtual = tempoDecorrido % DURACAO_PROJETO_MS;
+  const tempoAteProximaTroca = DURACAO_PROJETO_MS - tempoNoPeriodoAtual;
+
+  console.log(
+    `[Firebase] Próxima troca automática em ${Math.ceil(tempoAteProximaTroca / 1000)} segundos.`
+  );
+
+  setTimeout(() => {
+    window.location.reload();
+  }, tempoAteProximaTroca + 500);
+}
+
+// ============================================================
+// LIMPEZA AUTOMÁTICA DO PROJETO ANTERIOR
+// Quando um novo período de 7 dias começa, o projeto anterior
+// deixa de ser usado e todo o nó /cartazes dele é removido.
+// A limpeza é independente do banco ativo da página.
+// ============================================================
+async function limparProjetoFirebaseAnterior() {
+  const agora = Date.now();
+  const tempoDecorrido = Math.max(0, agora - INICIO_CICLO_FIREBASE);
+  const periodoAtual = Math.floor(tempoDecorrido / DURACAO_PROJETO_MS);
+
+  // No primeiro período não existe um período anterior deste ciclo para limpar.
+  if (periodoAtual <= 0) return;
+
+  const indiceAtual = periodoAtual % PROJETOS_FIREBASE.length;
+  const indiceAnterior = (indiceAtual - 1 + PROJETOS_FIREBASE.length) % PROJETOS_FIREBASE.length;
+  const projetoAnterior = PROJETOS_FIREBASE[indiceAnterior];
+
+  if (!projetoFirebaseEstaConfigurado(projetoAnterior)) {
+    console.warn(`[Limpeza] ${projetoAnterior.nome} não está configurado. Limpeza ignorada.`);
+    return;
+  }
+
+  // A chave inclui o número absoluto do período. Assim, quando o ciclo der a volta
+  // e o mesmo projeto voltar a sair de uso, uma nova limpeza poderá acontecer.
+  const chaveLimpeza = `firebase_limpeza_periodo_${periodoAtual}_projeto_${indiceAnterior}`;
+
+  if (localStorage.getItem(chaveLimpeza) === 'ok') {
+    console.log(`[Limpeza] ${projetoAnterior.nome} já foi limpo neste período.`);
+    return;
+  }
+
+  let appLimpeza = null;
+
+  try {
+    console.log(`[Limpeza] Limpando silenciosamente /cartazes de ${projetoAnterior.nome}...`);
+
+    // Nome exclusivo evita conflito com o Firebase principal atualmente ativo.
+    appLimpeza = initializeApp(
+      projetoAnterior.config,
+      `limpeza-${periodoAtual}-${indiceAnterior}-${Date.now()}`
+    );
+
+    const dbAnterior = getDatabase(appLimpeza);
+    await remove(ref(dbAnterior, 'cartazes'));
+
+    localStorage.setItem(chaveLimpeza, 'ok');
+    console.log(`[Limpeza] /cartazes de ${projetoAnterior.nome} removido com sucesso.`);
+  } catch (erro) {
+    // Não marca como concluído em caso de erro: uma próxima abertura tentará novamente.
+    console.error(`[Limpeza] Falha ao limpar ${projetoAnterior.nome}:`, erro);
+  }
+}
+
+const app = initializeApp(firebaseConfig);
+
+agendarTrocaAutomaticaFirebase();
+
+// Executa em segundo plano. Não bloqueia o carregamento do projeto atual.
+limparProjetoFirebaseAnterior();
+
   const db = getDatabase(app);
   const cartazesRef = ref(db, 'cartazes');
+
+  // ============================================================
+  // EXCLUSÃO AUTOMÁTICA INDIVIDUAL DOS CARTAZES
+  // TESTE: cada cartaz é excluído 1 minuto após ser salvo.
+  // Esta configuração é INDEPENDENTE da rotação de 168 horas
+  // entre os projetos Firebase.
+  // Para voltar a 8 dias depois, use:
+  // const TEMPO_EXCLUSAO_CARTAZ_MS = 8 * 24 * 60 * 60 * 1000;
+  // ============================================================
+  const TEMPO_EXCLUSAO_CARTAZ_MS = 192 * 60 * 60 * 1000;
+  const INTERVALO_VERIFICACAO_EXCLUSAO_MS = 10 * 1000;
+  const cartazesEmExclusaoAutomatica = new Set();
+
+  async function excluirCartazesExpirados(dados = window.listaCartazesMemoria) {
+    if (!dados || typeof dados !== 'object') return;
+
+    const agora = Date.now();
+    const exclusoes = [];
+
+    Object.entries(dados).forEach(([id, item]) => {
+      if (!item || typeof item !== 'object') return;
+
+      let timestamp = Number(item.timestamp);
+
+      // Compatibilidade com cartazes antigos que eventualmente não tenham timestamp.
+      if (!Number.isFinite(timestamp) || timestamp <= 0) {
+        if (item.dateStr && item.timeStr) {
+          const partesData = String(item.dateStr).split('/');
+          const partesHora = String(item.timeStr).split(':');
+          if (partesData.length === 3 && partesHora.length >= 2) {
+            timestamp = new Date(
+              Number(partesData[2]),
+              Number(partesData[1]) - 1,
+              Number(partesData[0]),
+              Number(partesHora[0]),
+              Number(partesHora[1]),
+              Number(partesHora[2] || 0)
+            ).getTime();
+          }
+        }
+      }
+
+      if (!Number.isFinite(timestamp) || timestamp <= 0) return;
+      if ((agora - timestamp) < TEMPO_EXCLUSAO_CARTAZ_MS) return;
+      if (cartazesEmExclusaoAutomatica.has(id)) return;
+
+      cartazesEmExclusaoAutomatica.add(id);
+
+      const exclusao = remove(ref(db, `cartazes/${id}`))
+        .then(() => {
+          console.log(`[Auto Exclusão] Cartaz ${id} excluído após atingir o tempo limite.`);
+        })
+        .catch((erro) => {
+          console.error(`[Auto Exclusão] Erro ao excluir o cartaz ${id}:`, erro);
+        })
+        .finally(() => {
+          cartazesEmExclusaoAutomatica.delete(id);
+        });
+
+      exclusoes.push(exclusao);
+    });
+
+    if (exclusoes.length > 0) {
+      await Promise.allSettled(exclusoes);
+    }
+  }
+
+  // Verifica periodicamente sem interferir na rotação dos projetos.
+  setInterval(() => {
+    excluirCartazesExpirados();
+  }, INTERVALO_VERIFICACAO_EXCLUSAO_MS);
 
   // Vincula as funções globais dos novos botões para que o HTML consiga invocá-las de dentro do módulo
   window.editarCartazIndex = function(id) {
@@ -798,7 +1211,9 @@ const firebaseConfig = {
 
   // Lógica do botão de exclusão em lote de selecionados
   document.getElementById('btn-excluir-selecionados').addEventListener('click', async () => {
-    const selecionados = document.querySelectorAll('.cartaz-select-item:checked');
+    const selecionados = Array.from(window.cartazesSelecionados).map(id => ({
+      getAttribute: (attr) => attr === 'data-id' ? id : null
+    }));
     
     if (selecionados.length === 0) {
       alert('Por favor, selecione ao menos um cartaz na tabela usando o checkbox para excluir!');
@@ -816,6 +1231,7 @@ const firebaseConfig = {
           const id = cb.getAttribute('data-id');
           const itemRef = ref(db, `cartazes/${id}`);
           await remove(itemRef);
+          window.cartazesSelecionados.delete(id);
         }
         document.getElementById('select-all-cartazes').checked = false;      
       } catch (err) {
@@ -994,7 +1410,7 @@ const firebaseConfig = {
       else if (tUpper.includes("PREÇO AVULSO") || tUpper.includes("PLACA AVULSA")) corDoTipo = "black";
 
       tr.innerHTML = `
-        <td class="col-checkbox"><input type="checkbox" class="cartaz-select-item" data-id="${row.id}"></td>
+        <td class="col-checkbox"><input type="checkbox" class="cartaz-select-item" data-id="${row.id}" ${window.cartazesSelecionados.has(row.id) ? 'checked' : ''}></td>
         <td class="col-descricao">${row.descricao}</td>
         <td class="col-tipo" style="color: ${corDoTipo};">${row.tipo === "PREÇO AVULSO" ? "PLACA AVULSA" : row.tipo}</td>
         <td class="col-vigencia">${row.vigencia}</td>
@@ -1027,11 +1443,58 @@ const firebaseConfig = {
         <line x1="14" y1="11" x2="14" y2="17"></line>
     </svg>
 </button>
+<input type="number" class="input-quantidade-copias" data-id="${row.id}" min="1" step="1" value="${obterQuantidadeCopias(row.id)}" title="Quantidade de cópias deste cartaz na exportação">
         </td>
       `;
 
       tabelaBody.appendChild(tr);
     });
+
+    // Sincroniza os checkboxes renderizados com a seleção persistente
+    document.querySelectorAll('.cartaz-select-item').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const id = cb.getAttribute('data-id');
+        if (cb.checked) {
+          window.cartazesSelecionados.add(id);
+        } else {
+          window.cartazesSelecionados.delete(id);
+        }
+        atualizarCheckboxSelecionarTodos();
+      });
+    });
+
+    // Mantém a quantidade de cópias mesmo ao trocar de página, filtrar ou ordenar
+    document.querySelectorAll('.input-quantidade-copias').forEach(input => {
+      input.addEventListener('input', () => {
+        const id = input.getAttribute('data-id');
+        let quantidade = parseInt(input.value, 10);
+        if (!Number.isFinite(quantidade) || quantidade < 1) quantidade = 1;
+        window.quantidadeCopiasCartazes[id] = quantidade;
+      });
+
+      input.addEventListener('change', () => {
+        const id = input.getAttribute('data-id');
+        const quantidade = obterQuantidadeCopias(id);
+        window.quantidadeCopiasCartazes[id] = quantidade;
+        input.value = quantidade;
+      });
+    });
+
+    atualizarCheckboxSelecionarTodos();
+    destacarInputsCopias();
+  }
+
+  function atualizarCheckboxSelecionarTodos() {
+    const master = document.getElementById('select-all-cartazes');
+    const visiveis = Array.from(document.querySelectorAll('.cartaz-select-item'));
+    if (!visiveis.length) {
+      master.checked = false;
+      master.indeterminate = false;
+      return;
+    }
+    const marcados = visiveis.filter(cb => cb.checked).length;
+    master.checked = marcados === visiveis.length;
+    master.indeterminate = marcados > 0 && marcados < visiveis.length;
   }
 
   // Ouvintes de evento de digitação para disparar os filtros de busca
@@ -1081,6 +1544,17 @@ const firebaseConfig = {
       });
       window.listaCartazesMemoria = flattenedData;
     }
+
+    // Assim que os dados chegam do Firebase, remove imediatamente os que já expiraram.
+    excluirCartazesExpirados(window.listaCartazesMemoria);
+
+    // Remove da seleção IDs que já não existem mais no banco
+    for (const id of Array.from(window.cartazesSelecionados)) {
+      if (!window.listaCartazesMemoria[id]) window.cartazesSelecionados.delete(id);
+    }
+    Object.keys(window.quantidadeCopiasCartazes).forEach(id => {
+      if (!window.listaCartazesMemoria[id]) delete window.quantidadeCopiasCartazes[id];
+    });
     renderizarTabela();
   });
 
@@ -1102,12 +1576,23 @@ const firebaseConfig = {
   // Evento do Checkbox de "Selecionar Todos"
   document.getElementById('select-all-cartazes').addEventListener('change', (e) => {
     const checkboxes = document.querySelectorAll('.cartaz-select-item');
-    checkboxes.forEach(cb => cb.checked = e.target.checked);
+    checkboxes.forEach(cb => {
+      cb.checked = e.target.checked;
+      const id = cb.getAttribute('data-id');
+      if (e.target.checked) {
+        window.cartazesSelecionados.add(id);
+      } else {
+        window.cartazesSelecionados.delete(id);
+      }
+    });
+    atualizarCheckboxSelecionarTodos();
   });
 
   // Ação de salvamento em lote dos itens selecionados
   document.getElementById('btn-salvar-lote').addEventListener('click', async () => {
-    const selecionados = document.querySelectorAll('.cartaz-select-item:checked');
+    const selecionados = Array.from(window.cartazesSelecionados).map(id => ({
+      getAttribute: (attr) => attr === 'data-id' ? id : null
+    }));
     
     if (selecionados.length === 0) {
       alert('Por favor, selecione ao menos um cartaz na tabela usando o checkbox!');
@@ -1552,6 +2037,8 @@ const firebaseConfig = {
       }
 
       alert('Todos os cartazes selecionados foram atualizados e salvos com sucesso!');
+      window.cartazesSelecionados.clear();
+      document.querySelectorAll('.cartaz-select-item').forEach(cb => cb.checked = false);
       document.getElementById('select-all-cartazes').checked = false;
       document.getElementById('lote-data-inicial').value = '';
       document.getElementById('lote-data-final').value = '';
@@ -1566,12 +2053,13 @@ const firebaseConfig = {
 
   // Ouvinte de evento para unir exatamente 2 cartazes selecionados em formato paisagem (A4) side-by-side
   document.getElementById('btn-unir-cartazes').addEventListener('click', async () => {
-    const selecionados = document.querySelectorAll('.cartaz-select-item:checked');
+    // Expande cada cartaz conforme a quantidade de cópias informada na tabela
+    const selecionados = expandirSelecionadosPorQuantidade();
     
     if (selecionados.length < 2) {
-  alert('Por favor, selecione pelo menos 2 cartazes.');
-  return;
-}
+      alert('Selecione cartazes cuja quantidade total de cópias seja pelo menos 2.');
+      return;
+    }
 
     const inputIni = document.getElementById('lote-data-inicial').value;
     const inputFim = document.getElementById('lote-data-final').value;
@@ -2080,7 +2568,8 @@ const firebaseConfig = {
 
   // Ouvinte de evento para juntar TODOS os cartazes selecionados em um ÚNICO arquivo PDF (Uma página por cartaz)
   document.getElementById('btn-juntar-todos').addEventListener('click', async () => {
-    const selecionados = document.querySelectorAll('.cartaz-select-item:checked');
+    // Expande cada cartaz conforme a quantidade de cópias informada na tabela
+    const selecionados = expandirSelecionadosPorQuantidade();
     
     if (selecionados.length === 0) {
       alert('Por favor, selecione ao menos um cartaz na tabela usando o checkbox para juntar.');
@@ -2580,6 +3069,10 @@ if (appMode) {
 
       <div style="font-size:17px; line-height:1.5; margin-bottom:22px;">
         Para juntar os cartazes num PDF único e imprimir cada um numa <strong>folha inteira</strong>, clique no botão <strong>“1 página por folha”</strong>.
+      </div>
+
+      <div style="font-size:17px; line-height:1.5; margin-bottom:32px;">
+        Se quiser clonar o cartaz no PDF digite a quantidade no campo <strong>CÓPIAS</strong>.
       </div>
 
       <label style="display:flex; align-items:center; justify-content:center; gap:9px; font-size:14px; font-weight:600; cursor:pointer; margin-bottom:22px;">
