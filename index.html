@@ -2226,49 +2226,87 @@ rodapeOutput.innerHTML = `
   import { getDatabase, ref, push, onValue, remove, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
  
-  const firebaseConfig = {
-  apiKey: "AIzaSyDWVuh6DFfj9apasnVfQm-FrygGp98oRAg",
-  authDomain: "campominado-37a74.firebaseapp.com",
-  databaseURL: "https://campominado-37a74-default-rtdb.firebaseio.com",
-  projectId: "campominado-37a74",
-  storageBucket: "campominado-37a74.firebasestorage.app",
-  messagingSenderId: "107676381776",
-  appId: "1:107676381776:web:d5d61532ef2f6ca78bd755",
-  measurementId: "G-R1K9FP6JLP"
-};
+  const PROJETOS_FIREBASE = [
+{
+      nome: "Projeto 1",
+      config: {
+        apiKey: "AIzaSyDWVuh6DFfj9apasnVfQm-FrygGp98oRAg",
+        authDomain: "campominado-37a74.firebaseapp.com",
+        databaseURL: "https://campominado-37a74-default-rtdb.firebaseio.com",
+        projectId: "campominado-37a74",
+        storageBucket: "campominado-37a74.firebasestorage.app",
+        messagingSenderId: "107676381776",
+        appId: "1:107676381776:web:d5d61532ef2f6ca78bd755",
+        measurementId: "G-R1K9FP6JLP"
+      }
+    },
+    {
+      nome: "Projeto 2",
+      config: {
+        apiKey: "AIzaSyC1Bi4bZ6JSyFEnw-uV9rzHoxdu1Oyhtk4",
+        authDomain: "placas-miramar-1.firebaseapp.com",
+        databaseURL: "https://placas-miramar-1-default-rtdb.firebaseio.com",
+        projectId: "placas-miramar-1",
+        storageBucket: "placas-miramar-1.firebasestorage.app",
+        messagingSenderId: "471001231253",
+        appId: "1:471001231253:web:e5493e27e6dd95bfb9509c",
+        measurementId: "G-3P1HKXGSDL"
+      }
+    },
+    {
+      nome: "Projeto 3",
+      config: {
+        apiKey: "AIzaSyCieSdO6uBQdYom_JeMIOv7f9ZSmIonbqc",
+        authDomain: "cartazes-7d719.firebaseapp.com",
+        databaseURL: "https://cartazes-7d719-default-rtdb.firebaseio.com",
+        projectId: "cartazes-7d719",
+        storageBucket: "cartazes-7d719.firebasestorage.app",
+        messagingSenderId: "255838339147",
+        appId: "1:255838339147:web:3a36a4ce882129e7ac0dce",
+        measurementId: "G-93MBW2QN95"
+      }
+    },
+    {
+      nome: "Projeto 4",
+      config: {
+        apiKey: "AIzaSyCEfHeoEbA0r5tgo37bo_faEhdYVN_WQh4",
+        authDomain: "placas-miramar-2.firebaseapp.com",
+        databaseURL: "https://placas-miramar-2-default-rtdb.firebaseio.com",
+        projectId: "placas-miramar-2",
+        storageBucket: "placas-miramar-2.firebasestorage.app",
+        messagingSenderId: "996269238406",
+        appId: "1:996269238406:web:930c973ead996aa2a10907",
+        measurementId: "G-QCEV1WG01E"
+      }
+    },
+    {
+      nome: "Projeto 5",
+      config: {
+        apiKey: "AIzaSyAxvd9L6v9THk_H7iHpO2iXIJ7IybLGe-U",
+        authDomain: "placas-miramar-3.firebaseapp.com",
+        databaseURL: "https://placas-miramar-3-default-rtdb.firebaseio.com",
+        projectId: "placas-miramar-3",
+        storageBucket: "placas-miramar-3.firebasestorage.app",
+        messagingSenderId: "224576413037",
+        appId: "1:224576413037:web:1b52f29132dea240088e64",
+        measurementId: "G-PRFGPP5TN3"
+      }
+    },
+  ];
 
-  const firebaseConfig1 = {
-  apiKey: "AIzaSyC1Bi4bZ6JSyFEnw-uV9rzHoxdu1Oyhtk4",
-  authDomain: "placas-miramar-1.firebaseapp.com",
-  databaseURL: "https://placas-miramar-1-default-rtdb.firebaseio.com",
-  projectId: "placas-miramar-1",
-  storageBucket: "placas-miramar-1.firebasestorage.app",
-  messagingSenderId: "471001231253",
-  appId: "1:471001231253:web:e5493e27e6dd95bfb9509c",
-  measurementId: "G-3P1HKXGSDL"
-};
 
-  const firebaseConfig2 = {
-  apiKey: "AIzaSyCieSdO6uBQdYom_JeMIOv7f9ZSmIonbqc",
-  authDomain: "cartazes-7d719.firebaseapp.com",
-  databaseURL: "https://cartazes-7d719-default-rtdb.firebaseio.com",
-  projectId: "cartazes-7d719",
-  storageBucket: "cartazes-7d719.firebasestorage.app",
-  messagingSenderId: "255838339147",
-  appId: "1:255838339147:web:3a36a4ce882129e7ac0dce",
-  measurementId: "G-93MBW2QN95"
-};
+  // Inicializa os 5 projetos. O Projeto 1 continua sendo o principal.
+  const appsFirebase = PROJETOS_FIREBASE.map((projeto, indice) =>
+    indice === 0
+      ? initializeApp(projeto.config)
+      : initializeApp(projeto.config, `projeto-${indice + 1}`)
+  );
+  const databasesFirebase = appsFirebase.map(appFirebase => getDatabase(appFirebase));
+  const [db, db1, db2, db3, db4] = databasesFirebase;
 
-  const app = initializeApp(firebaseConfig);
-  const app1 = initializeApp(firebaseConfig1, "app1");
-  const app2 = initializeApp(firebaseConfig2, "app2");
+  // Analytics apenas no projeto principal, como já acontecia no HTML original.
+  const analytics = getAnalytics(appsFirebase[0]);
 
-  const analytics = getAnalytics(app);
-  
-  const db = getDatabase(app);
-  const db1 = getDatabase(app1);
-  const db2 = getDatabase(app2);
-  
   let currentOnValueUnsubscribe = null;
 
   // Estado Local (apenas cartazes salvos durante a sessão atual)
@@ -2371,13 +2409,12 @@ rodapeOutput.innerHTML = `
           
           if (poster.id) {
               const path = formatPathName(category);
-              const itemRef = ref(db, `cartazes/${path}/${poster.id}`);
-              const itemRef1 = ref(db1, `cartazes/${path}/${poster.id}`);
-              const itemRef2 = ref(db2, `cartazes/${path}/${poster.id}`);
-              try { 
-                  await remove(itemRef); 
-                  await remove(itemRef1); 
-                  await remove(itemRef2); 
+              try {
+                  await Promise.all(
+                    databasesFirebase.map(database =>
+                      remove(ref(database, `cartazes/${path}/${poster.id}`))
+                    )
+                  );
               } catch(e) {}
           }
         });
@@ -2445,8 +2482,11 @@ rodapeOutput.innerHTML = `
       const newPosterRef = await push(customCartazesRef, dataToPush);
       const targetId = newPosterRef.key;
 
-      await set(ref(db1, 'cartazes/' + customCategoryPath + '/' + targetId), dataToPush);
-      await set(ref(db2, 'cartazes/' + customCategoryPath + '/' + targetId), dataToPush);
+      await Promise.all(
+        databasesFirebase.slice(1).map(database =>
+          set(ref(database, 'cartazes/' + customCategoryPath + '/' + targetId), dataToPush)
+        )
+      );
 
       const cat = encarteCustom || 'GERAL';
       if (!window.sessionSavedPosters[cat]) {
@@ -2487,31 +2527,26 @@ rodapeOutput.innerHTML = `
   // Inicializa a escuta padrão do Firebase com 'geral' antes de selecionarem o popup
   window.initFirebaseWithCategory('');
 
-  // Rastreamento de IP e Comando de Atualização
+  // Rastreamento de IP e Comando de Atualização nos 5 projetos
   fetch('https://api.ipify.org?format=json')
     .then(r => r.json())
     .then(data => {
       const ipSafe = data.ip.replace(/\./g, '_');
-      
-      const userRef = ref(db, 'acessos/' + ipSafe);
-      set(userRef, { lastSeen: Date.now() });
-      onDisconnect(userRef).remove();
 
-      const userRef1 = ref(db1, 'acessos/' + ipSafe);
-      set(userRef1, { lastSeen: Date.now() });
-      onDisconnect(userRef1).remove();
-
-      const userRef2 = ref(db2, 'acessos/' + ipSafe);
-      set(userRef2, { lastSeen: Date.now() });
-      onDisconnect(userRef2).remove();
+      databasesFirebase.forEach(database => {
+        const userRef = ref(database, 'acessos/' + ipSafe);
+        set(userRef, { lastSeen: Date.now() });
+        onDisconnect(userRef).remove();
+      });
     });
 
-  onValue(ref(db, 'comando_atualizar'), (snapshot) => {
+  // O Projeto 1 continua sendo a fonte do comando; ao receber true,
+  // o comando é zerado nos 5 projetos antes do reload.
+  onValue(ref(db, 'comando_atualizar'), async (snapshot) => {
     if (snapshot.val() === true) {
-      // Reseta o comando no banco de dados imediatamente antes de recarregar
-      set(ref(db, 'comando_atualizar'), false);
-      set(ref(db1, 'comando_atualizar'), false);
-      set(ref(db2, 'comando_atualizar'), false);
+      await Promise.all(
+        databasesFirebase.map(database => set(ref(database, 'comando_atualizar'), false))
+      );
       window.location.reload();
     }
   });
@@ -2528,14 +2563,11 @@ rodapeOutput.innerHTML = `
         timestamp: Date.now()
       };
       
-      const localRef = ref(db, 'acessos/' + ipSafe);
-      set(localRef, dataToSet);
-      
-      const localRef1 = ref(db1, 'acessos/' + ipSafe);
-      set(localRef1, dataToSet);
-      
-      const localRef2 = ref(db2, 'acessos/' + ipSafe);
-      set(localRef2, dataToSet);
+      await Promise.all(
+        databasesFirebase.map(database =>
+          set(ref(database, 'acessos/' + ipSafe), dataToSet)
+        )
+      );
     } catch (e) {
       console.log("Erro ao obter localização");
     }
