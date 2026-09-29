@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Visualizar e Editar Cartazes</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@800&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@800&family=Oswald:wght@400;700&family=Yatra+One&family=Righteous&family=Concert+One&family=Gidole&family=Londrina+Sketch&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"> 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
@@ -17,7 +16,7 @@
       --card-bg:#ffffff;
       --text:#222;
     }
-    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#bcbdbe;}
+    html,body{height:100%;margin:0;font-family: gidole, sans-serif; background:#bcbdbe;}
     
     .container-geral {
       max-width: 1150px;
@@ -30,6 +29,7 @@
       border-bottom: 2px solid var(--blue);
       padding-bottom: 8px;
       margin-top: 10px;
+      font-family: winky sans, sans-serif;
       -webkit-text-stroke: 0.7px #000;
       text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.9);
     }
@@ -74,9 +74,9 @@
       padding: 8px 12px;
       border-radius: 6px;
       border: 1px solid #ddd;
-      font-family: 'Oswald', sans-serif;
       font-size: 14px;
-      width: 160px;
+      width: 100px;
+      font-family: gidole, sans-serif;
     }
 
     .btn-salvar-lote {
@@ -87,12 +87,13 @@
       color: #fff;
       font-weight: bold;
       cursor: pointer;
-      font-family: 'Oswald', sans-serif;
+      font-family: 'Gidole', sans-serif;
       font-size: 15px;
       height: 39px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.9);
     }
 
     .btn-salvar-lote:hover {
@@ -143,7 +144,7 @@
     td {
       padding: 3px 6px;
       border-bottom: 1px solid #eee;
-      color: #333;
+      color: #000000;
       vertical-align: middle;
     }
 
@@ -155,7 +156,7 @@
     .col-checkbox input[type="checkbox"] { transform: scale(1.3); cursor: pointer; }
     .col-descricao { font-weight: bold; }
     .col-tipo { font-weight: bold; text-transform: uppercase; }
-    .col-vigencia { color: #151515; font-weight: bold; font-size: 12px; }
+    .col-vigencia { color: #151515; font-size: 12px; }
     .col-preco { font-weight: bold; color: var(--blue); }
     .col-salvo { color: #666; font-size: 11px; }
     .col-acoes { text-align: center; white-space: nowrap; }
@@ -582,6 +583,81 @@
    GIFS: SOBEM E AUMENTAM NO HOVER
 ======================================== */
 
+/* ========================================
+   ANIMAÇÃO DO CALENDÁRIO — SALVAR NOVA DATA
+======================================== */
+#btn-salvar-lote .icone-calendario-animado {
+    overflow: visible;
+    transition: transform 0.25s ease;
+    transform-origin: center;
+
+}
+
+#btn-salvar-lote:hover .icone-calendario-animado {
+    transform: translateY(-4px) scale(1.12);
+}
+
+#btn-salvar-lote .folha-calendario {
+    fill: transparent;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: none;
+}
+
+#btn-salvar-lote .check-calendario {
+    stroke-dasharray: 10;
+    stroke-dashoffset: 10;
+    animation: none;
+}
+
+
+/* ENQUANTO O MOUSE ESTIVER EM CIMA, FICA EM LOOP */
+#btn-salvar-lote:hover .folha-calendario {
+    animation: descerFolhaCalendario 1.45s ease-in-out infinite;
+}
+
+#btn-salvar-lote:hover .check-calendario {
+    animation: desenharCheckCalendario 1.45s ease-in-out infinite;
+}
+
+/* A folha fica atrás da moldura do calendário e desliza para baixo */
+@keyframes descerFolhaCalendario {
+    0%, 12% {
+        transform: translateY(-1px);
+        opacity: 0;
+    }
+    20% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    48% {
+        transform: translateY(9px);
+        opacity: 1;
+    }
+    58% {
+        transform: translateY(13px);
+        opacity: 0;
+    }
+    59%, 100% {
+        transform: translateY(-1px);
+        opacity: 0;
+    }
+}
+
+@keyframes desenharCheckCalendario {
+    0%, 48% {
+        stroke-dashoffset: 10;
+        opacity: 0;
+    }
+    56% {
+        opacity: 1;
+    }
+    82%, 100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+}
+
 #btn-unir-cartazes img,
 #btn-juntar-todos img {
     transition: transform 0.25s ease;
@@ -599,15 +675,16 @@
 
 #btn-salvar-lote,
 #btn-unir-cartazes,
-#btn-juntar-todos {
+#btn-juntar-todos,
+#btn-excluir-selecionados {
     transition: transform 0.08s ease, box-shadow 0.08s ease;
     box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
 }
 
-/* Ao segurar o clique */
 #btn-salvar-lote:active,
 #btn-unir-cartazes:active,
-#btn-juntar-todos:active {
+#btn-juntar-todos:active,
+#btn-excluir-selecionados:active {
     transform: translateY(4px);
     box-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
 }
@@ -740,7 +817,7 @@
        TABELA COM COLUNAS FIXAS — PADRÃO DEFINIDO
        ========================================================= */
     #tabela-container table { table-layout: fixed; }
-    #tabela-container th:nth-child(1), #tabela-container td:nth-child(1) { width: 48px; }
+    #tabela-container th:nth-child(1), #tabela-container td:nth-child(1) { width: 30px; }
     #tabela-container th:nth-child(2), #tabela-container td:nth-child(2) { width: 230px; }
     #tabela-container th:nth-child(3), #tabela-container td:nth-child(3) { width: 90px; }
     #tabela-container th:nth-child(4), #tabela-container td:nth-child(4) { width: 130px; }
@@ -883,30 +960,27 @@
     <div class="painel-controle">
       <div class="field-data">
         <label for="lote-data-inicial">Nova Data Inicial (Opcional)</label>
-        <input type="date" id="lote-data-inicial">
+        <input type="date" id="lote-data-inicial" style= "width: 160px;">
       </div>
       <div class="field-data">
         <label for="lote-data-final">Nova Data Final</label>
-        <input type="date" id="lote-data-final">
+        <input type="date" id="lote-data-final" style= "width: 160px;">
       </div>
 <button class="btn-salvar-lote" id="btn-salvar-lote"
         title="Selecione os cartazes e atualize a data de oferta">
 
-    <svg xmlns="http://www.w3.org/2000/svg"
-         width="22" height="22"
-         viewBox="0 0 24 24"
-         fill="none"
-         stroke="currentColor"
-         stroke-width="2.3"
-         stroke-linecap="round"
-         stroke-linejoin="round">
-         
-        <path d="M8 2v4"/>
-        <path d="M16 2v4"/>
-        <rect width="18" height="18" x="3" y="4" rx="2"/>
-        <path d="M3 10h18"/>
-        <path d="m9 16 2 2 4-4"/>
-    </svg>
+<svg class="icone-calendario-animado" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+<path class="folha-calendario"
+      fill="#185a2e"
+      d="M3 10.5h18V19c0 .8-.7 1.5-1.5 1.5H4.5C3.7 20.5 3 19.8 3 19z"/>
+  <g class="calendario-corpo">
+    <path d="M8 2v4m8-4v4"/>
+    <rect width="18" height="18" x="3" y="4" rx="2"/>
+    <path d="M3 10h18"/>
+  </g>
+  <path class="check-calendario" d="m9 16 2 2 4-4"/>
+</svg>
+
 
     Salvar Nova Data
 </button>
@@ -934,7 +1008,7 @@
     <div class="painel-controle" style="margin-top: -10px; margin-bottom: 20px;">
       <div class="field-data">
         <label for="filtro-tipo">Buscar por Tipo</label>
-        <select id="filtro-tipo" class="input-filtro" style="width: 185px; height: 39px; box-sizing: border-box;">
+        <select id="filtro-tipo" class="input-filtro" style="width: 185px; height: 39px; box-sizing: border-box; font-family: gidole, sans-serif;">
           <option value="">Todos os Tipos</option>
           <option value="PREÇO AVULSO">PLACA AVULSA</option>
           <option value="ENCARTE SEMANAL" style="color:gray">ENCARTE SEMANAL</option>
@@ -948,16 +1022,20 @@
       </div>
       <div class="field-data">
         <label for="filtro-descricao">Buscar por Descrição</label>
-        <input type="text" id="filtro-descricao" class="input-filtro" placeholder="Ex: Arroz...">
+        <input type="text" id="filtro-descricao" class="input-filtro" placeholder="Ex: Arroz..." style="width: 230px;" >
       </div>
       <div class="field-data">
         <label for="filtro-preco">Buscar por Preço</label>
         <input type="text" id="filtro-preco" class="input-filtro" placeholder="Ex: 5,99...">
       </div>
       <div class="field-data">
+        <label for="filtro-vigencia-final">Buscar por Vigência</label>
+        <input type="date" id="filtro-vigencia-final" class="input-filtro" style="width: 160px; height: 39px; box-sizing: border-box; font-family: gidole, sans-serif;">
+      </div>
+      <div class="field-data">
         <label for="filtro-loja">Buscar por Loja</label>
-        <select id="filtro-loja" class="input-filtro" style="width: 160px;">
-          <option value="">Todas as Lojas</option>
+        <select id="filtro-loja" class="input-filtro" style="width: 100px; font-family: gidole, sans-serif;">
+          <option value="">Todas</option>
           <option value="Loja 1">Loja 1</option>
           <option value="Loja 2">Loja 2</option>
           <option value="Loja 3">Loja 3</option>
@@ -2070,6 +2148,7 @@ limparProjetoFirebaseAnterior();
     const valFiltroTipo = document.getElementById('filtro-tipo').value.toLowerCase().trim();
     const valFiltroDesc = document.getElementById('filtro-descricao').value.toLowerCase().trim();
     const valFiltroPreco = document.getElementById('filtro-preco').value.toLowerCase().trim();
+    const valFiltroVigenciaFinal = document.getElementById('filtro-vigencia-final').value.trim();
     const valFiltroLoja = document.getElementById('filtro-loja').value.toLowerCase().trim();
 
     // Mapeia os dados processando as propriedades necessárias para ordenação
@@ -2113,6 +2192,7 @@ limparProjetoFirebaseAnterior();
         descricao: descricaoLimpa.toUpperCase(),
         tipo: tipo,
         vigencia: vigenciaExibicao.toUpperCase(),
+        dataFinal: String(item.dataFinal || '').trim(),
         precoTexto: item.precoText ? 'R$ ' + item.precoText : 'Em branco',
         precoValor: precoNum,
         loja: item.lojaText || 'Não informada', // Captura o campo salvo pelo index.html
@@ -2134,8 +2214,9 @@ limparProjetoFirebaseAnterior();
   }
       const matchDesc = !valFiltroDesc || row.descricao.toLowerCase().includes(valFiltroDesc);
       const matchPreco = !valFiltroPreco || row.precoTexto.toLowerCase().includes(valFiltroPreco);
-        const matchLoja = !valFiltroLoja || row.loja.toLowerCase() === valFiltroLoja;
-      return matchTipo && matchDesc && matchPreco && matchLoja;
+      const matchVigenciaFinal = !valFiltroVigenciaFinal || (row.dataFinal && row.dataFinal <= valFiltroVigenciaFinal);
+      const matchLoja = !valFiltroLoja || row.loja.toLowerCase() === valFiltroLoja;
+      return matchTipo && matchDesc && matchPreco && matchVigenciaFinal && matchLoja;
     });
 
     if (itensArray.length === 0) {
@@ -2245,6 +2326,7 @@ document.getElementById('last-page').disabled =
       else if (tUpper.includes("QUINTA DA FEIRA")) corDoTipo = "green";
       else if (tUpper.includes("FDS DE OFERTAS")) corDoTipo = "orange";
       else if (tUpper.includes("FECHA MÊS")) corDoTipo = "blue";
+      else if (tUpper.includes("OFERTAS APP")) corDoTipo = "#f86336";
       else if (tUpper.includes("PREÇO AVULSO") || tUpper.includes("PLACA AVULSA")) corDoTipo = "black";
 
       tr.innerHTML = `
@@ -2365,6 +2447,7 @@ document.getElementById('last-page').disabled =
   document.getElementById('filtro-tipo').addEventListener('change', () => { window.paginaAtual = 1; renderizarTabela(); });
   document.getElementById('filtro-descricao').addEventListener('input', () => { window.paginaAtual = 1; renderizarTabela(); });
   document.getElementById('filtro-preco').addEventListener('input', () => { window.paginaAtual = 1; renderizarTabela(); });
+  document.getElementById('filtro-vigencia-final').addEventListener('change', () => { window.paginaAtual = 1; renderizarTabela(); });
   document.getElementById('filtro-loja').addEventListener('change', () => { window.paginaAtual = 1; renderizarTabela(); });
 
   document.getElementById('first-page').addEventListener('click', () => {
