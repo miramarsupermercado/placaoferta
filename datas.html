@@ -1152,6 +1152,88 @@
   </div>
 
 <script>
+  // =========================================================
+  // CAPTURA DE ERROS/AVISOS DO NAVEGADOR PARA O SUPORTE
+  // Mantém apenas os registros mais recentes e não altera
+  // o funcionamento normal do console do navegador.
+  // =========================================================
+  (() => {
+    const MAX_REGISTROS = 30;
+    const MAX_CARACTERES_POR_REGISTRO = 700;
+    const logs = [];
+
+    function textoSeguro(valor) {
+      try {
+        if (valor instanceof Error) {
+          return `${valor.name}: ${valor.message}${valor.stack ? `\n${valor.stack}` : ''}`;
+        }
+        if (typeof valor === 'string') return valor;
+        if (valor === undefined) return 'undefined';
+        if (valor === null) return 'null';
+        if (typeof valor === 'object') {
+          const vistos = new WeakSet();
+          return JSON.stringify(valor, (chave, item) => {
+            if (typeof item === 'object' && item !== null) {
+              if (vistos.has(item)) return '[Circular]';
+              vistos.add(item);
+            }
+            return item;
+          });
+        }
+        return String(valor);
+      } catch (_) {
+        try { return String(valor); } catch (_) { return '[valor não serializável]'; }
+      }
+    }
+
+    function registrar(tipo, itens) {
+      const horario = new Date().toLocaleTimeString('pt-BR');
+      let mensagem = Array.from(itens).map(textoSeguro).join(' ');
+      if (mensagem.length > MAX_CARACTERES_POR_REGISTRO) {
+        mensagem = mensagem.slice(0, MAX_CARACTERES_POR_REGISTRO) + '…';
+      }
+      logs.push(`[${horario}] [${tipo}] ${mensagem}`);
+      if (logs.length > MAX_REGISTROS) logs.shift();
+    }
+
+    ['error', 'warn'].forEach((metodo) => {
+      const original = console[metodo].bind(console);
+      console[metodo] = (...args) => {
+        registrar(metodo.toUpperCase(), args);
+        original(...args);
+      };
+    });
+
+    window.addEventListener('error', (event) => {
+      const partes = [event.message || 'Erro JavaScript não identificado'];
+      if (event.filename) partes.push(`arquivo: ${event.filename}`);
+      if (event.lineno) partes.push(`linha: ${event.lineno}${event.colno ? `:${event.colno}` : ''}`);
+      if (event.error && event.error.stack) partes.push(event.error.stack);
+      registrar('ERRO GLOBAL', partes);
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      registrar('PROMISE REJEITADA', [event.reason]);
+    });
+
+    window.obterLogsSuporte = function(limiteCaracteres = 2800) {
+      if (!logs.length) return 'Nenhum erro ou aviso foi capturado pelo navegador.';
+      const selecionados = [];
+      let usados = 0;
+
+      // Prioriza os registros mais recentes caso seja necessário cortar.
+      for (let i = logs.length - 1; i >= 0; i--) {
+        const item = logs[i];
+        const custo = item.length + 1;
+        if (usados + custo > limiteCaracteres) break;
+        selecionados.unshift(item);
+        usados += custo;
+      }
+
+      return selecionados.join('\n');
+    };
+  })();
+
   window.listaCartazesMemoria = {};
   // Mantém a seleção dos cartazes mesmo ao trocar de página/filtro/ordenação
   window.cartazesSelecionados = new Set();
@@ -1305,6 +1387,177 @@ function posicionarDica() {
         dica.remove();
     }, 10000);
 }
+
+
+
+  // =========================================================
+  // SUPORTE TELEGRAM INDEPENDENTE DO FIREBASE
+  // Este bloco fica fora do módulo Firebase para que
+  // continue funcionando mesmo se o Firebase falhar ou não
+  // houver projetos configurados.
+  // =========================================================
+  // Suporte automático via Telegram.
+  // A loja é perguntada apenas no primeiro chamado deste navegador e fica salva no localStorage.
+  // ATENÇÃO: nesta versão de teste o token fica exposto no HTML, conforme solicitado.
+  const TELEGRAM_SUPORTE_TOKEN = '8535227078:AAEbEUL_usZ791YTi-4n2PJoDJKDB0jo-gI';
+  const TELEGRAM_SUPORTE_CHAT_ID = '8722664013';
+  const CHAVE_LOJA_SUPORTE = 'lojaSuporteTelegram';
+
+  // Cronômetro silencioso: mede o tempo desde a abertura/carregamento da página.
+  // performance.now() é monotônico e não é afetado por mudanças no relógio do computador.
+  const INICIO_PAGINA_SUPORTE = performance.now();
+
+  function formatarTempoAteChamado(ms) {
+    const totalSegundos = Math.max(0, Math.floor(ms / 1000));
+    const horas = Math.floor(totalSegundos / 3600);
+    const minutos = Math.floor((totalSegundos % 3600) / 60);
+    const segundos = totalSegundos % 60;
+
+    const partes = [];
+    if (horas > 0) partes.push(`${horas} h`);
+    if (minutos > 0) partes.push(`${minutos} min`);
+    partes.push(`${segundos} s`);
+    return partes.join(' ');
+  }
+
+  function obterLojaSuporteSalva() {
+    try {
+      return localStorage.getItem(CHAVE_LOJA_SUPORTE) || '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function solicitarLojaSuporte() {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById('suporte-loja-overlay');
+      const select = document.getElementById('suporte-loja-select');
+      const confirmar = document.getElementById('suporte-loja-confirmar');
+      const cancelar = document.getElementById('suporte-loja-cancelar');
+      if (!overlay || !select || !confirmar || !cancelar) {
+        resolve('');
+        return;
+      }
+
+      select.value = '';
+      overlay.classList.add('aberto');
+      overlay.setAttribute('aria-hidden', 'false');
+      setTimeout(() => select.focus(), 0);
+
+      const finalizar = (loja) => {
+        overlay.classList.remove('aberto');
+        overlay.setAttribute('aria-hidden', 'true');
+        confirmar.removeEventListener('click', confirmarLoja);
+        cancelar.removeEventListener('click', cancelarLoja);
+        overlay.removeEventListener('click', clicarFora);
+        document.removeEventListener('keydown', teclaEsc);
+        resolve(loja);
+      };
+
+      const confirmarLoja = () => {
+        const loja = select.value;
+        if (!loja) {
+          select.focus();
+          return;
+        }
+        try { localStorage.setItem(CHAVE_LOJA_SUPORTE, loja); } catch (_) {}
+        finalizar(loja);
+      };
+      const cancelarLoja = () => finalizar('');
+      const clicarFora = (event) => { if (event.target === overlay) finalizar(''); };
+      const teclaEsc = (event) => { if (event.key === 'Escape') finalizar(''); };
+
+      confirmar.addEventListener('click', confirmarLoja);
+      cancelar.addEventListener('click', cancelarLoja);
+      overlay.addEventListener('click', clicarFora);
+      document.addEventListener('keydown', teclaEsc);
+    });
+  }
+
+  async function enviarAlertaSuporteTelegram() {
+    const link = document.getElementById('link-suporte-telegram');
+    const detalhe = document.getElementById('progresso-cartazes-detalhe');
+    if (!link || !detalhe || link.classList.contains('enviando')) return;
+
+    link.classList.add('enviando');
+
+    // Registra o tempo no exato momento do clique que iniciou o chamado.
+    // Assim, o tempo gasto escolhendo a loja na primeira utilização não entra na medição.
+    const tempoAteChamado = formatarTempoAteChamado(performance.now() - INICIO_PAGINA_SUPORTE);
+
+    let loja = obterLojaSuporteSalva();
+    if (!loja) {
+      link.textContent = 'identificando loja...';
+      loja = await solicitarLojaSuporte();
+      if (!loja) {
+        link.classList.remove('enviando');
+        link.textContent = 'clique aqui';
+        return;
+      }
+    }
+
+    link.textContent = 'enviando...';
+    const agora = new Date();
+
+let numeroChamado = parseInt(
+  localStorage.getItem('numeroChamadoSuporte') || '0',
+  10
+);
+
+numeroChamado++;
+
+localStorage.setItem('numeroChamadoSuporte', numeroChamado);
+
+const mensagem = [
+  `⚠️ <strong>CHAMADO ${loja} - Nº ${numeroChamado}</strong>`,
+  '',
+  'O usuário informou que os cartazes não carregaram.',
+      '',
+  `<strong>Loja:</strong> ${loja}`,
+  `<strong>Página:</strong> Cartazes Salvos`,
+  `<strong>Tempo até o chamado:</strong> ${tempoAteChamado}`,
+  `<strong>Data/Hora:</strong> ${agora.toLocaleString('pt-BR')}`,
+      '',
+      '🖥️ LOG DO NAVEGADOR:',
+      typeof window.obterLogsSuporte === 'function'
+        ? window.obterLogsSuporte(2800)
+        : 'Captura de log indisponível.'
+    ].join('\n');
+
+    try {
+      const resposta = await fetch(`https://api.telegram.org/bot${TELEGRAM_SUPORTE_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: new URLSearchParams({
+          chat_id: TELEGRAM_SUPORTE_CHAT_ID,
+          text: mensagem,
+          parse_mode: 'HTML'
+        })
+      });
+      const resultado = await resposta.json();
+      if (!resposta.ok || !resultado.ok) throw new Error(resultado.description || 'Falha no Telegram');
+
+      detalhe.textContent = '✅ Suporte notificado';
+    } catch (erro) {
+      console.error('Erro ao notificar suporte pelo Telegram:', erro);
+      detalhe.innerHTML = 'Não foi possível notificar o suporte. <span id="link-suporte-telegram" role="button" tabindex="0">Tentar novamente</span>';
+    }
+  }
+
+  document.addEventListener('click', (event) => {
+    if (event.target && event.target.id === 'link-suporte-telegram') {
+      event.preventDefault();
+      enviarAlertaSuporteTelegram();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.target && event.target.id === 'link-suporte-telegram' && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      enviarAlertaSuporteTelegram();
+    }
+  });
+
 
 </script>
 
@@ -1779,148 +2032,6 @@ limparProjetoFirebaseAnterior();
       barra.style.width = p + '%';
     }
   }
-
-  // Suporte automático via Telegram.
-  // A loja é perguntada apenas no primeiro chamado deste navegador e fica salva no localStorage.
-  // ATENÇÃO: nesta versão de teste o token fica exposto no HTML, conforme solicitado.
-  const TELEGRAM_SUPORTE_TOKEN = '8535227078:AAEbEUL_usZ791YTi-4n2PJoDJKDB0jo-gI';
-  const TELEGRAM_SUPORTE_CHAT_ID = '8722664013';
-  const CHAVE_LOJA_SUPORTE = 'lojaSuporteTelegram';
-
-  // Cronômetro silencioso: mede o tempo desde a abertura/carregamento da página.
-  // performance.now() é monotônico e não é afetado por mudanças no relógio do computador.
-  const INICIO_PAGINA_SUPORTE = performance.now();
-
-  function formatarTempoAteChamado(ms) {
-    const totalSegundos = Math.max(0, Math.floor(ms / 1000));
-    const horas = Math.floor(totalSegundos / 3600);
-    const minutos = Math.floor((totalSegundos % 3600) / 60);
-    const segundos = totalSegundos % 60;
-
-    const partes = [];
-    if (horas > 0) partes.push(`${horas} h`);
-    if (minutos > 0) partes.push(`${minutos} min`);
-    partes.push(`${segundos} s`);
-    return partes.join(' ');
-  }
-
-  function obterLojaSuporteSalva() {
-    return localStorage.getItem(CHAVE_LOJA_SUPORTE) || '';
-  }
-
-  function solicitarLojaSuporte() {
-    return new Promise((resolve) => {
-      const overlay = document.getElementById('suporte-loja-overlay');
-      const select = document.getElementById('suporte-loja-select');
-      const confirmar = document.getElementById('suporte-loja-confirmar');
-      const cancelar = document.getElementById('suporte-loja-cancelar');
-      if (!overlay || !select || !confirmar || !cancelar) {
-        resolve('');
-        return;
-      }
-
-      select.value = '';
-      overlay.classList.add('aberto');
-      overlay.setAttribute('aria-hidden', 'false');
-      setTimeout(() => select.focus(), 0);
-
-      const finalizar = (loja) => {
-        overlay.classList.remove('aberto');
-        overlay.setAttribute('aria-hidden', 'true');
-        confirmar.removeEventListener('click', confirmarLoja);
-        cancelar.removeEventListener('click', cancelarLoja);
-        overlay.removeEventListener('click', clicarFora);
-        document.removeEventListener('keydown', teclaEsc);
-        resolve(loja);
-      };
-
-      const confirmarLoja = () => {
-        const loja = select.value;
-        if (!loja) {
-          select.focus();
-          return;
-        }
-        localStorage.setItem(CHAVE_LOJA_SUPORTE, loja);
-        finalizar(loja);
-      };
-      const cancelarLoja = () => finalizar('');
-      const clicarFora = (event) => { if (event.target === overlay) finalizar(''); };
-      const teclaEsc = (event) => { if (event.key === 'Escape') finalizar(''); };
-
-      confirmar.addEventListener('click', confirmarLoja);
-      cancelar.addEventListener('click', cancelarLoja);
-      overlay.addEventListener('click', clicarFora);
-      document.addEventListener('keydown', teclaEsc);
-    });
-  }
-
-  async function enviarAlertaSuporteTelegram() {
-    const link = document.getElementById('link-suporte-telegram');
-    const detalhe = document.getElementById('progresso-cartazes-detalhe');
-    if (!link || !detalhe || link.classList.contains('enviando')) return;
-
-    link.classList.add('enviando');
-
-    // Registra o tempo no exato momento do clique que iniciou o chamado.
-    // Assim, o tempo gasto escolhendo a loja na primeira utilização não entra na medição.
-    const tempoAteChamado = formatarTempoAteChamado(performance.now() - INICIO_PAGINA_SUPORTE);
-
-    let loja = obterLojaSuporteSalva();
-    if (!loja) {
-      link.textContent = 'identificando loja...';
-      loja = await solicitarLojaSuporte();
-      if (!loja) {
-        link.classList.remove('enviando');
-        link.textContent = 'clique aqui';
-        return;
-      }
-    }
-
-    link.textContent = 'enviando...';
-    const agora = new Date();
-    const mensagem = [
-      '⚠️ ALERTA DE CARREGAMENTO',
-      '',
-      'O usuário informou que os cartazes não carregaram.',
-      `Loja: ${loja}`,
-      'Página: Cartazes Salvos',
-      `Tempo até o chamado: ${tempoAteChamado}`,
-      `Data/Hora: ${agora.toLocaleString('pt-BR')}`,
-      `Endereço: ${location.href}`
-    ].join('\n');
-
-    try {
-      const resposta = await fetch(`https://api.telegram.org/bot${TELEGRAM_SUPORTE_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-        body: new URLSearchParams({
-          chat_id: TELEGRAM_SUPORTE_CHAT_ID,
-          text: mensagem
-        })
-      });
-      const resultado = await resposta.json();
-      if (!resposta.ok || !resultado.ok) throw new Error(resultado.description || 'Falha no Telegram');
-
-      detalhe.textContent = '✅ Suporte notificado';
-    } catch (erro) {
-      console.error('Erro ao notificar suporte pelo Telegram:', erro);
-      detalhe.innerHTML = 'Não foi possível notificar o suporte. <span id="link-suporte-telegram" role="button" tabindex="0">Tentar novamente</span>';
-    }
-  }
-
-  document.addEventListener('click', (event) => {
-    if (event.target && event.target.id === 'link-suporte-telegram') {
-      event.preventDefault();
-      enviarAlertaSuporteTelegram();
-    }
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.target && event.target.id === 'link-suporte-telegram' && (event.key === 'Enter' || event.key === ' ')) {
-      event.preventDefault();
-      enviarAlertaSuporteTelegram();
-    }
-  });
 
   function ocultarProgressoCartazes() {
     const box = document.getElementById('progresso-cartazes-box');
