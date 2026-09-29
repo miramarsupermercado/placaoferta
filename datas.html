@@ -1392,7 +1392,6 @@ const PROJETOS_FIREBASE = [
     },
   ];
 
-
 // 168 horas = 7 dias
 const DURACAO_PROJETO_MS = 168 * 60 * 60 * 1000;
 
@@ -1788,6 +1787,23 @@ limparProjetoFirebaseAnterior();
   const TELEGRAM_SUPORTE_CHAT_ID = '8722664013';
   const CHAVE_LOJA_SUPORTE = 'lojaSuporteTelegram';
 
+  // Cronômetro silencioso: mede o tempo desde a abertura/carregamento da página.
+  // performance.now() é monotônico e não é afetado por mudanças no relógio do computador.
+  const INICIO_PAGINA_SUPORTE = performance.now();
+
+  function formatarTempoAteChamado(ms) {
+    const totalSegundos = Math.max(0, Math.floor(ms / 1000));
+    const horas = Math.floor(totalSegundos / 3600);
+    const minutos = Math.floor((totalSegundos % 3600) / 60);
+    const segundos = totalSegundos % 60;
+
+    const partes = [];
+    if (horas > 0) partes.push(`${horas} h`);
+    if (minutos > 0) partes.push(`${minutos} min`);
+    partes.push(`${segundos} s`);
+    return partes.join(' ');
+  }
+
   function obterLojaSuporteSalva() {
     return localStorage.getItem(CHAVE_LOJA_SUPORTE) || '';
   }
@@ -1845,6 +1861,10 @@ limparProjetoFirebaseAnterior();
 
     link.classList.add('enviando');
 
+    // Registra o tempo no exato momento do clique que iniciou o chamado.
+    // Assim, o tempo gasto escolhendo a loja na primeira utilização não entra na medição.
+    const tempoAteChamado = formatarTempoAteChamado(performance.now() - INICIO_PAGINA_SUPORTE);
+
     let loja = obterLojaSuporteSalva();
     if (!loja) {
       link.textContent = 'identificando loja...';
@@ -1864,6 +1884,7 @@ limparProjetoFirebaseAnterior();
       'O usuário informou que os cartazes não carregaram.',
       `Loja: ${loja}`,
       'Página: Cartazes Salvos',
+      `Tempo até o chamado: ${tempoAteChamado}`,
       `Data/Hora: ${agora.toLocaleString('pt-BR')}`,
       `Endereço: ${location.href}`
     ].join('\n');
