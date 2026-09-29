@@ -17,7 +17,7 @@
       --card-bg:#ffffff;
       --text:#222;
     }
-    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f1f3f6;}
+    html,body{height:100%;margin:0;font-family: 'Oswald', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#bcbdbe;}
     
     .container-geral {
       max-width: 1150px;
@@ -26,10 +26,12 @@
     }
     
     h2 {
-      color: var(--blue);
+      color: #ffffff;
       border-bottom: 2px solid var(--blue);
       padding-bottom: 8px;
       margin-top: 10px;
+      -webkit-text-stroke: 0.7px #000;
+      text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.9);
     }
 
     .btn-voltar {
@@ -88,11 +90,20 @@
       font-family: 'Oswald', sans-serif;
       font-size: 15px;
       height: 39px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-salvar-lote:hover {
       background: #185a2e;
     }
+    #btn-unir-cartazes:hover {
+    background: #151618 !important;
+  }
+#btn-juntar-todos:hover {
+    background: #445c7a !important;
+}
 
     /* Estilização da Tabela Formato Tabulado */
     .tabela-container {
@@ -533,13 +544,341 @@
     .cartaz.oferta-dia-mode .descricao { color: #000000; top: 115px; font-family:'UturnaRoundBold'; }
     .cartaz.oferta-dia-mode .preco-antigo { color: #313131 !important; }
     .cartaz.oferta-dia-mode .big-value, .cartaz.oferta-dia-mode .centavos, .cartaz.oferta-dia-mode .rs { color: #101010; }
+
+    /* =========================================================
+       MODO ADM / CONTROLE DE FUNÇÕES POR TIPO DE PLACA
+       ========================================================= */
+    #btn-modo-adm {
+      margin-left:auto; background:#172033; color:#fff; border:0; border-radius:7px;
+      padding:10px 16px; font-family:'Oswald',sans-serif; font-weight:700; cursor:pointer;
+      box-shadow:0 2px 8px rgba(0,0,0,.15);
+    }
+    #btn-modo-adm.ativo { background:#8e44ad; }
+    .adm-modal { display:none; position:fixed; inset:0; z-index:12000; background:rgba(0,0,0,.72); padding:18px; box-sizing:border-box; align-items:center; justify-content:center; }
+    .adm-modal.aberto { display:flex; }
+    .adm-box { width:min(1450px,98vw); max-height:95vh; background:#fff; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 18px 55px rgba(0,0,0,.35); }
+    .adm-header { background:#172033; color:#fff; padding:13px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .adm-header h3 { margin:0; font-size:20px; }
+    .adm-header button { border:0; background:#fff; color:#172033; width:36px; height:36px; border-radius:6px; cursor:pointer; font-size:23px; }
+    .adm-body { padding:16px; overflow:auto; }
+    .adm-info { background:#eef4ff; border:1px solid #cbdcf7; border-radius:8px; padding:10px 12px; margin-bottom:14px; font:13px Arial,sans-serif; line-height:1.45; }
+    .adm-table-wrap { overflow:auto; border:1px solid #d8dde5; border-radius:8px; }
+    #adm-permissoes-table { width:100%; min-width:1180px; border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px; }
+    #adm-permissoes-table th { position:sticky; top:0; z-index:2; background:#213966; color:#fff; padding:9px 7px; text-align:center; white-space:nowrap; }
+    #adm-permissoes-table th:first-child { left:0; z-index:3; text-align:left; }
+    #adm-permissoes-table td { border-bottom:1px solid #e8ebef; border-right:1px solid #eef0f3; padding:8px; text-align:center; background:#fff; }
+    #adm-permissoes-table td:first-child { position:sticky; left:0; z-index:1; text-align:left; font-weight:700; background:#f7f9fb; min-width:190px; }
+    #adm-permissoes-table input[type=checkbox] { transform:scale(1.25); cursor:pointer; accent-color:#1f7a45; }
+    .adm-todas-cell { background:#eef7f1 !important; }
+    .adm-actions { display:flex; gap:10px; flex-wrap:wrap; padding:12px 16px; border-top:1px solid #ddd; background:#f6f7f9; }
+    .adm-actions button { border:0; border-radius:7px; padding:10px 16px; font-weight:700; cursor:pointer; }
+    #adm-salvar { background:#1f7a45; color:#fff; }
+    #adm-ativar-tudo { background:#2d78c4; color:#fff; }
+    #adm-desativar-tudo { background:#c0392b; color:#fff; }
+    #adm-sair { background:#59636e; color:#fff; margin-left:auto; }
+    .funcao-bloqueada { opacity:.32 !important; filter:grayscale(1); cursor:not-allowed !important; pointer-events:auto !important; }
+/* EFEITO DE BOTÃO SENDO PRESSIONADO */
+/* ========================================
+   GIFS: SOBEM E AUMENTAM NO HOVER
+======================================== */
+
+#btn-unir-cartazes img,
+#btn-juntar-todos img {
+    transition: transform 0.25s ease;
+}
+
+#btn-unir-cartazes:hover img,
+#btn-juntar-todos:hover img {
+    transform: translateY(-10px) scale(1.12);
+}
+
+
+/* ========================================
+   BOTÕES: EFEITO DE PRESSIONAR
+======================================== */
+
+#btn-salvar-lote,
+#btn-unir-cartazes,
+#btn-juntar-todos {
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Ao segurar o clique */
+#btn-salvar-lote:active,
+#btn-unir-cartazes:active,
+#btn-juntar-todos:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+}
+
+    /* Exclusão por intervalo: visível somente com Modo ADM ativo */
+    #painel-exclusao-intervalo { display:none; }
+    #painel-exclusao-intervalo.adm-visivel { display:flex; }
+
+    /* Contador fixo de cartazes selecionados */
+    #contador-cartazes-selecionados {
+      display:none;
+      position:fixed;
+      right:22px;
+      bottom:22px;
+      z-index:11500;
+      background:#213966;
+      color:#fff;
+      border-radius:10px;
+      padding:11px 16px;
+      font-family:'Oswald',sans-serif;
+      font-size:15px;
+      font-weight:700;
+      box-shadow:0 5px 18px rgba(0,0,0,.28);
+      display:none;
+      align-items:center;
+      gap:12px;
+    }
+    #contador-cartazes-selecionados.visivel { display:flex; }
+    #btn-desmarcar-todos {
+      border:1px solid rgba(255,255,255,.65);
+      background:#fff;
+      color:#213966;
+      border-radius:6px;
+      padding:5px 9px;
+      font-family:'Oswald',sans-serif;
+      font-size:12px;
+      font-weight:700;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    #btn-desmarcar-todos:hover { background:#eef3fb; }
+
+    /* Permite ordenar pelos selecionados clicando na célula do cabeçalho,
+       sem impedir o funcionamento normal do checkbox "Selecionar Todos". */
+    th.col-checkbox.sortable-selecao {
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+    }
+    th.col-checkbox.sortable-selecao:hover { background-color:#2b4982; }
+    #sort-selecionados-icon {
+      position:absolute;
+      right:3px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:9px;
+    }
+
+
+    /* =========================================================
+       GERENCIADOR DE DICAS / ORIENTAÇÕES DO MODO ADM
+       ========================================================= */
+    .adm-dicas-area { margin-top:18px; border-top:2px solid #e2e6ec; padding-top:16px; font-family:Arial,sans-serif; }
+    .adm-dicas-topo { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .adm-dicas-topo h4 { margin:0; color:#172033; font-size:18px; }
+    .adm-dicas-topo button, .adm-dica-form button { border:0; border-radius:7px; padding:9px 13px; font-weight:700; cursor:pointer; }
+    #adm-nova-dica { background:#213966; color:#fff; }
+    .adm-dica-form { display:none; background:#f7f9fc; border:1px solid #d8dde5; border-radius:10px; padding:14px; margin-bottom:14px; }
+    .adm-dica-form.aberto { display:block; }
+    .adm-dica-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .adm-dica-campo { display:flex; flex-direction:column; gap:5px; }
+    .adm-dica-campo.largo { grid-column:1/-1; }
+    .adm-dica-campo label { font:700 12px Arial,sans-serif; color:#39424e; }
+    .adm-dica-campo input, .adm-dica-campo select, .adm-dica-campo textarea { width:100%; box-sizing:border-box; border:1px solid #cbd2dc; border-radius:6px; padding:9px; font:13px Arial,sans-serif; background:#fff; }
+    .adm-dica-campo textarea { min-height:82px; resize:vertical; }
+    .adm-seletor-linha { display:flex; gap:7px; }
+    .adm-seletor-linha input { flex:1; }
+    .adm-seletor-linha button { background:#59636e; color:#fff; white-space:nowrap; }
+    .adm-dica-acoes-form { display:flex; gap:8px; margin-top:13px; }
+    #adm-dica-salvar { background:#1f7a45; color:#fff; }
+    #adm-dica-cancelar { background:#dfe3e8; color:#222; }
+    .adm-dicas-lista { display:grid; gap:9px; }
+    .adm-dica-item { border:1px solid #d8dde5; border-radius:9px; padding:11px 12px; display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; background:#fff; }
+    .adm-dica-item.inativa { opacity:.58; }
+    .adm-dica-item-titulo { font-weight:800; color:#172033; margin-bottom:4px; }
+    .adm-dica-item-meta { font-size:11px; color:#68727e; line-height:1.45; }
+    .adm-dica-item-texto { font-size:12px; color:#333; margin-top:5px; }
+    .adm-dica-item-acoes { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .adm-dica-item-acoes button { border:0; border-radius:6px; padding:7px 9px; cursor:pointer; font-weight:700; }
+    .adm-dica-editar { background:#f39c12; color:#fff; }
+    .adm-dica-toggle { background:#2d78c4; color:#fff; }
+    .adm-dica-excluir { background:#c0392b; color:#fff; }
+    .adm-switch { display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:700; }
+    .adm-switch input { width:auto; }
+    .adm-onde-aplicar { margin-top:10px; padding:10px 12px; border:1px solid #d8dde5; border-radius:8px; background:#f8fafc; display:flex; flex-direction:column; gap:7px; }
+    .adm-onde-aplicar-titulo { font-size:12px; font-weight:800; color:#172033; }
+    .adm-onde-aplicar label { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; cursor:pointer; }
+    .adm-onde-aplicar input[type=radio] { width:auto; accent-color:#213966; cursor:pointer; }
+
+    /* Seleção visual de elemento na tela */
+    body.modo-selecionar-dica, body.modo-selecionar-dica * { cursor:crosshair !important; }
+    .adm-elemento-hover { outline:4px solid #ff8a1c !important; outline-offset:3px !important; position:relative; z-index:15001 !important; }
+    #adm-selecao-banner { display:none; position:fixed; left:50%; top:18px; transform:translateX(-50%); z-index:30000; background:#172033; color:#fff; padding:12px 18px; border-radius:9px; box-shadow:0 7px 24px rgba(0,0,0,.35); font:700 14px Arial,sans-serif; }
+    #adm-selecao-banner.visivel { display:block; }
+
+    /* Orientações exibidas aos usuários */
+    .orientacao-destaque-contorno { outline:4px solid #ff8a1c !important; outline-offset:4px !important; }
+    @keyframes orientacaoPiscar { 0%,100%{box-shadow:0 0 0 0 rgba(255,138,28,0)} 50%{box-shadow:0 0 0 7px rgba(255,138,28,.55)} }
+    @keyframes orientacaoPulsar { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+    .orientacao-destaque-piscar { animation:orientacaoPiscar .8s ease-in-out infinite !important; }
+    .orientacao-destaque-pulsar { animation:orientacaoPulsar .85s ease-in-out infinite !important; position:relative; z-index:14001 !important; }
+    .orientacao-balao { position:fixed; z-index:14002; width:min(310px,calc(100vw - 28px)); background:#213966; color:#fff; border-radius:9px; padding:13px 14px; box-sizing:border-box; box-shadow:0 8px 25px rgba(0,0,0,.3); font-family:Arial,sans-serif; }
+    .orientacao-balao h5, .orientacao-popup h5 { margin:0 28px 7px 0; font-size:16px; }
+    .orientacao-balao p, .orientacao-popup p { margin:0; font-size:13px; line-height:1.45; white-space:pre-wrap; }
+    .orientacao-fechar { position:absolute; right:8px; top:7px; border:0; background:transparent; color:inherit; font-size:20px; cursor:pointer; }
+    .orientacao-nav { display:flex; justify-content:flex-end; align-items:center; gap:7px; margin-top:11px; }
+    .orientacao-nav span { margin-right:auto; font-size:11px; opacity:.8; }
+    .orientacao-nav button { border:0; border-radius:6px; padding:7px 10px; font-weight:700; cursor:pointer; }
+    .orientacao-overlay { position:fixed; inset:0; z-index:14000; background:rgba(0,0,0,.52); display:flex; align-items:center; justify-content:center; padding:18px; box-sizing:border-box; }
+    .orientacao-popup { position:relative; width:min(520px,92vw); background:#fff; color:#222; border-radius:13px; padding:23px; box-sizing:border-box; box-shadow:0 15px 45px rgba(0,0,0,.35); font-family:Arial,sans-serif; }
+    .orientacao-faixa { position:fixed; left:0; right:0; top:0; z-index:14002; background:#213966; color:#fff; padding:13px 52px 13px 18px; box-shadow:0 4px 18px rgba(0,0,0,.28); font-family:Arial,sans-serif; }
+    .orientacao-faixa strong { display:block; margin-bottom:3px; }
+    .orientacao-faixa .orientacao-fechar { right:16px; top:8px; }
+
+    @media (max-width:760px) { .adm-dica-grid { grid-template-columns:1fr; } .adm-dica-campo.largo { grid-column:auto; } }
+
+
+
+    /* =========================================================
+       TABELA COM COLUNAS FIXAS — PADRÃO DEFINIDO
+       ========================================================= */
+    #tabela-container table { table-layout: fixed; }
+    #tabela-container th:nth-child(1), #tabela-container td:nth-child(1) { width: 48px; }
+    #tabela-container th:nth-child(2), #tabela-container td:nth-child(2) { width: 230px; }
+    #tabela-container th:nth-child(3), #tabela-container td:nth-child(3) { width: 90px; }
+    #tabela-container th:nth-child(4), #tabela-container td:nth-child(4) { width: 130px; }
+    #tabela-container th:nth-child(5), #tabela-container td:nth-child(5) { width: 50px; }
+    #tabela-container th:nth-child(6), #tabela-container td:nth-child(6) { width: 40px; }
+    #tabela-container th:nth-child(7), #tabela-container td:nth-child(7) { width: 125px; }
+    #tabela-container th:nth-child(8), #tabela-container td:nth-child(8) { width: 230px; }
+
+
+    /* Texto longo das células: corre horizontalmente ao passar o mouse */
+    #tabela-container td:not(.col-checkbox):not(.col-acoes) {
+      height: 38px;
+      max-height: 38px;
+      box-sizing: border-box;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .td-marquee-wrap {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      display: block;
+    }
+    .td-marquee-text {
+      display: inline-block;
+      white-space: nowrap;
+      transform: translateX(0);
+      will-change: transform;
+    }
+    .td-marquee-wrap.tem-overflow:hover .td-marquee-text {
+      animation: tdMarquee var(--marquee-duracao, 3s) linear infinite alternate;
+    }
+    @keyframes tdMarquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(var(--marquee-distancia, 0px)); }
+    }
+
+    /* =========================================================
+       PROGRESSO DA BUSCA DOS CARTAZES
+       Não faz consultas extras ao Firebase.
+       ========================================================= */
+    #lista-vazia.carregando-cartazes {
+      padding: 24px 30px;
+      box-sizing: border-box;
+    }
+    .progresso-cartazes-box {
+      width: min(520px, 92%);
+      margin: 0 auto;
+      text-align: center;
+    }
+    .progresso-cartazes-titulo {
+      color: var(--blue);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .progresso-cartazes-status {
+      min-height: 20px;
+      color: #555;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .progresso-cartazes-trilho {
+      position: relative;
+      height: 13px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e5e8ed;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.16);
+    }
+    .progresso-cartazes-barra {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #213966, #4a90e2);
+      transition: width .18s ease;
+    }
+    .progresso-cartazes-trilho.indeterminado .progresso-cartazes-barra {
+      width: 35%;
+      animation: progressoCartazesIndeterminado 1.05s ease-in-out infinite;
+    }
+    @keyframes progressoCartazesIndeterminado {
+      0%   { transform: translateX(-110%); }
+      100% { transform: translateX(300%); }
+    }
+    .progresso-cartazes-detalhe {
+      margin-top: 8px;
+      min-height: 17px;
+      color: #68727e;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #link-suporte-telegram {
+      color: #213966;
+      font-weight: 800;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    #link-suporte-telegram:hover { opacity: .75; }
+    #link-suporte-telegram.enviando { pointer-events: none; opacity: .6; }
+
+
+    /* Identificação da loja no primeiro chamado de suporte */
+    #suporte-loja-overlay {
+      display:none; position:fixed; inset:0; z-index:40000;
+      background:rgba(0,0,0,.58); align-items:center; justify-content:center;
+      padding:18px; box-sizing:border-box;
+    }
+    #suporte-loja-overlay.aberto { display:flex; }
+    .suporte-loja-box {
+      width:min(390px,94vw); background:#fff; border-radius:12px; padding:22px;
+      box-sizing:border-box; box-shadow:0 15px 45px rgba(0,0,0,.35);
+      font-family:'Oswald',sans-serif; text-align:left;
+    }
+    .suporte-loja-box h3 { margin:0 0 8px; color:#213966; font-size:20px; }
+    .suporte-loja-box p { margin:0 0 14px; color:#555; font-size:14px; }
+    #suporte-loja-select {
+      width:100%; height:42px; border:1px solid #cbd2dc; border-radius:7px;
+      padding:0 10px; font:14px 'Oswald',sans-serif; background:#fff; box-sizing:border-box;
+    }
+    .suporte-loja-acoes { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+    .suporte-loja-acoes button {
+      border:0; border-radius:7px; padding:9px 14px; font:700 14px 'Oswald',sans-serif; cursor:pointer;
+    }
+    #suporte-loja-cancelar { background:#e2e5e9; color:#333; }
+    #suporte-loja-confirmar { background:#213966; color:#fff; }
+
   </style>
 </head>
 <body>
 
   <div class="container-geral">
     <a href="index.html" class="btn-voltar">← Voltar à Criar Cartaz</a>
-    <h2>CARTAZES SALVOS</h2>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <h2 style="flex:1;">CARTAZES SALVOS</h2>
+      <button type="button" id="btn-modo-adm">🔒 Modo ADM</button>
+    </div>
 
     <div class="painel-controle">
       <div class="field-data">
@@ -550,17 +889,37 @@
         <label for="lote-data-final">Nova Data Final</label>
         <input type="date" id="lote-data-final">
       </div>
-      <button class="btn-salvar-lote" id="btn-salvar-lote" title="Selecione os cartazes e atualize a data de oferta">💾 Salvar Nova Data</button>
+<button class="btn-salvar-lote" id="btn-salvar-lote"
+        title="Selecione os cartazes e atualize a data de oferta">
+
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="22" height="22"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2.3"
+         stroke-linecap="round"
+         stroke-linejoin="round">
+         
+        <path d="M8 2v4"/>
+        <path d="M16 2v4"/>
+        <rect width="18" height="18" x="3" y="4" rx="2"/>
+        <path d="M3 10h18"/>
+        <path d="m9 16 2 2 4-4"/>
+    </svg>
+
+    Salvar Nova Data
+</button>
 <button class="btn-salvar-lote" id="btn-unir-cartazes" style="background:#4c5058; display: inline-flex; align-items: center; gap: 6px;" title="Unir 2 cartazes por vez em modo paisagem A4">
-  <img src="fundo-cartaz-app(duplo).png" alt="Ícone" style="width: 80px; height: 80px; margin-left:-15px; margin-top: -17px; object-fit: contain;"> 2 páginas por folha
+  <img src="duplo.gif" alt="Ícone" style="width: 80px; height: 80px; margin-left:-15px; margin-top: -17px; object-fit: contain;"> 2 páginas por folha
 </button>
 <button class="btn-salvar-lote" id="btn-juntar-todos" style="background:#979491; display: inline-flex; align-items: center; gap: 6px; position: relative;" title="Selecione os cartazes e salve todos em PDF único">
-  <img src="miniatura-oferta.png" alt="Ícone" style="width: 55px; height: 60px; margin-left:-20px; margin-top: -20px; object-fit: contain;"> 1 página por folha
+  <img src="placaA4.gif" alt="Ícone" style="width: 55px; height: 60px; margin-left:-20px; margin-top: -20px; object-fit: contain;"> 1 página por folha
 </button>
     </div>
 
     <!-- Painel para Exclusão por Intervalo de Datas -->
-    <div class="painel-controle" style="margin-top: -10px; margin-bottom: 20px; border: 1px solid #f5c6cb; background-color: #fdf7f7;">
+    <div class="painel-controle" id="painel-exclusao-intervalo" style="margin-top: -10px; margin-bottom: 20px; border: 1px solid #f5c6cb; background-color: #fdf7f7;">
       <div class="field-data">
         <label for="excluir-data-inicial" style="color: #c0392b;">Data Inicial Exclusão</label>
         <input type="date" id="excluir-data-inicial">
@@ -611,7 +970,11 @@
           <option value="Loja 10">Loja 10</option>
         </select>
       </div>
-      <button class="btn-salvar-lote" id="btn-excluir-selecionados" style="background:#c0392b; height: 39px; margin-right: auto;">🗑️ Excluir Selecionados</button>
+      <button class="btn-salvar-lote" id="btn-excluir-selecionados" style="background:#c0392b; height: 39px; margin-right: auto;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <line x1="10" y1="11" x2="10" y2="17"></line>
+        <line x1="14" y1="11" x2="14" y2="17"></line>
+    </svg> Excluir Selecionados</button>
     </div>
     
 
@@ -619,7 +982,7 @@
       <table>
         <thead>
           <tr>
-            <th class="col-checkbox"><input type="checkbox" id="select-all-cartazes" title="Selecionar Todos"></th>
+            <th class="col-checkbox sortable-selecao" id="th-selecionados" title="Clique fora da caixa para ordenar por selecionados"><input type="checkbox" id="select-all-cartazes" title="Selecionar Todos"><span id="sort-selecionados-icon"></span></th>
             <th class="sortable" data-sort="descricao">Descrição <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="tipo">Tipo <span class="sort-icon"></span></th>
             <th class="sortable" data-sort="vigencia">Data de Vigência <span class="sort-icon"></span></th>
@@ -639,16 +1002,31 @@
       </table>
     </div>
 
-    <div id="paginacao-controles" class="paginacao-container" style="display: none;">
-      <button id="prev-page" class="btn-paginacao">Anterior</button>
-      <span id="info-paginacao">Página 1 de 1</span>
-      <button id="next-page" class="btn-paginacao">Próximo</button>
-    </div>
+<div id="paginacao-controles" class="paginacao-container" style="display: none;">
+  <button id="first-page" class="btn-paginacao">Primeira</button>
+  <button id="prev-page" class="btn-paginacao">Anterior</button>
 
-    <div id="lista-vazia">
-      Buscando cartazes...
-      <img src="spinner.gif" alt="Carregando..." style="width:95px; height:50px; margin: 0 auto; display: block;" />
+  <span id="info-paginacao">1 de 1</span>
+
+  <button id="next-page" class="btn-paginacao">Próxima</button>
+  <button id="last-page" class="btn-paginacao">Última</button>
+</div>
+
+    <div id="lista-vazia" class="carregando-cartazes">
+      <div id="progresso-cartazes-box" class="progresso-cartazes-box">
+        <div id="progresso-cartazes-titulo" class="progresso-cartazes-titulo">Buscando cartazes...</div>
+        <div id="progresso-cartazes-status" class="progresso-cartazes-status">Por favor, espere!</div>
+        <div id="progresso-cartazes-trilho" class="progresso-cartazes-trilho indeterminado">
+          <div id="progresso-cartazes-barra" class="progresso-cartazes-barra"></div>
+        </div>
+        <div id="progresso-cartazes-detalhe" class="progresso-cartazes-detalhe">Caso não carregue, <span id="link-suporte-telegram" role="button" tabindex="0">clique aqui</span></div>
+      </div>
     </div>
+  </div>
+
+  <div id="contador-cartazes-selecionados" aria-live="polite">
+    <span id="contador-cartazes-selecionados-texto">0 cartazes selecionados</span>
+    <button type="button" id="btn-desmarcar-todos">Desmarcar todos</button>
   </div>
 
   <div id="render-box">
@@ -665,6 +1043,103 @@
           </div>
         </div>
         <div class="rodape" id="rodape-render"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel administrativo: permissões por função e tipo de placa -->
+  <div id="adm-modal" class="adm-modal" aria-hidden="true">
+    <div class="adm-box" role="dialog" aria-modal="true" aria-labelledby="adm-titulo">
+      <div class="adm-header">
+        <h3 id="adm-titulo">⚙️ Painel Administrativo — Funções por Tipo de Placa</h3>
+        <button type="button" id="adm-fechar" title="Fechar">×</button>
+      </div>
+      <div class="adm-body">
+        <div class="adm-info">
+          Marque quais tipos de placa podem usar cada função. A coluna <b>TODAS</b> marca ou desmarca todos os tipos daquela função.
+          As configurações são salvas no Firebase e aplicadas em tempo real nesta página.
+        </div>
+        <div class="adm-table-wrap">
+          <table id="adm-permissoes-table">
+            <thead id="adm-permissoes-head"></thead>
+            <tbody id="adm-permissoes-body"></tbody>
+          </table>
+        </div>
+
+        <section class="adm-dicas-area" id="adm-dicas-area">
+          <div class="adm-dicas-topo">
+            <div>
+              <h4>📢 Dicas e orientações</h4>
+              <div style="font-size:12px;color:#68727e;margin-top:3px;">Crie e altere orientações sem editar o código da página.</div>
+            </div>
+            <button type="button" id="adm-nova-dica">+ Nova orientação</button>
+          </div>
+
+          <div class="adm-dica-form" id="adm-dica-form">
+            <input type="hidden" id="adm-dica-id">
+            <div class="adm-dica-grid">
+              <div class="adm-dica-campo"><label>Título</label><input id="adm-dica-titulo" type="text" placeholder="Ex.: Quantidade de cópias"></div>
+              <div class="adm-dica-campo"><label>Tipo</label><select id="adm-dica-tipo"><option value="balao">Balão</option><option value="popup">Pop-up central</option><option value="faixa">Faixa no topo</option></select></div>
+              <div class="adm-dica-campo largo"><label>Texto da orientação</label><textarea id="adm-dica-texto" placeholder="Digite a orientação que o usuário verá..."></textarea></div>
+              <div class="adm-dica-campo largo">
+                <label>🎯 ONDE APONTAR</label>
+                <div class="adm-seletor-linha"><input id="adm-dica-alvo" type="text" readonly placeholder="Nenhum elemento selecionado"><button type="button" id="adm-selecionar-alvo">🎯 Selecionar elemento na tela</button></div>
+                <small id="adm-dica-alvo-label" style="color:#68727e"></small>
+                <input type="hidden" id="adm-dica-alvo-unico">
+                <input type="hidden" id="adm-dica-alvo-todos">
+                <div class="adm-onde-aplicar">
+                  <div class="adm-onde-aplicar-titulo">ONDE APLICAR?</div>
+                  <label><input type="radio" name="adm-dica-aplicacao" value="unico" checked> Somente no elemento selecionado</label>
+                  <label><input type="radio" name="adm-dica-aplicacao" value="todos"> Todos os elementos iguais</label>
+                </div>
+              </div>
+              <div class="adm-dica-campo"><label>Duração</label><select id="adm-dica-duracao"><option value="5000">5 segundos</option><option value="10000">10 segundos</option><option value="0">Até o usuário fechar</option></select></div>
+              <div class="adm-dica-campo"><label>Quando mostrar</label><select id="adm-dica-quando"><option value="abrir">Ao abrir a página</option><option value="cartazes">Quando os cartazes carregarem</option><option value="clique">Ao clicar em determinado botão/elemento</option></select></div>
+              <div class="adm-dica-campo largo" id="adm-gatilho-wrap" style="display:none"><label>Elemento que dispara a orientação</label><div class="adm-seletor-linha"><input id="adm-dica-gatilho" type="text" readonly placeholder="Selecione o botão/elemento que servirá de gatilho"><button type="button" id="adm-selecionar-gatilho">🎯 Selecionar gatilho</button></div><small id="adm-dica-gatilho-label" style="color:#68727e"></small></div>
+              <div class="adm-dica-campo"><label>Frequência</label><select id="adm-dica-frequencia"><option value="sempre">Sempre</option><option value="acesso">Uma vez por acesso</option><option value="dispositivo">Uma única vez por dispositivo</option></select></div>
+              <div class="adm-dica-campo"><label>Destaque do elemento</label><select id="adm-dica-destaque"><option value="nenhum">Nenhum</option><option value="piscar">Piscar</option><option value="contorno">Contorno</option><option value="pulsar">Pulsar</option></select></div>
+              <div class="adm-dica-campo"><label>Sequência / grupo</label><input id="adm-dica-sequencia" type="text" placeholder="Ex.: tutorial-impressao (opcional)"></div>
+              <div class="adm-dica-campo"><label>Ordem na sequência</label><input id="adm-dica-ordem" type="number" min="1" step="1" value="1"></div>
+              <div class="adm-dica-campo"><label class="adm-switch"><input id="adm-dica-ativa" type="checkbox" checked> Orientação ativa</label></div>
+            </div>
+            <div class="adm-dica-acoes-form"><button type="button" id="adm-dica-salvar">💾 Salvar orientação</button><button type="button" id="adm-dica-cancelar">Cancelar</button></div>
+          </div>
+          <div class="adm-dicas-lista" id="adm-dicas-lista"><div style="color:#68727e;font-size:12px;">Carregando orientações...</div></div>
+        </section>
+      </div>
+      <div class="adm-actions">
+        <button type="button" id="adm-ativar-tudo">✓ Ativar tudo</button>
+        <button type="button" id="adm-desativar-tudo">✕ Desativar tudo</button>
+        <button type="button" id="adm-salvar">💾 Salvar configuração</button>
+        <button type="button" id="adm-sair">🔒 Sair do modo ADM</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adm-selecao-banner">🎯 Clique no elemento que deseja selecionar. Pressione ESC para cancelar.</div>
+
+
+
+  <div id="suporte-loja-overlay" aria-hidden="true">
+    <div class="suporte-loja-box" role="dialog" aria-modal="true" aria-labelledby="suporte-loja-titulo">
+      <h3 id="suporte-loja-titulo">Identifique sua loja</h3>
+      <p>Selecione a loja. Esta escolha será salva neste navegador para os próximos chamados.</p>
+      <select id="suporte-loja-select">
+        <option value="">Selecione a loja...</option>
+        <option value="Loja 1">Loja 1</option>
+        <option value="Loja 2">Loja 2</option>
+        <option value="Loja 3">Loja 3</option>
+        <option value="Loja 4">Loja 4</option>
+        <option value="Loja 5">Loja 5</option>
+        <option value="Loja 6">Loja 6</option>
+        <option value="Loja 7">Loja 7</option>
+        <option value="Loja 8">Loja 8</option>
+        <option value="Loja 9">Loja 9</option>
+        <option value="Loja 10">Loja 10</option>
+      </select>
+      <div class="suporte-loja-acoes">
+        <button type="button" id="suporte-loja-cancelar">Cancelar</button>
+        <button type="button" id="suporte-loja-confirmar">Salvar e enviar</button>
       </div>
     </div>
   </div>
@@ -700,6 +1175,21 @@
     });
     return expandidos;
   }
+  // Atualiza o contador fixo no canto inferior direito.
+  function atualizarContadorSelecionados() {
+    const contador = document.getElementById('contador-cartazes-selecionados');
+    if (!contador) return;
+    const quantidade = window.cartazesSelecionados.size;
+    const texto = document.getElementById('contador-cartazes-selecionados-texto');
+    if (texto) {
+      texto.textContent = quantidade === 1
+        ? '1 cartaz selecionado'
+        : `${quantidade} cartazes selecionados`;
+    }
+    contador.classList.toggle('visivel', quantidade > 0);
+  }
+  window.atualizarContadorSelecionados = atualizarContadorSelecionados;
+
   // Variáveis para gerenciar o estado da ordenação
   window.currentSortColumn = 'salvo';
   window.currentSortDirection = 'desc';
@@ -779,18 +1269,30 @@ function destacarInputsCopias() {
 
     document.body.appendChild(dica);
 
-    function posicionarDica() {
-        const rect = primeiroInput.getBoundingClientRect();
+function posicionarDica() {
+    const rect = primeiroInput.getBoundingClientRect();
+    const margem = 15;
 
-        dica.style.left =
-            (rect.right + 15 + window.scrollX) + 'px';
+    // Tenta mostrar à direita do campo
+    let left = rect.right + margem + window.scrollX;
 
-        dica.style.top =
-            (rect.top +
-             window.scrollY +
-             rect.height / 2 -
-             dica.offsetHeight / 2) + 'px';
+    // Se ultrapassar a lateral direita da tela,
+    // mostra a dica à esquerda do campo
+    if (left + dica.offsetWidth > window.scrollX + window.innerWidth - margem) {
+        left = rect.left + window.scrollX - dica.offsetWidth - margem;
     }
+
+    // Segurança para nunca ultrapassar a lateral esquerda
+    left = Math.max(window.scrollX + margem, left);
+
+    dica.style.left = left + 'px';
+
+    dica.style.top =
+        (rect.top +
+         window.scrollY +
+         rect.height / 2 -
+         dica.offsetHeight / 2) + 'px';
+}
 
     posicionarDica();
 
@@ -826,14 +1328,14 @@ const PROJETOS_FIREBASE = [
 {
       nome: "Projeto 1",
       config: {
-        apiKey: "AIzaSyC1Bi4bZ6JSyFEnw-uV9rzHoxdu1Oyhtk4",
-        authDomain: "placas-miramar-1.firebaseapp.com",
-        databaseURL: "https://placas-miramar-1-default-rtdb.firebaseio.com",
-        projectId: "placas-miramar-1",
-        storageBucket: "placas-miramar-1.firebasestorage.app",
-        messagingSenderId: "471001231253",
-        appId: "1:471001231253:web:e5493e27e6dd95bfb9509c",
-        measurementId: "G-3P1HKXGSDL"
+        apiKey: "AIzaSyDWVuh6DFfj9apasnVfQm-FrygGp98oRAg",
+        authDomain: "campominado-37a74.firebaseapp.com",
+        databaseURL: "https://campominado-37a74-default-rtdb.firebaseio.com",
+        projectId: "campominado-37a74",
+        storageBucket: "campominado-37a74.firebasestorage.app",
+        messagingSenderId: "107676381776",
+        appId: "1:107676381776:web:d5d61532ef2f6ca78bd755",
+        measurementId: "G-R1K9FP6JLP"
       }
     },
     {
@@ -852,14 +1354,14 @@ const PROJETOS_FIREBASE = [
     {
       nome: "Projeto 3",
       config: {
-        apiKey: "AIzaSyDWVuh6DFfj9apasnVfQm-FrygGp98oRAg",
-        authDomain: "campominado-37a74.firebaseapp.com",
-        databaseURL: "https://campominado-37a74-default-rtdb.firebaseio.com",
-        projectId: "campominado-37a74",
-        storageBucket: "campominado-37a74.firebasestorage.app",
-        messagingSenderId: "107676381776",
-        appId: "1:107676381776:web:d5d61532ef2f6ca78bd755",
-        measurementId: "G-R1K9FP6JLP"
+        apiKey: "AIzaSyC1Bi4bZ6JSyFEnw-uV9rzHoxdu1Oyhtk4",
+        authDomain: "placas-miramar-1.firebaseapp.com",
+        databaseURL: "https://placas-miramar-1-default-rtdb.firebaseio.com",
+        projectId: "placas-miramar-1",
+        storageBucket: "placas-miramar-1.firebasestorage.app",
+        messagingSenderId: "471001231253",
+        appId: "1:471001231253:web:e5493e27e6dd95bfb9509c",
+        measurementId: "G-3P1HKXGSDL"
       }
     },
     {
@@ -889,6 +1391,7 @@ const PROJETOS_FIREBASE = [
       }
     },
   ];
+
 
 // 168 horas = 7 dias
 const DURACAO_PROJETO_MS = 168 * 60 * 60 * 1000;
@@ -1233,7 +1736,8 @@ limparProjetoFirebaseAnterior();
           await remove(itemRef);
           window.cartazesSelecionados.delete(id);
         }
-        document.getElementById('select-all-cartazes').checked = false;      
+        document.getElementById('select-all-cartazes').checked = false;
+        atualizarContadorSelecionados();
       } catch (err) {
         console.error(err);
         alert('Ocorreu um erro ao tentar excluir os cartazes selecionados.');
@@ -1241,6 +1745,177 @@ limparProjetoFirebaseAnterior();
         loadingOverlay.style.display = 'none';
       }
     }
+  });
+
+  // Progresso visual da carga. Usa somente os dados da leitura que a página já faz.
+  function atualizarProgressoCartazes({ titulo, status, detalhe, percentual = null, indeterminado = false } = {}) {
+    const vazio = document.getElementById('lista-vazia');
+    const box = document.getElementById('progresso-cartazes-box');
+    if (!vazio || !box) return;
+
+    vazio.style.display = 'block';
+    vazio.classList.add('carregando-cartazes');
+    box.style.display = 'block';
+
+    const elTitulo = document.getElementById('progresso-cartazes-titulo');
+    const elStatus = document.getElementById('progresso-cartazes-status');
+    const elDetalhe = document.getElementById('progresso-cartazes-detalhe');
+    const trilho = document.getElementById('progresso-cartazes-trilho');
+    const barra = document.getElementById('progresso-cartazes-barra');
+
+    if (titulo != null) elTitulo.textContent = titulo;
+    if (status != null) elStatus.textContent = status;
+    if (detalhe != null) {
+      if (detalhe === 'SUPORTE_TELEGRAM') {
+        elDetalhe.innerHTML = 'Caso não carregue, <span id="link-suporte-telegram" role="button" tabindex="0">clique aqui</span>';
+      } else {
+        elDetalhe.textContent = detalhe;
+      }
+    }
+
+    trilho.classList.toggle('indeterminado', !!indeterminado);
+    if (!indeterminado && percentual != null) {
+      const p = Math.max(0, Math.min(100, Number(percentual) || 0));
+      barra.style.transform = 'none';
+      barra.style.width = p + '%';
+    }
+  }
+
+  // Suporte automático via Telegram.
+  // A loja é perguntada apenas no primeiro chamado deste navegador e fica salva no localStorage.
+  // ATENÇÃO: nesta versão de teste o token fica exposto no HTML, conforme solicitado.
+  const TELEGRAM_SUPORTE_TOKEN = '8535227078:AAEbEUL_usZ791YTi-4n2PJoDJKDB0jo-gI';
+  const TELEGRAM_SUPORTE_CHAT_ID = '8722664013';
+  const CHAVE_LOJA_SUPORTE = 'lojaSuporteTelegram';
+
+  function obterLojaSuporteSalva() {
+    return localStorage.getItem(CHAVE_LOJA_SUPORTE) || '';
+  }
+
+  function solicitarLojaSuporte() {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById('suporte-loja-overlay');
+      const select = document.getElementById('suporte-loja-select');
+      const confirmar = document.getElementById('suporte-loja-confirmar');
+      const cancelar = document.getElementById('suporte-loja-cancelar');
+      if (!overlay || !select || !confirmar || !cancelar) {
+        resolve('');
+        return;
+      }
+
+      select.value = '';
+      overlay.classList.add('aberto');
+      overlay.setAttribute('aria-hidden', 'false');
+      setTimeout(() => select.focus(), 0);
+
+      const finalizar = (loja) => {
+        overlay.classList.remove('aberto');
+        overlay.setAttribute('aria-hidden', 'true');
+        confirmar.removeEventListener('click', confirmarLoja);
+        cancelar.removeEventListener('click', cancelarLoja);
+        overlay.removeEventListener('click', clicarFora);
+        document.removeEventListener('keydown', teclaEsc);
+        resolve(loja);
+      };
+
+      const confirmarLoja = () => {
+        const loja = select.value;
+        if (!loja) {
+          select.focus();
+          return;
+        }
+        localStorage.setItem(CHAVE_LOJA_SUPORTE, loja);
+        finalizar(loja);
+      };
+      const cancelarLoja = () => finalizar('');
+      const clicarFora = (event) => { if (event.target === overlay) finalizar(''); };
+      const teclaEsc = (event) => { if (event.key === 'Escape') finalizar(''); };
+
+      confirmar.addEventListener('click', confirmarLoja);
+      cancelar.addEventListener('click', cancelarLoja);
+      overlay.addEventListener('click', clicarFora);
+      document.addEventListener('keydown', teclaEsc);
+    });
+  }
+
+  async function enviarAlertaSuporteTelegram() {
+    const link = document.getElementById('link-suporte-telegram');
+    const detalhe = document.getElementById('progresso-cartazes-detalhe');
+    if (!link || !detalhe || link.classList.contains('enviando')) return;
+
+    link.classList.add('enviando');
+
+    let loja = obterLojaSuporteSalva();
+    if (!loja) {
+      link.textContent = 'identificando loja...';
+      loja = await solicitarLojaSuporte();
+      if (!loja) {
+        link.classList.remove('enviando');
+        link.textContent = 'clique aqui';
+        return;
+      }
+    }
+
+    link.textContent = 'enviando...';
+    const agora = new Date();
+    const mensagem = [
+      '⚠️ ALERTA DE CARREGAMENTO',
+      '',
+      'O usuário informou que os cartazes não carregaram.',
+      `Loja: ${loja}`,
+      'Página: Cartazes Salvos',
+      `Data/Hora: ${agora.toLocaleString('pt-BR')}`,
+      `Endereço: ${location.href}`
+    ].join('\n');
+
+    try {
+      const resposta = await fetch(`https://api.telegram.org/bot${TELEGRAM_SUPORTE_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: new URLSearchParams({
+          chat_id: TELEGRAM_SUPORTE_CHAT_ID,
+          text: mensagem
+        })
+      });
+      const resultado = await resposta.json();
+      if (!resposta.ok || !resultado.ok) throw new Error(resultado.description || 'Falha no Telegram');
+
+      detalhe.textContent = '✅ Suporte notificado';
+    } catch (erro) {
+      console.error('Erro ao notificar suporte pelo Telegram:', erro);
+      detalhe.innerHTML = 'Não foi possível notificar o suporte. <span id="link-suporte-telegram" role="button" tabindex="0">Tentar novamente</span>';
+    }
+  }
+
+  document.addEventListener('click', (event) => {
+    if (event.target && event.target.id === 'link-suporte-telegram') {
+      event.preventDefault();
+      enviarAlertaSuporteTelegram();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.target && event.target.id === 'link-suporte-telegram' && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      enviarAlertaSuporteTelegram();
+    }
+  });
+
+  function ocultarProgressoCartazes() {
+    const box = document.getElementById('progresso-cartazes-box');
+    if (box) box.style.display = 'none';
+  }
+
+  // Permite que o navegador redesenhe a barra durante processamentos maiores.
+  function aguardarFrameCartazes() {
+    return new Promise(resolve => requestAnimationFrame(() => resolve()));
+  }
+
+  atualizarProgressoCartazes({
+    titulo: 'Buscando cartazes...',
+    status: 'Por favor, espere!',
+    detalhe: 'SUPORTE_TELEGRAM',
+    indeterminado: true
   });
 
   // Função para renderizar a tabela com base nos dados, estado de ordenação e filtros ativos
@@ -1345,7 +2020,15 @@ limparProjetoFirebaseAnterior();
     // Executa a ordenação com base na coluna e direção activa
     itensArray.sort((a, b) => {
       let comparison = 0;
-      if (window.currentSortColumn === 'descricao') {
+      if (window.currentSortColumn === 'selecionados') {
+        const selecaoOrdenacao = window.snapshotSelecaoOrdenacao || new Set();
+        const aSelecionado = selecaoOrdenacao.has(a.id) ? 1 : 0;
+        const bSelecionado = selecaoOrdenacao.has(b.id) ? 1 : 0;
+        comparison = aSelecionado - bSelecionado;
+
+        // Empate: mantém uma ordem estável e previsível pelo momento em que foi salvo.
+        if (comparison === 0) comparison = a.timestamp - b.timestamp;
+      } else if (window.currentSortColumn === 'descricao') {
   comparison = a.descricao.localeCompare(b.descricao);
 } else if (window.currentSortColumn === 'loja') { // Adicione esta condição
   comparison = a.loja.localeCompare(b.loja);
@@ -1362,23 +2045,38 @@ limparProjetoFirebaseAnterior();
     });
 
     // --- LÓGICA DE PAGINAÇÃO ---
-    const totalItens = itensArray.length;
-    const totalPaginas = Math.ceil(totalItens / itensPorPagina);
-    
-    if (window.paginaAtual > totalPaginas) window.paginaAtual = totalPaginas || 1;
-    
-    const inicio = (window.paginaAtual - 1) * itensPorPagina;
-    const fim = inicio + itensPorPagina;
-    const itensPaginados = itensArray.slice(inicio, fim);
+// --- LÓGICA DE PAGINAÇÃO ---
+const totalItens = itensArray.length;
+const totalPaginas = Math.ceil(totalItens / itensPorPagina);
+
+// Guarda o total de páginas atual para o botão "Última"
+window.totalPaginasAtual = totalPaginas;
+
+if (window.paginaAtual > totalPaginas) window.paginaAtual = totalPaginas || 1;
+
+const inicio = (window.paginaAtual - 1) * itensPorPagina;
+const fim = inicio + itensPorPagina;
+const itensPaginados = itensArray.slice(inicio, fim);
 
     // Atualiza controles Visuais
     const controlesPag = document.getElementById('paginacao-controles');
     if (totalItens > itensPorPagina) {
         controlesPag.style.display = 'flex';
-        document.getElementById('info-paginacao').textContent = `Página ${window.paginaAtual} de ${totalPaginas}`;
-        document.getElementById('prev-page').disabled = (window.paginaAtual === 1);
-        document.getElementById('next-page').disabled = (window.paginaAtual === totalPaginas);
-    } else {
+document.getElementById('info-paginacao').textContent =
+    `${window.paginaAtual} de ${totalPaginas}`;
+
+document.getElementById('first-page').disabled =
+    (window.paginaAtual === 1);
+
+document.getElementById('prev-page').disabled =
+    (window.paginaAtual === 1);
+
+document.getElementById('next-page').disabled =
+    (window.paginaAtual === totalPaginas);
+
+document.getElementById('last-page').disabled =
+    (window.paginaAtual === totalPaginas);
+      } else {
         controlesPag.style.display = 'none';
     }
 
@@ -1392,6 +2090,14 @@ limparProjetoFirebaseAnterior();
         iconSpan.textContent = '';
       }
     });
+
+    const sortSelecionadosIcon = document.getElementById('sort-selecionados-icon');
+    if (sortSelecionadosIcon) {
+      sortSelecionadosIcon.textContent =
+        window.currentSortColumn === 'selecionados'
+          ? (window.currentSortDirection === 'asc' ? '▲' : '▼')
+          : '';
+    }
 
     // Renderiza as linhas na tabela (usando o array paginado)
     itensPaginados.forEach((row) => {
@@ -1411,11 +2117,11 @@ limparProjetoFirebaseAnterior();
 
       tr.innerHTML = `
         <td class="col-checkbox"><input type="checkbox" class="cartaz-select-item" data-id="${row.id}" ${window.cartazesSelecionados.has(row.id) ? 'checked' : ''}></td>
-        <td class="col-descricao">${row.descricao}</td>
-        <td class="col-tipo" style="color: ${corDoTipo};">${row.tipo === "PREÇO AVULSO" ? "PLACA AVULSA" : row.tipo}</td>
-        <td class="col-vigencia">${row.vigencia}</td>
-        <td class="col-preco">${row.precoTexto}</td>
-        <td class="col-loja" style="font-weight: bold; color: #555;">${row.loja}</td> <td class="col-salvo">${row.salvoTexto}</td>
+        <td class="col-descricao"><span class="td-marquee-wrap"><span class="td-marquee-text">${row.descricao}</span></span></td>
+        <td class="col-tipo" style="color: ${corDoTipo};"><span class="td-marquee-wrap"><span class="td-marquee-text">${row.tipo === "PREÇO AVULSO" ? "PLACA AVULSA" : row.tipo}</span></span></td>
+        <td class="col-vigencia"><span class="td-marquee-wrap"><span class="td-marquee-text">${row.vigencia}</span></span></td>
+        <td class="col-preco"><span class="td-marquee-wrap"><span class="td-marquee-text">${row.precoTexto}</span></span></td>
+        <td class="col-loja" style="font-weight: bold; color: #555;"><span class="td-marquee-wrap"><span class="td-marquee-text">${row.loja}</span></span></td> <td class="col-salvo"><span class="td-marquee-wrap"><span class="td-marquee-text">${row.salvoTexto}</span></span></td>
         <td class="col-acoes">
           <a href="${pdfUrl}" target="_blank" class="btn-visualizar" title="Visualizar">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1450,6 +2156,26 @@ limparProjetoFirebaseAnterior();
       tabelaBody.appendChild(tr);
     });
 
+    // Calcula localmente quanto cada texto precisa percorrer.
+    // Não faz nenhuma leitura adicional no Firebase.
+    requestAnimationFrame(() => {
+      document.querySelectorAll('#tabela-body-cartazes .td-marquee-wrap').forEach(wrap => {
+        const texto = wrap.querySelector('.td-marquee-text');
+        if (!texto) return;
+        const excesso = Math.ceil(texto.scrollWidth - wrap.clientWidth);
+        if (excesso > 2) {
+          wrap.classList.add('tem-overflow');
+          wrap.style.setProperty('--marquee-distancia', `-${excesso + 8}px`);
+          wrap.style.setProperty('--marquee-duracao', `${Math.max(2.2, excesso / 38).toFixed(2)}s`);
+          wrap.title = texto.textContent.trim();
+        } else {
+          wrap.classList.remove('tem-overflow');
+          wrap.style.removeProperty('--marquee-distancia');
+          wrap.style.removeProperty('--marquee-duracao');
+        }
+      });
+    });
+
     // Sincroniza os checkboxes renderizados com a seleção persistente
     document.querySelectorAll('.cartaz-select-item').forEach(cb => {
       cb.addEventListener('change', () => {
@@ -1460,6 +2186,12 @@ limparProjetoFirebaseAnterior();
           window.cartazesSelecionados.delete(id);
         }
         atualizarCheckboxSelecionarTodos();
+        atualizarContadorSelecionados();
+
+        // Não reordena aqui. Mesmo que a última ordenação tenha sido por
+        // "selecionados", o item permanece exatamente na página/posição atual.
+        // Uma nova ordenação só acontece quando o usuário clicar novamente
+        // no cabeçalho da coluna de seleção.
       });
     });
 
@@ -1481,7 +2213,7 @@ limparProjetoFirebaseAnterior();
     });
 
     atualizarCheckboxSelecionarTodos();
-    destacarInputsCopias();
+    // Dicas de orientação agora são controladas pelo Gerenciador do Modo ADM.
   }
 
   function atualizarCheckboxSelecionarTodos() {
@@ -1503,47 +2235,105 @@ limparProjetoFirebaseAnterior();
   document.getElementById('filtro-preco').addEventListener('input', () => { window.paginaAtual = 1; renderizarTabela(); });
   document.getElementById('filtro-loja').addEventListener('change', () => { window.paginaAtual = 1; renderizarTabela(); });
 
+  document.getElementById('first-page').addEventListener('click', () => {
+    if (window.paginaAtual !== 1) {
+        window.paginaAtual = 1;
+        renderizarTabela();
+    }
+});
   // Eventos dos botões de paginação
-  document.getElementById('prev-page').addEventListener('click', () => {
-      if (window.paginaAtual > 1) {
-          window.paginaAtual--;
-          renderizarTabela();
-          window.scrollTo(0,0);
-      }
-  });
+document.getElementById('prev-page').addEventListener('click', () => {
+    if (window.paginaAtual > 1) {
+        window.paginaAtual--;
+        renderizarTabela();
+    }
+});
 
-  document.getElementById('next-page').addEventListener('click', () => {
-      const totalPaginas = Math.ceil(Object.keys(window.listaCartazesMemoria).length / itensPorPagina);
-      if (window.paginaAtual < totalPaginas) {
-          window.paginaAtual++;
-          renderizarTabela();
-          window.scrollTo(0,0);
-      }
-  });
+document.getElementById('next-page').addEventListener('click', () => {
+    const totalPaginas = Math.ceil(
+        Object.keys(window.listaCartazesMemoria).length / itensPorPagina
+    );
 
-  // Carrega e atualiza a tabela em tempo real varrendo os nós aninhados de cada categoria
-  onValue(cartazesRef, (snapshot) => {
+document.getElementById('last-page').addEventListener('click', () => {
+    if (window.totalPaginasAtual > 0) {
+        window.paginaAtual = window.totalPaginasAtual;
+        renderizarTabela();
+    }
+});
+
+    if (window.paginaAtual < totalPaginas) {
+        window.paginaAtual++;
+        renderizarTabela();
+    }
+});
+
+  // Carrega e atualiza a tabela em tempo real varrendo os nós aninhados de cada categoria.
+  // IMPORTANTE: esta barra NÃO cria nenhuma leitura extra no Firebase.
+  onValue(cartazesRef, async (snapshot) => {
+    atualizarProgressoCartazes({
+      titulo: 'Buscando cartazes...',
+      status: 'Dados recebidos. Preparando cartazes...',
+      detalhe: 'Analisando os registros recebidos...',
+      percentual: 0,
+      indeterminado: false
+    });
+
     if (!snapshot.exists()) {
       window.listaCartazesMemoria = {};
     } else {
       const rawData = snapshot.val();
       const flattenedData = {};
-      
-      // Itera recursivamente para capturar itens independentemente se estão na raiz ou aninhados por tipo
+      const tarefas = [];
+
+      // Monta uma lista LOCAL do que já veio no mesmo snapshot do Firebase.
+      // Nenhuma consulta adicional é feita aqui.
       Object.keys(rawData).forEach(key => {
-        if (rawData[key] && rawData[key].base64) {
-          flattenedData[key] = rawData[key];
-        } else if (typeof rawData[key] === 'object') {
-          Object.keys(rawData[key]).forEach(subKey => {
-            if (rawData[key][subKey] && rawData[key][subKey].base64) {
-              // Constrói o caminho completo da chave para preservação e salvamento corretos
-              flattenedData[`${key}/${subKey}`] = rawData[key][subKey];
-            }
+        const valor = rawData[key];
+        if (valor && valor.base64) {
+          tarefas.push({ id: key, item: valor });
+        } else if (valor && typeof valor === 'object') {
+          Object.keys(valor).forEach(subKey => {
+            tarefas.push({ id: `${key}/${subKey}`, item: valor[subKey] });
           });
         }
       });
+
+      const total = tarefas.length;
+      const lote = 25;
+      let encontrados = 0;
+
+      for (let i = 0; i < total; i++) {
+        const tarefa = tarefas[i];
+        if (tarefa.item && tarefa.item.base64) {
+          flattenedData[tarefa.id] = tarefa.item;
+          encontrados++;
+        }
+
+        const processados = i + 1;
+        if (processados % lote === 0 || processados === total) {
+          const percentual = total ? Math.round((processados / total) * 100) : 100;
+          atualizarProgressoCartazes({
+            titulo: 'Carregando cartazes...',
+            status: `Processando ${processados} de ${total} — ${percentual}%`,
+            detalhe: `${encontrados} cartaz${encontrados === 1 ? '' : 'es'} encontrado${encontrados === 1 ? '' : 's'}`,
+            percentual,
+            indeterminado: false
+          });
+          await aguardarFrameCartazes();
+        }
+      }
+
       window.listaCartazesMemoria = flattenedData;
     }
+
+    atualizarProgressoCartazes({
+      titulo: 'Quase pronto...',
+      status: 'Organizando os cartazes...',
+      detalhe: `${Object.keys(window.listaCartazesMemoria).length} cartaz${Object.keys(window.listaCartazesMemoria).length === 1 ? '' : 'es'} carregado${Object.keys(window.listaCartazesMemoria).length === 1 ? '' : 's'}`,
+      percentual: 100,
+      indeterminado: false
+    });
+    await aguardarFrameCartazes();
 
     // Assim que os dados chegam do Firebase, remove imediatamente os que já expiraram.
     excluirCartazesExpirados(window.listaCartazesMemoria);
@@ -1555,7 +2345,18 @@ limparProjetoFirebaseAnterior();
     Object.keys(window.quantidadeCopiasCartazes).forEach(id => {
       if (!window.listaCartazesMemoria[id]) delete window.quantidadeCopiasCartazes[id];
     });
+    atualizarContadorSelecionados();
     renderizarTabela();
+    ocultarProgressoCartazes();
+  }, (erro) => {
+    console.error('Erro ao carregar cartazes:', erro);
+    atualizarProgressoCartazes({
+      titulo: 'Não foi possível carregar os cartazes',
+      status: 'Ocorreu um erro ao acessar o banco de dados.',
+      detalhe: 'Atualize a página para tentar novamente.',
+      percentual: 0,
+      indeterminado: false
+    });
   });
 
   // Configura os ouvintes de clique nos cabeçalhos ordenáveis
@@ -1573,6 +2374,31 @@ limparProjetoFirebaseAnterior();
     });
   });
 
+  // Ordenação por seleção usa um SNAPSHOT do momento do clique.
+  // Assim, selecionar novos cartazes depois não faz as linhas "pularem"
+  // entre páginas. Só um novo clique no cabeçalho refaz a ordenação.
+  window.snapshotSelecaoOrdenacao = new Set();
+
+  // desc = selecionados primeiro; asc = não selecionados primeiro.
+  const thSelecionados = document.getElementById('th-selecionados');
+  const checkboxSelecionarTodos = document.getElementById('select-all-cartazes');
+
+  checkboxSelecionarTodos.addEventListener('click', (e) => e.stopPropagation());
+
+  thSelecionados.addEventListener('click', () => {
+    // Captura quais cartazes estão selecionados EXATAMENTE neste momento.
+    window.snapshotSelecaoOrdenacao = new Set(window.cartazesSelecionados);
+
+    if (window.currentSortColumn === 'selecionados') {
+      window.currentSortDirection = window.currentSortDirection === 'desc' ? 'asc' : 'desc';
+    } else {
+      window.currentSortColumn = 'selecionados';
+      window.currentSortDirection = 'desc';
+    }
+    window.paginaAtual = 1;
+    renderizarTabela();
+  });
+
   // Evento do Checkbox de "Selecionar Todos"
   document.getElementById('select-all-cartazes').addEventListener('change', (e) => {
     const checkboxes = document.querySelectorAll('.cartaz-select-item');
@@ -1586,6 +2412,27 @@ limparProjetoFirebaseAnterior();
       }
     });
     atualizarCheckboxSelecionarTodos();
+    atualizarContadorSelecionados();
+
+    // Não reordena automaticamente ao selecionar/desmarcar.
+  });
+
+  // Desmarca TODOS os cartazes selecionados, inclusive os que estão em outras páginas.
+  document.getElementById('btn-desmarcar-todos').addEventListener('click', () => {
+    window.cartazesSelecionados.clear();
+
+    // Atualiza apenas os checkboxes atualmente visíveis, sem reordenar a tabela.
+    document.querySelectorAll('.cartaz-select-item').forEach(cb => {
+      cb.checked = false;
+    });
+
+    const selecionarTodos = document.getElementById('select-all-cartazes');
+    if (selecionarTodos) {
+      selecionarTodos.checked = false;
+      selecionarTodos.indeterminate = false;
+    }
+
+    atualizarContadorSelecionados();
   });
 
   // Ação de salvamento em lote dos itens selecionados
@@ -3055,56 +3902,632 @@ if (appMode) {
       loadingOverlay.style.display = 'none';
     }
   });
-</script>
 
 
-  <!-- POP-UP DE AVISO SOBRE OS MODOS DE IMPRESSÃO -->
-  <div id="aviso-impressao-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:20000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
-    <div style="width:min(550px, 90vw); background:#fff; border-radius:14px; box-shadow:0 12px 35px rgba(0,0,0,.28); padding:28px; box-sizing:border-box; text-align:center; color:#222;">
-      <div style="font-size:22px; font-weight:700; color:#213966; margin-bottom:18px;">Novidade na impressão de cartazes</div>
+  // ============================================================
+  // MODO ADM - CONTROLE DE FUNÇÕES POR TIPO DE PLACA
+  // ============================================================
+  const ADM_TIPOS = [
+    'PREÇO AVULSO', 'ENCARTE SEMANAL', 'TERÇA DA CARNE', 'QUINTA DA FEIRA',
+    'FDS DE OFERTAS', 'FECHA MÊS', 'OFERTAS APP', 'OFERTA DO DIA'
+  ];
 
-      <div style="font-size:17px; line-height:1.5; margin-bottom:12px;">
-        Agora, você pode unir <strong>mais de 2 cartazes</strong> na função <strong>“2 páginas por folha”</strong>.
-      </div>
+  const ADM_FUNCOES = [
+    { id:'salvarNovaData',       nome:'💾 Salvar Nova Data' },
+    { id:'combinarCartazes',     nome:'📄 Combinar Cartazes' },
+    { id:'juntarTodos',          nome:'📄 Juntar Todos (PDF único)' },
+    { id:'previewEditor',        nome:'👁 Prévia / Editor do PDF' },
+    { id:'visualizar',           nome:'👁 Visualizar cartaz' },
+    { id:'editar',               nome:'✏️ Editar cartaz' },
+    { id:'baixar',               nome:'⬇️ Baixar cartaz' },
+    { id:'excluir',              nome:'🗑️ Excluir cartaz' },
+    { id:'excluirSelecionados',  nome:'🗑️ Excluir Selecionados' },
+    { id:'excluirIntervalo',     nome:'🗑️ Excluir por Intervalo' }
+  ];
 
-      <div style="font-size:17px; line-height:1.5; margin-bottom:22px;">
-        Para juntar os cartazes num PDF único e imprimir cada um numa <strong>folha inteira</strong>, clique no botão <strong>“1 página por folha”</strong>.
-      </div>
+  const admConfigRef = ref(db, 'configuracoes/permissoesDatas');
+  window.__admAtivo = sessionStorage.getItem('modoAdmDatas') === '1';
+  window.__admPermissoes = {};
 
-      <div style="font-size:17px; line-height:1.5; margin-bottom:32px;">
-        Se quiser clonar o cartaz no PDF digite a quantidade no campo <strong>CÓPIAS</strong>.
-      </div>
+  function admTipoNormalizado(tipo) {
+    let t = String(tipo || 'PREÇO AVULSO').trim().toUpperCase();
+    if (t === 'PLACA AVULSA') t = 'PREÇO AVULSO';
+    if (t === 'OFERTA APP') t = 'OFERTAS APP';
+    return ADM_TIPOS.includes(t) ? t : 'PREÇO AVULSO';
+  }
 
-      <label style="display:flex; align-items:center; justify-content:center; gap:9px; font-size:14px; font-weight:600; cursor:pointer; margin-bottom:22px;">
-        <input type="checkbox" id="nao-exibir-aviso-impressao" style="width:18px; height:18px; cursor:pointer;">
-        Não exibir novamente
-      </label>
+  function admTipoDoItem(item) {
+    let descricao = String(item?.descricaoText || '');
+    if (descricao.startsWith('[')) {
+      const fim = descricao.indexOf(']');
+      if (fim !== -1) return admTipoNormalizado(descricao.substring(1, fim));
+    }
+    return 'PREÇO AVULSO';
+  }
 
-      <button id="fechar-aviso-impressao" type="button" style="border:none; border-radius:7px; background:#213966; color:#fff; font-family:'Oswald',sans-serif; font-weight:700; font-size:16px; padding:10px 32px; cursor:pointer;">
-        ENTENDI
-      </button>
-    </div>
-  </div>
+  function admConfigPadrao() {
+    const cfg = {};
+    ADM_FUNCOES.forEach(f => {
+      cfg[f.id] = {};
+      ADM_TIPOS.forEach(t => cfg[f.id][t] = true);
+    });
+    return cfg;
+  }
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const chaveAviso = 'naoExibirAvisoImpressaoV2';
-      const overlay = document.getElementById('aviso-impressao-overlay');
-      const checkbox = document.getElementById('nao-exibir-aviso-impressao');
-      const btnFechar = document.getElementById('fechar-aviso-impressao');
+  function admPermitido(funcao, tipo) {
+    // ADM autenticado não é bloqueado pelas permissões que ele próprio administra.
+    if (window.__admAtivo) return true;
+    const t = admTipoNormalizado(tipo);
+    const valor = window.__admPermissoes?.[funcao]?.[t];
+    return valor !== false; // ausência de configuração = permitido
+  }
 
-      if (localStorage.getItem(chaveAviso) !== 'true') {
-        overlay.style.display = 'flex';
-      }
+  function admTiposSelecionados() {
+    return Array.from(document.querySelectorAll('.cartaz-select-item:checked')).map(cb => {
+      const item = window.listaCartazesMemoria?.[cb.dataset.id];
+      return { id:cb.dataset.id, tipo:admTipoDoItem(item) };
+    });
+  }
 
-      btnFechar.addEventListener('click', function () {
-        if (checkbox.checked) {
-          localStorage.setItem(chaveAviso, 'true');
-        }
-        overlay.style.display = 'none';
+  function admBloquearSeNecessario(funcao, selecionados, mensagemBase) {
+    if (window.__admAtivo) return false;
+    const bloqueados = selecionados.filter(x => !admPermitido(funcao, x.tipo));
+    if (!bloqueados.length) return false;
+    const tipos = [...new Set(bloqueados.map(x => x.tipo === 'PREÇO AVULSO' ? 'PLACA AVULSA' : x.tipo))];
+    alert(`${mensagemBase || 'Esta função está desativada'} para: ${tipos.join(', ')}.`);
+    return true;
+  }
+
+  function admAtualizarBotao() {
+    const b = document.getElementById('btn-modo-adm');
+    if (b) {
+      b.classList.toggle('ativo', window.__admAtivo);
+      b.textContent = window.__admAtivo ? '🔓 ADM Ativo' : '🔒 Modo ADM';
+    }
+
+    const painelIntervalo = document.getElementById('painel-exclusao-intervalo');
+    if (painelIntervalo) {
+      painelIntervalo.classList.toggle('adm-visivel', window.__admAtivo);
+    }
+  }
+
+  function admAplicarInterface() {
+    admAtualizarBotao();
+    document.querySelectorAll('#tabela-body-cartazes tr').forEach(tr => {
+      const seletor = tr.querySelector('.cartaz-select-item');
+      if (!seletor) return;
+      const item = window.listaCartazesMemoria?.[seletor.dataset.id];
+      const tipo = admTipoDoItem(item);
+      const mapa = [
+        ['.preview-pdf-item','previewEditor'], ['.btn-visualizar','visualizar'],
+        ['.btn-editar','editar'], ['.btn-baixar','baixar'], ['.btn-excluir','excluir']
+      ];
+      mapa.forEach(([sel,funcao]) => {
+        const el = tr.querySelector(sel); if (!el) return;
+        const ok = admPermitido(funcao,tipo);
+        el.classList.toggle('funcao-bloqueada', !ok);
+        el.setAttribute('aria-disabled', ok ? 'false' : 'true');
+        if (el.matches('input')) el.disabled = !ok;
+        if (!ok) el.title = 'Função desativada pelo administrador para este tipo de placa';
       });
     });
-  </script>
+  }
+
+  function admMontarPainel() {
+    const head = document.getElementById('adm-permissoes-head');
+    const body = document.getElementById('adm-permissoes-body');
+    head.innerHTML = `<tr><th>FUNÇÃO</th><th class="adm-todas-cell">TODAS</th>${ADM_TIPOS.map(t=>`<th>${t === 'PREÇO AVULSO' ? 'PLACA AVULSA' : t}</th>`).join('')}</tr>`;
+    body.innerHTML = ADM_FUNCOES.map(f => {
+      const todos = ADM_TIPOS.every(t => window.__admPermissoes?.[f.id]?.[t] !== false);
+      return `<tr data-funcao="${f.id}">
+        <td>${f.nome}</td>
+        <td class="adm-todas-cell"><input type="checkbox" class="adm-check-todas" ${todos?'checked':''} title="Marcar/desmarcar todos desta função"></td>
+        ${ADM_TIPOS.map(t => `<td><input type="checkbox" class="adm-check-tipo" data-tipo="${t}" ${window.__admPermissoes?.[f.id]?.[t] !== false?'checked':''}></td>`).join('')}
+      </tr>`;
+    }).join('');
+  }
+
+  function admAbrirPainel() {
+    admMontarPainel();
+    const m = document.getElementById('adm-modal');
+    m.classList.add('aberto'); m.setAttribute('aria-hidden','false');
+  }
+  function admFecharPainel() {
+    const m = document.getElementById('adm-modal');
+    m.classList.remove('aberto'); m.setAttribute('aria-hidden','true');
+  }
+
+  // OBS.: este PIN protege a interface, não substitui Firebase Authentication/Rules.
+  // Troque o valor abaixo antes de publicar a página.
+  const ADM_PIN = '2026';
+
+  document.getElementById('btn-modo-adm').addEventListener('click', () => {
+    if (!window.__admAtivo) {
+      const pin = prompt('Digite o PIN do administrador:');
+      if (pin === null) return;
+      if (pin !== ADM_PIN) { alert('PIN de administrador incorreto.'); return; }
+      window.__admAtivo = true;
+      sessionStorage.setItem('modoAdmDatas','1');
+      admAtualizarBotao(); admAplicarInterface();
+    }
+    admAbrirPainel();
+  });
+  document.getElementById('adm-fechar').addEventListener('click', admFecharPainel);
+  document.getElementById('adm-modal').addEventListener('click', e => { if (e.target.id === 'adm-modal') admFecharPainel(); });
+  document.getElementById('adm-sair').addEventListener('click', () => {
+    window.__admAtivo = false; sessionStorage.removeItem('modoAdmDatas'); admFecharPainel(); admAplicarInterface();
+  });
+
+  document.getElementById('adm-permissoes-body').addEventListener('change', e => {
+    const tr = e.target.closest('tr'); if (!tr) return;
+    if (e.target.classList.contains('adm-check-todas')) {
+      tr.querySelectorAll('.adm-check-tipo').forEach(c => c.checked = e.target.checked);
+    } else if (e.target.classList.contains('adm-check-tipo')) {
+      const tipos = [...tr.querySelectorAll('.adm-check-tipo')];
+      tr.querySelector('.adm-check-todas').checked = tipos.every(c => c.checked);
+    }
+  });
+
+  document.getElementById('adm-ativar-tudo').addEventListener('click', () => {
+    document.querySelectorAll('#adm-permissoes-body input[type=checkbox]').forEach(c => c.checked = true);
+  });
+  document.getElementById('adm-desativar-tudo').addEventListener('click', () => {
+    document.querySelectorAll('#adm-permissoes-body input[type=checkbox]').forEach(c => c.checked = false);
+  });
+  document.getElementById('adm-salvar').addEventListener('click', async () => {
+    const novo = {};
+    document.querySelectorAll('#adm-permissoes-body tr').forEach(tr => {
+      const f = tr.dataset.funcao; novo[f] = {};
+      tr.querySelectorAll('.adm-check-tipo').forEach(c => novo[f][c.dataset.tipo] = c.checked);
+    });
+    try {
+      await update(admConfigRef, novo);
+      window.__admPermissoes = novo;
+      alert('Configuração administrativa salva com sucesso!');
+      admAplicarInterface();
+    } catch(err) {
+      console.error(err); alert('Não foi possível salvar as permissões no Firebase. Verifique as regras do banco.');
+    }
+  });
+
+  // Recebe as permissões em tempo real.
+  onValue(admConfigRef, snap => {
+    const padrao = admConfigPadrao();
+    const salvo = snap.exists() ? snap.val() : {};
+    ADM_FUNCOES.forEach(f => ADM_TIPOS.forEach(t => {
+      if (typeof salvo?.[f.id]?.[t] === 'boolean') padrao[f.id][t] = salvo[f.id][t];
+    }));
+    window.__admPermissoes = padrao;
+    admAplicarInterface();
+  });
+
+  // Reaplica os estados quando a tabela é recriada/paginada/filtrada.
+  const admObserver = new MutationObserver(() => admAplicarInterface());
+  admObserver.observe(document.getElementById('tabela-body-cartazes'), {childList:true, subtree:true});
+
+  // Bloqueio REAL na interface antes dos handlers já existentes.
+  document.addEventListener('click', e => {
+    const alvo = e.target.closest('#btn-salvar-lote,#btn-unir-cartazes,#btn-juntar-todos,#btn-excluir-selecionados,#btn-excluir-intervalo,.btn-visualizar,.btn-editar,.btn-baixar,.btn-excluir');
+    if (!alvo || window.__admAtivo) return;
+    let funcao = null, itens = [];
+    if (alvo.id === 'btn-salvar-lote') { funcao='salvarNovaData'; itens=admTiposSelecionados(); }
+    else if (alvo.id === 'btn-unir-cartazes') { funcao='combinarCartazes'; itens=admTiposSelecionados(); }
+    else if (alvo.id === 'btn-juntar-todos') { funcao='juntarTodos'; itens=admTiposSelecionados(); }
+    else if (alvo.id === 'btn-excluir-selecionados') { funcao='excluirSelecionados'; itens=admTiposSelecionados(); }
+    else if (alvo.id === 'btn-excluir-intervalo') {
+      // Como a exclusão por intervalo pode atingir vários tipos, exige permissão para todos os tipos existentes no intervalo.
+      funcao='excluirIntervalo'; itens=Object.entries(window.listaCartazesMemoria||{}).map(([id,item])=>({id,tipo:admTipoDoItem(item)}));
+    } else {
+      const tr = alvo.closest('tr'); const cb = tr?.querySelector('.cartaz-select-item');
+      if (!cb) return;
+      const tipo = admTipoDoItem(window.listaCartazesMemoria?.[cb.dataset.id]); itens=[{id:cb.dataset.id,tipo}];
+      if (alvo.matches('.btn-visualizar')) funcao='visualizar';
+      else if (alvo.matches('.btn-editar')) funcao='editar';
+      else if (alvo.matches('.btn-baixar')) funcao='baixar';
+      else if (alvo.matches('.btn-excluir')) funcao='excluir';
+    }
+    if (funcao && admBloquearSeNecessario(funcao,itens,'Função desativada pelo administrador')) {
+      e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
+    }
+  }, true);
+
+  document.addEventListener('change', e => {
+    if (!e.target.classList.contains('preview-pdf-item') || window.__admAtivo) return;
+    const id=e.target.dataset.id, tipo=admTipoDoItem(window.listaCartazesMemoria?.[id]);
+    if (!admPermitido('previewEditor',tipo)) {
+      e.target.checked=false; e.preventDefault(); e.stopImmediatePropagation();
+      alert(`Prévia / Editor do PDF está desativado pelo administrador para ${tipo === 'PREÇO AVULSO' ? 'PLACA AVULSA' : tipo}.`);
+    }
+  }, true);
+
+
+
+  // ============================================================
+  // GERENCIADOR DE DICAS E ORIENTAÇÕES
+  // ============================================================
+  const admDicasRef = ref(db, 'configuracoes/dicasOrientacao');
+  window.__dicasOrientacao = {};
+  let admCampoSelecaoAtual = null;
+  let admElementoHover = null;
+  let orientacaoAtualCleanup = null;
+  let orientacaoTimer = null;
+  let cartazesJaDispararamDicas = false;
+
+  const escHtml = (v='') => String(v).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+  function admNormalizarElementoSelecionado(el) {
+    if (!el) return null;
+    // Se clicar no SVG, path, IMG, SPAN etc. de um controle, usa o controle inteiro.
+    return el.closest('button,a,input,select,textarea,label,th,td,[role="button"]') || el;
+  }
+
+  function admClassesUteis(el) {
+    return [...(el?.classList || [])].filter(c =>
+      !c.startsWith('adm-') &&
+      !c.startsWith('orientacao-') &&
+      c !== 'funcao-bloqueada' &&
+      c !== 'ativo' && c !== 'visivel' && c !== 'aberto'
+    );
+  }
+
+  // Seletor para "TODOS OS ELEMENTOS IGUAIS".
+  // Aqui a classe compartilhada tem prioridade sobre ID, pois o objetivo é alcançar o grupo.
+  function admSelectorElemento(el) {
+    el = admNormalizarElementoSelecionado(el);
+    if (!el || el === document.body || el === document.documentElement) return '';
+    const classes = admClassesUteis(el);
+    const preferidas = ['input-quantidade-copias','btn-visualizar','btn-editar','btn-baixar','btn-excluir','cartaz-select-item','input-filtro','btn-salvar-lote','btn-paginacao'];
+    const pref = preferidas.find(c => classes.includes(c));
+    if (pref) return `.${CSS.escape(pref)}`;
+    if (classes.length) return `${el.tagName.toLowerCase()}.${classes.slice(0,2).map(CSS.escape).join('.')}`;
+    if (el.id) return `#${CSS.escape(el.id)}`;
+    return el.tagName.toLowerCase();
+  }
+
+  function admSelectorElementoUnico(el) {
+    el = admNormalizarElementoSelecionado(el);
+    if (!el || el === document.body || el === document.documentElement) return '';
+    if (el.id) return `#${CSS.escape(el.id)}`;
+    if (el.dataset && el.dataset.id) {
+      const classe = [...el.classList].find(c => !c.startsWith('adm-') && !c.startsWith('orientacao-'));
+      if (classe) return `.${CSS.escape(classe)}[data-id="${CSS.escape(el.dataset.id)}"]`;
+      return `${el.tagName.toLowerCase()}[data-id="${CSS.escape(el.dataset.id)}"]`;
+    }
+    const partes=[];
+    let atual=el;
+    while(atual && atual!==document.body && partes.length<5){
+      if(atual.id){ partes.unshift(`#${CSS.escape(atual.id)}`); break; }
+      let parte=atual.tagName.toLowerCase();
+      const pai=atual.parentElement;
+      if(pai){
+        const iguais=[...pai.children].filter(x=>x.tagName===atual.tagName);
+        if(iguais.length>1) parte += `:nth-of-type(${iguais.indexOf(atual)+1})`;
+      }
+      partes.unshift(parte); atual=pai;
+    }
+    return partes.join(' > ');
+  }
+
+  function admAtualizarAlvoPorAplicacao() {
+    const modo=document.querySelector('input[name="adm-dica-aplicacao"]:checked')?.value || 'unico';
+    const unico=document.getElementById('adm-dica-alvo-unico').value;
+    const todos=document.getElementById('adm-dica-alvo-todos').value;
+    document.getElementById('adm-dica-alvo').value = modo==='todos' ? (todos||unico) : (unico||todos);
+  }
+
+  function admRotuloElemento(el) {
+    if (!el) return '';
+    return (el.getAttribute('title') || el.getAttribute('aria-label') || el.innerText || el.value || el.placeholder || el.id || el.className || el.tagName).toString().trim().replace(/\s+/g,' ').slice(0,120);
+  }
+
+  function admIniciarSelecao(campo) {
+    admCampoSelecaoAtual = campo;
+    admFecharPainel();
+    document.body.classList.add('modo-selecionar-dica');
+    document.getElementById('adm-selecao-banner').classList.add('visivel');
+  }
+
+  function admEncerrarSelecao(cancelar=false) {
+    document.body.classList.remove('modo-selecionar-dica');
+    document.getElementById('adm-selecao-banner').classList.remove('visivel');
+    if (admElementoHover) admElementoHover.classList.remove('adm-elemento-hover');
+    admElementoHover = null;
+    admCampoSelecaoAtual = null;
+    if (!cancelar) admAbrirPainel();
+    else admAbrirPainel();
+  }
+
+  document.addEventListener('mouseover', e => {
+    if (!admCampoSelecaoAtual) return;
+    if (e.target.closest('#adm-selecao-banner')) return;
+    if (admElementoHover) admElementoHover.classList.remove('adm-elemento-hover');
+    admElementoHover = e.target;
+    admElementoHover.classList.add('adm-elemento-hover');
+  }, true);
+
+  document.addEventListener('click', e => {
+    if (!admCampoSelecaoAtual) return;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    const el = admNormalizarElementoSelecionado(e.target);
+    const seletor = admSelectorElemento(el);
+    if (!seletor) return;
+    const prefixo = admCampoSelecaoAtual === 'alvo' ? 'adm-dica-alvo' : 'adm-dica-gatilho';
+    if (admCampoSelecaoAtual === 'alvo') {
+      const seletorUnico = admSelectorElementoUnico(el);
+      document.getElementById('adm-dica-alvo-unico').value = seletorUnico;
+      document.getElementById('adm-dica-alvo-todos').value = seletor;
+      admAtualizarAlvoPorAplicacao();
+      const qtd = (()=>{ try{return document.querySelectorAll(seletor).length;}catch(_e){return 1;} })();
+      document.getElementById('adm-dica-alvo-label').textContent = `Selecionado: ${admRotuloElemento(el)}  •  ${seletor}  •  ${qtd} elemento(s) igual(is)`;
+    } else {
+      document.getElementById(prefixo).value = seletor;
+      document.getElementById(prefixo+'-label').textContent = `Selecionado: ${admRotuloElemento(el)}  •  ${seletor}`;
+    }
+    admEncerrarSelecao(false);
+  }, true);
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && admCampoSelecaoAtual) admEncerrarSelecao(true); });
+
+  function admLimparFormularioDica() {
+    document.getElementById('adm-dica-id').value='';
+    document.getElementById('adm-dica-titulo').value='';
+    document.getElementById('adm-dica-texto').value='';
+    document.getElementById('adm-dica-tipo').value='balao';
+    document.getElementById('adm-dica-alvo').value='';
+    document.getElementById('adm-dica-alvo-unico').value='';
+    document.getElementById('adm-dica-alvo-todos').value='';
+    document.querySelector('input[name="adm-dica-aplicacao"][value="unico"]').checked=true;
+    document.getElementById('adm-dica-alvo-label').textContent='';
+    document.getElementById('adm-dica-duracao').value='10000';
+    document.getElementById('adm-dica-quando').value='abrir';
+    document.getElementById('adm-dica-gatilho').value='';
+    document.getElementById('adm-dica-gatilho-label').textContent='';
+    document.getElementById('adm-dica-frequencia').value='acesso';
+    document.getElementById('adm-dica-destaque').value='contorno';
+    document.getElementById('adm-dica-sequencia').value='';
+    document.getElementById('adm-dica-ordem').value='1';
+    document.getElementById('adm-dica-ativa').checked=true;
+    admAtualizarCampoGatilho();
+  }
+
+  function admAtualizarCampoGatilho() {
+    document.getElementById('adm-gatilho-wrap').style.display = document.getElementById('adm-dica-quando').value === 'clique' ? 'flex' : 'none';
+  }
+
+  function admAbrirFormularioDica(dica=null) {
+    admLimparFormularioDica();
+    if (dica) {
+      document.getElementById('adm-dica-id').value=dica.id || '';
+      document.getElementById('adm-dica-titulo').value=dica.titulo || '';
+      document.getElementById('adm-dica-texto').value=dica.texto || '';
+      document.getElementById('adm-dica-tipo').value=dica.tipo || 'balao';
+      document.getElementById('adm-dica-alvo-unico').value=dica.alvoUnico || dica.alvo || '';
+      document.getElementById('adm-dica-alvo-todos').value=dica.alvoTodos || dica.alvo || '';
+      const aplicacao=dica.aplicacao || 'unico';
+      const radioAplicacao=document.querySelector(`input[name="adm-dica-aplicacao"][value="${aplicacao}"]`);
+      if(radioAplicacao) radioAplicacao.checked=true;
+      admAtualizarAlvoPorAplicacao();
+      document.getElementById('adm-dica-alvo-label').textContent=dica.alvoLabel ? `Selecionado: ${dica.alvoLabel}  •  ${dica.alvo||''}` : '';
+      document.getElementById('adm-dica-duracao').value=String(dica.duracao ?? 10000);
+      document.getElementById('adm-dica-quando').value=dica.quando || 'abrir';
+      document.getElementById('adm-dica-gatilho').value=dica.gatilho || '';
+      document.getElementById('adm-dica-gatilho-label').textContent=dica.gatilhoLabel ? `Selecionado: ${dica.gatilhoLabel}  •  ${dica.gatilho||''}` : '';
+      document.getElementById('adm-dica-frequencia').value=dica.frequencia || 'acesso';
+      document.getElementById('adm-dica-destaque').value=dica.destaque || 'nenhum';
+      document.getElementById('adm-dica-sequencia').value=dica.sequencia || '';
+      document.getElementById('adm-dica-ordem').value=dica.ordem || 1;
+      document.getElementById('adm-dica-ativa').checked=dica.ativa !== false;
+      admAtualizarCampoGatilho();
+    }
+    document.getElementById('adm-dica-form').classList.add('aberto');
+    document.getElementById('adm-dica-titulo').focus();
+  }
+
+  function admRenderizarDicas() {
+    const lista = document.getElementById('adm-dicas-lista');
+    const dicas = Object.entries(window.__dicasOrientacao || {}).map(([id,d])=>({id,...d})).sort((a,b)=>(a.sequencia||'').localeCompare(b.sequencia||'') || Number(a.ordem||1)-Number(b.ordem||1));
+    if (!dicas.length) { lista.innerHTML='<div style="padding:12px;border:1px dashed #cbd2dc;border-radius:8px;color:#68727e;font-size:12px;">Nenhuma orientação cadastrada. Clique em <b>+ Nova orientação</b>.</div>'; return; }
+    lista.innerHTML=dicas.map(d=>`<div class="adm-dica-item ${d.ativa===false?'inativa':''}" data-id="${escHtml(d.id)}"><div><div class="adm-dica-item-titulo">${d.ativa===false?'⚪':'🟢'} ${escHtml(d.titulo||'Sem título')}</div><div class="adm-dica-item-meta">${escHtml(d.tipo||'balao')} • ${escHtml(d.quando||'abrir')} • ${escHtml(d.frequencia||'sempre')} • ${d.aplicacao==='todos'?'todos os elementos iguais':'somente o selecionado'}${d.sequencia?` • sequência: ${escHtml(d.sequencia)} #${Number(d.ordem||1)}`:''}</div><div class="adm-dica-item-texto">${escHtml(d.texto||'')}</div></div><div class="adm-dica-item-acoes"><button class="adm-dica-editar">Editar</button><button class="adm-dica-toggle">${d.ativa===false?'Ativar':'Desativar'}</button><button class="adm-dica-excluir">Excluir</button></div></div>`).join('');
+  }
+
+  document.getElementById('adm-nova-dica').addEventListener('click',()=>admAbrirFormularioDica());
+  document.getElementById('adm-dica-cancelar').addEventListener('click',()=>document.getElementById('adm-dica-form').classList.remove('aberto'));
+  document.getElementById('adm-dica-quando').addEventListener('change',admAtualizarCampoGatilho);
+  document.getElementById('adm-selecionar-alvo').addEventListener('click',()=>admIniciarSelecao('alvo'));
+  document.getElementById('adm-selecionar-gatilho').addEventListener('click',()=>admIniciarSelecao('gatilho'));
+  document.querySelectorAll('input[name="adm-dica-aplicacao"]').forEach(r=>r.addEventListener('change',admAtualizarAlvoPorAplicacao));
+
+  document.getElementById('adm-dica-salvar').addEventListener('click', async () => {
+    const idExistente=document.getElementById('adm-dica-id').value.trim();
+    const titulo=document.getElementById('adm-dica-titulo').value.trim();
+    const textoDica=document.getElementById('adm-dica-texto').value.trim();
+    const tipo=document.getElementById('adm-dica-tipo').value;
+    admAtualizarAlvoPorAplicacao();
+    const alvo=document.getElementById('adm-dica-alvo').value.trim();
+    const aplicacao=document.querySelector('input[name="adm-dica-aplicacao"]:checked')?.value || 'unico';
+    const alvoUnico=document.getElementById('adm-dica-alvo-unico').value.trim();
+    const alvoTodos=document.getElementById('adm-dica-alvo-todos').value.trim();
+    const quando=document.getElementById('adm-dica-quando').value;
+    const gatilho=document.getElementById('adm-dica-gatilho').value.trim();
+    if (!titulo || !textoDica) { alert('Preencha o título e o texto da orientação.'); return; }
+    if (tipo === 'balao' && !alvo) { alert('Para uma orientação do tipo Balão, selecione onde ela deve apontar.'); return; }
+    if (quando === 'clique' && !gatilho) { alert('Selecione o elemento que deverá disparar a orientação ao ser clicado.'); return; }
+    const id=idExistente || `dica_${Date.now()}`;
+    const dica={
+      titulo, texto:textoDica, tipo, alvo, aplicacao, alvoUnico, alvoTodos,
+      alvoLabel:document.getElementById('adm-dica-alvo-label').textContent.replace(/^Selecionado:\s*/,'').split('  •  ')[0],
+      duracao:Number(document.getElementById('adm-dica-duracao').value), quando, gatilho,
+      gatilhoLabel:document.getElementById('adm-dica-gatilho-label').textContent.replace(/^Selecionado:\s*/,'').split('  •  ')[0],
+      frequencia:document.getElementById('adm-dica-frequencia').value,
+      destaque:document.getElementById('adm-dica-destaque').value,
+      sequencia:document.getElementById('adm-dica-sequencia').value.trim(),
+      ordem:Math.max(1,parseInt(document.getElementById('adm-dica-ordem').value,10)||1),
+      ativa:document.getElementById('adm-dica-ativa').checked,
+      atualizadoEm:Date.now()
+    };
+    try { await update(admDicasRef,{[id]:dica}); document.getElementById('adm-dica-form').classList.remove('aberto'); alert('Orientação salva com sucesso!'); }
+    catch(err){ console.error(err); alert('Não foi possível salvar a orientação no Firebase.'); }
+  });
+
+  document.getElementById('adm-dicas-lista').addEventListener('click', async e => {
+    const item=e.target.closest('.adm-dica-item'); if(!item) return;
+    const id=item.dataset.id, dica=window.__dicasOrientacao?.[id]; if(!dica) return;
+    if(e.target.classList.contains('adm-dica-editar')) admAbrirFormularioDica({id,...dica});
+    if(e.target.classList.contains('adm-dica-toggle')) { try{ await update(ref(db,`configuracoes/dicasOrientacao/${id}`),{ativa:dica.ativa===false, atualizadoEm:Date.now()}); }catch(err){alert('Não foi possível alterar o estado da orientação.');} }
+    if(e.target.classList.contains('adm-dica-excluir')) { if(confirm(`Excluir a orientação "${dica.titulo||'Sem título'}"?`)) { try{ await remove(ref(db,`configuracoes/dicasOrientacao/${id}`)); }catch(err){alert('Não foi possível excluir a orientação.');} } }
+  });
+
+  function orientacaoChave(d){ return `orientacao_${d.id}_${d.atualizadoEm||0}`; }
+  function orientacaoPodeExibir(d){
+    if(d.ativa===false) return false;
+    const k=orientacaoChave(d);
+    if(d.frequencia==='acesso' && sessionStorage.getItem(k)==='1') return false;
+    if(d.frequencia==='dispositivo' && localStorage.getItem(k)==='1') return false;
+    return true;
+  }
+  function orientacaoMarcarExibida(d){ const k=orientacaoChave(d); if(d.frequencia==='acesso') sessionStorage.setItem(k,'1'); if(d.frequencia==='dispositivo') localStorage.setItem(k,'1'); }
+  function orientacaoLimparAtual(){
+    clearTimeout(orientacaoTimer); orientacaoTimer=null;
+    if(orientacaoAtualCleanup){ orientacaoAtualCleanup(); orientacaoAtualCleanup=null; }
+    document.querySelectorAll('.orientacao-balao,.orientacao-overlay,.orientacao-faixa').forEach(x=>x.remove());
+    document.querySelectorAll('.orientacao-destaque-contorno,.orientacao-destaque-piscar,.orientacao-destaque-pulsar').forEach(x=>x.classList.remove('orientacao-destaque-contorno','orientacao-destaque-piscar','orientacao-destaque-pulsar'));
+  }
+  function orientacaoDestacar(el,tipo){ if(!el||tipo==='nenhum')return; el.classList.add(`orientacao-destaque-${tipo}`); }
+
+  // Resolve os alvos de forma robusta para IDs, classes, seletores compostos
+  // e elementos que são recriados dinamicamente (como linhas da tabela).
+  function orientacaoResolverAlvos(d){
+    const seletores=[];
+    if(d.aplicacao==='todos') {
+      if(d.alvoTodos) seletores.push(d.alvoTodos);
+      if(d.alvo) seletores.push(d.alvo);
+      if(d.alvoUnico) seletores.push(d.alvoUnico);
+    } else {
+      if(d.alvoUnico) seletores.push(d.alvoUnico);
+      if(d.alvo) seletores.push(d.alvo);
+      if(d.alvoTodos) seletores.push(d.alvoTodos);
+    }
+
+    for(const seletor of [...new Set(seletores.filter(Boolean))]){
+      try{
+        const encontrados=[...document.querySelectorAll(seletor)];
+        if(encontrados.length){
+          return d.aplicacao==='todos' ? encontrados : [encontrados[0]];
+        }
+      }catch(_e){}
+    }
+    return [];
+  }
+  function orientacaoPosicionarBalao(box,el){
+    const r=el.getBoundingClientRect(), m=12, bw=box.offsetWidth, bh=box.offsetHeight;
+    let left=r.right+m, top=r.top+r.height/2-bh/2;
+    if(left+bw>window.innerWidth-m) left=r.left-bw-m;
+    if(left<m) left=m;
+    top=Math.max(m,Math.min(top,window.innerHeight-bh-m));
+    box.style.left=`${left}px`; box.style.top=`${top}px`;
+  }
+
+  function orientacaoGrupoDa(d){
+    if(!d.sequencia) return [d];
+    return Object.entries(window.__dicasOrientacao||{}).map(([id,x])=>({id,...x})).filter(x=>x.ativa!==false && x.sequencia===d.sequencia).sort((a,b)=>Number(a.ordem||1)-Number(b.ordem||1));
+  }
+
+  function orientacaoExibir(d, grupo=null, indice=0){
+    orientacaoLimparAtual();
+    if(!d || !orientacaoPodeExibir(d)) return;
+    grupo=grupo||orientacaoGrupoDa(d);
+    let alvo=null, alvos=orientacaoResolverAlvos(d);
+    alvo = alvos.find(el=>{
+      const r=el.getBoundingClientRect();
+      return r.width>0 && r.height>0 && r.bottom>=0 && r.top<=window.innerHeight && r.right>=0 && r.left<=window.innerWidth;
+    }) || alvos[0] || null;
+
+    // Balão precisa de um alvo. Se o elemento ainda não existe (ex.: tabela ainda
+    // carregando), tenta novamente por alguns segundos em vez de perder a dica.
+    if(d.tipo==='balao' && !alvo){
+      const tentativas=Number(d.__tentativasAlvo||0);
+      if(tentativas<20){
+        setTimeout(()=>orientacaoExibir({...d,__tentativasAlvo:tentativas+1},grupo,indice),250);
+      } else {
+        // Se um alvo da sequência não existir nesta tela, não trava o tutorial:
+        // pula para a próxima orientação do grupo.
+        const prox=grupo[indice+1];
+        if(prox) orientacaoExibirForcado(prox,grupo,indice+1);
+        else orientacaoLimparAtual();
+      }
+      return;
+    }
+    orientacaoMarcarExibida(d);
+    alvos.forEach(el=>orientacaoDestacar(el,d.destaque||'nenhum'));
+    const temSeq=grupo.length>1;
+    const nav=temSeq?`<div class="orientacao-nav"><span>${indice+1} de ${grupo.length}</span>${indice>0?'<button data-nav="ant">Anterior</button>':''}<button data-nav="prox">${indice===grupo.length-1?'Entendi':'Próxima'}</button></div>`:'';
+    let box;
+    if(d.tipo==='popup'){
+      const ov=document.createElement('div'); ov.className='orientacao-overlay';
+      ov.innerHTML=`<div class="orientacao-popup"><button class="orientacao-fechar" title="Fechar">×</button><h5>${escHtml(d.titulo)}</h5><p>${escHtml(d.texto)}</p>${nav}</div>`;
+      document.body.appendChild(ov); box=ov.querySelector('.orientacao-popup');
+    } else if(d.tipo==='faixa'){
+      box=document.createElement('div'); box.className='orientacao-faixa'; box.innerHTML=`<button class="orientacao-fechar" title="Fechar">×</button><strong>${escHtml(d.titulo)}</strong><div>${escHtml(d.texto).replace(/\n/g,'<br>')}</div>${nav}`; document.body.appendChild(box);
+    } else {
+      box=document.createElement('div'); box.className='orientacao-balao'; box.innerHTML=`<button class="orientacao-fechar" title="Fechar">×</button><h5>${escHtml(d.titulo)}</h5><p>${escHtml(d.texto)}</p>${nav}`; document.body.appendChild(box); orientacaoPosicionarBalao(box,alvo);
+      const repos=()=>orientacaoPosicionarBalao(box,alvo); window.addEventListener('resize',repos); window.addEventListener('scroll',repos,true); orientacaoAtualCleanup=()=>{window.removeEventListener('resize',repos);window.removeEventListener('scroll',repos,true);};
+    }
+    const fechar=()=>orientacaoLimparAtual();
+    const avancar=()=>{
+      const prox=grupo[indice+1];
+      if(prox) orientacaoExibirForcado(prox,grupo,indice+1);
+      else fechar();
+    };
+    // Em uma sequência, fechar a dica atual também continua para a próxima.
+    // Fora de sequência, o X apenas fecha normalmente.
+    box.querySelector('.orientacao-fechar')?.addEventListener('click',()=>{
+      if(grupo.length>1 && indice<grupo.length-1) avancar();
+      else fechar();
+    });
+    box.querySelector('[data-nav="ant"]')?.addEventListener('click',()=>{ const ant=grupo[indice-1]; if(ant) orientacaoExibirForcado(ant,grupo,indice-1); });
+    box.querySelector('[data-nav="prox"]')?.addEventListener('click',avancar);
+    // 5s/10s: avança automaticamente. "Até fechar": avança pelo X ou botão Próxima.
+    if(Number(d.duracao)>0){ orientacaoTimer=setTimeout(avancar,Number(d.duracao)); }
+  }
+
+  function orientacaoExibirForcado(d,grupo,indice){
+    // Dentro de uma sequência, navegação não deve ser bloqueada pela frequência.
+    const freq=d.frequencia; d={...d,frequencia:'sempre'}; orientacaoExibir(d,grupo,indice); d.frequencia=freq;
+  }
+
+  function orientacoesDisparar(quando, gatilhoEl=null){
+    const todas=Object.entries(window.__dicasOrientacao||{}).map(([id,d])=>({id,...d})).filter(d=>d.ativa!==false && d.quando===quando);
+    const candidatas=todas.filter(d=>{ if(quando!=='clique') return true; if(!d.gatilho||!gatilhoEl)return false; try{return !!gatilhoEl.closest(d.gatilho);}catch(_e){return false;} });
+    const inicios=candidatas.filter(d=>!d.sequencia || Number(d.ordem||1)===Math.min(...candidatas.filter(x=>x.sequencia===d.sequencia).map(x=>Number(x.ordem||1))));
+    const primeira=inicios.find(orientacaoPodeExibir); if(primeira) orientacaoExibir(primeira);
+  }
+
+  onValue(admDicasRef, snap=>{
+    window.__dicasOrientacao=snap.exists()?snap.val():{};
+    admRenderizarDicas();
+    // Dicas de abertura são avaliadas após o Firebase carregar a configuração.
+    setTimeout(()=>orientacoesDisparar('abrir'),150);
+  });
+
+  // Usa CAPTURE para as dicas acionadas por clique. Assim botões continuam disparando
+  // a orientação mesmo quando o próprio botão possui listeners que interrompem a propagação.
+  document.addEventListener('click',e=>{
+    if(admCampoSelecaoAtual || e.target.closest('.orientacao-balao,.orientacao-overlay,.orientacao-faixa,#adm-modal')) return;
+    orientacoesDisparar('clique', admNormalizarElementoSelecionado(e.target));
+  },true);
+
+  // Detecta a primeira carga real dos cartazes sem acoplar textos ou seletores ao renderizador.
+  const dicasCartazesObserver=new MutationObserver(()=>{
+    if(cartazesJaDispararamDicas) return;
+    if(document.querySelector('#tabela-body-cartazes tr')){ cartazesJaDispararamDicas=true; setTimeout(()=>orientacoesDisparar('cartazes'),100); }
+  });
+  dicasCartazesObserver.observe(document.getElementById('tabela-body-cartazes'),{childList:true});
+
+  admAtualizarBotao();
+
+
+</script>
+
 
 </body>
 </html>
