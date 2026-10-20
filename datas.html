@@ -946,6 +946,38 @@
     #suporte-loja-cancelar { background:#e2e5e9; color:#333; }
     #suporte-loja-confirmar { background:#213966; color:#fff; }
 
+
+    /* Botão flutuante de suporte no canto inferior direito */
+    #btn-fale-com-suporte {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 13000;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 5px 10px;
+      border: 0;
+      border-radius: 999px;
+      background: #213966;
+      color: #fff;
+      font: 15px 'Gidole', sans-serif;
+      box-shadow: 0 5px 18px rgba(0,0,0,.28);
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+    #btn-fale-com-suporte:hover {
+      background: #ff8a1c;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(0,0,0,.3);
+    }
+    #btn-fale-com-suporte:active { transform: translateY(1px); }
+    #btn-fale-com-suporte:disabled { opacity: .65; cursor: wait; }
+    @media (max-width: 600px) {
+      #btn-fale-com-suporte { right: 12px; bottom: 12px; padding: 12px 16px; font-size: 14px; }
+    }
+
   </style>
 </head>
 <body>
@@ -1097,10 +1129,15 @@
         <div id="progresso-cartazes-trilho" class="progresso-cartazes-trilho indeterminado">
           <div id="progresso-cartazes-barra" class="progresso-cartazes-barra"></div>
         </div>
-        <div id="progresso-cartazes-detalhe" class="progresso-cartazes-detalhe">Caso não carregue, <span id="link-suporte-telegram" role="button" tabindex="0">clique aqui</span></div>
+        <div id="progresso-cartazes-detalhe" class="progresso-cartazes-detalhe">Caso não carregue, <span id="link-suporte-telegram" role="button" tabindex="0">clique aqui para abrir um chamado</span></div>
       </div>
     </div>
   </div>
+
+
+  <button type="button" id="btn-fale-com-suporte" aria-label="Fale com o suporte">
+    <span aria-hidden="true">💬</span> Fale com o suporte
+  </button>
 
   <div id="contador-cartazes-selecionados" aria-live="polite">
     <span id="contador-cartazes-selecionados-texto">0 cartazes selecionados</span>
@@ -1217,7 +1254,7 @@
       </select>
       <div class="suporte-loja-acoes">
         <button type="button" id="suporte-loja-cancelar">Cancelar</button>
-        <button type="button" id="suporte-loja-confirmar">Salvar e enviar</button>
+        <button type="button" id="suporte-loja-confirmar">ABRIR CHAMADO</button>
       </div>
     </div>
   </div>
@@ -1552,90 +1589,88 @@ function posicionarDica() {
     });
   }
 
-  async function enviarAlertaSuporteTelegram() {
-    const link = document.getElementById('link-suporte-telegram');
-    const detalhe = document.getElementById('progresso-cartazes-detalhe');
-    if (!link || !detalhe || link.classList.contains('enviando')) return;
+  // Abre chat.html em uma nova aba após identificar/confirmar a loja.
+  async function enviarAlertaSuporteTelegram(origem) {
+    const controle = origem || document.getElementById('link-suporte-telegram');
+    if (!controle || controle.classList.contains('enviando') || controle.disabled) return;
 
-    link.classList.add('enviando');
+    controle.classList.add('enviando');
+    if (controle.tagName === 'BUTTON') controle.disabled = true;
 
-    // Registra o tempo no exato momento do clique que iniciou o chamado.
-    // Assim, o tempo gasto escolhendo a loja na primeira utilização não entra na medição.
-    const tempoAteChamado = formatarTempoAteChamado(performance.now() - INICIO_PAGINA_SUPORTE);
+    const textoOriginal = controle.tagName === 'BUTTON'
+      ? controle.innerHTML
+      : 'clique aqui para abrir um chamado';
 
     let loja = obterLojaSuporteSalva();
     if (!loja) {
-      link.textContent = 'identificando loja...';
-      loja = await solicitarLojaSuporte();
-      if (!loja) {
-        link.classList.remove('enviando');
-        link.textContent = 'clique aqui';
-        return;
+      if (controle.tagName === 'BUTTON') {
+        controle.innerHTML = '<span aria-hidden="true">💬</span> Identificando loja...';
+      } else {
+        controle.textContent = 'identificando loja...';
       }
+      loja = await solicitarLojaSuporte();
     }
 
-    link.textContent = 'enviando...';
-    const agora = new Date();
+    if (!loja) {
+      controle.classList.remove('enviando');
+      if (controle.tagName === 'BUTTON') {
+        controle.disabled = false;
+        controle.innerHTML = textoOriginal;
+      } else {
+        controle.textContent = 'clique aqui para abrir um chamado';
+      }
+      return;
+    }
 
-let numeroChamado = parseInt(
-  localStorage.getItem('numeroChamadoSuporte') || '0',
-  10
-);
+    // Mantém a identificação para que o chat abra já associado à loja escolhida.
+    try { localStorage.setItem('chat_store', loja); } catch (_) {}
 
-numeroChamado++;
+    const urlChat = new URL('chat.html', window.location.href);
+    urlChat.searchParams.set('loja', loja);
 
-localStorage.setItem('numeroChamadoSuporte', numeroChamado);
+    // Abre a página do chat em uma nova aba.
+    const abaChat = window.open(urlChat.href, '_blank');
+    controle.classList.remove('enviando');
 
-const mensagem = [
-  `⚠️ <strong>CHAMADO ${loja} - Nº ${numeroChamado}</strong>`,
-  '',
-  'O usuário informou que os cartazes não carregaram.',
-      '',
-  `<strong>Loja:</strong> ${loja}`,
-  `<strong>Página:</strong> Cartazes Salvos`,
-  `<strong>Tempo até o chamado:</strong> ${tempoAteChamado}`,
-  `<strong>Data/Hora:</strong> ${agora.toLocaleString('pt-BR')}`,
-      '',
-      '🖥️ LOG DO NAVEGADOR:',
-      typeof window.obterLogsSuporte === 'function'
-        ? window.obterLogsSuporte(2800)
-        : 'Captura de log indisponível.'
-    ].join('\n');
+    if (controle.tagName === 'BUTTON') {
+      controle.disabled = false;
+      controle.innerHTML = textoOriginal;
+    } else if (!abaChat) {
+      controle.textContent = 'loja identificada — clique para abrir o chat';
+    } else {
+      controle.textContent = 'abrir chat novamente';
+    }
 
-    try {
-      const resposta = await fetch(`https://api.telegram.org/bot${TELEGRAM_SUPORTE_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-        body: new URLSearchParams({
-          chat_id: TELEGRAM_SUPORTE_CHAT_ID,
-          text: mensagem,
-          parse_mode: 'HTML'
-        })
-      });
-      const resultado = await resposta.json();
-      if (!resposta.ok || !resultado.ok) throw new Error(resultado.description || 'Falha no Telegram');
-
-      detalhe.textContent = '✅ Suporte notificado';
-    } catch (erro) {
-      console.error('Erro ao notificar suporte pelo Telegram:', erro);
-      detalhe.innerHTML = 'Não foi possível notificar o suporte. <span id="link-suporte-telegram" role="button" tabindex="0">Tentar novamente</span>';
+    if (!abaChat) {
+      // Se o navegador bloquear a nova aba, a loja permanece identificada;
+      // um novo clique poderá tentar abrir o chat novamente.
+      console.warn('O navegador bloqueou a abertura de chat.html. Permita pop-ups para este site.');
     }
   }
 
   document.addEventListener('click', (event) => {
-    if (event.target && event.target.id === 'link-suporte-telegram') {
+    const alvo = event.target;
+    if (!alvo) return;
+
+    if (alvo.closest && alvo.closest('#link-suporte-telegram')) {
       event.preventDefault();
-      enviarAlertaSuporteTelegram();
+      enviarAlertaSuporteTelegram(document.getElementById('link-suporte-telegram'));
+      return;
+    }
+
+    if (alvo.closest && alvo.closest('#btn-fale-com-suporte')) {
+      event.preventDefault();
+      enviarAlertaSuporteTelegram(document.getElementById('btn-fale-com-suporte'));
     }
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.target && event.target.id === 'link-suporte-telegram' && (event.key === 'Enter' || event.key === ' ')) {
+    if (event.target && event.target.id === 'link-suporte-telegram' &&
+        (event.key === 'Enter' || event.key === ' ')) {
       event.preventDefault();
-      enviarAlertaSuporteTelegram();
+      enviarAlertaSuporteTelegram(event.target);
     }
   });
-
 
 </script>
 
@@ -2098,7 +2133,7 @@ limparProjetoFirebaseAnterior();
     if (status != null) elStatus.textContent = status;
     if (detalhe != null) {
       if (detalhe === 'SUPORTE_TELEGRAM') {
-        elDetalhe.innerHTML = 'Caso não carregue, <span id="link-suporte-telegram" role="button" tabindex="0">clique aqui</span>';
+        elDetalhe.innerHTML = 'Caso não carregue, <span id="link-suporte-telegram" role="button" tabindex="0">clique aqui para abrir um chamado</span>';
       } else {
         elDetalhe.textContent = detalhe;
       }
