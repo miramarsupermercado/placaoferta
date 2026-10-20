@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat de Suporte - Lojas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 h-screen flex flex-col justify-center items-center">
+
+    <!-- Tela de Seleção de Loja (1 a 10) -->
+    <div id="store-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full text-center max-h-[90vh] flex flex-col">
+            <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                <i class="fa-solid fa-store"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-1">Identificação da Loja</h2>
+            <p class="text-slate-600 mb-4 text-xs">Selecione a sua unidade para iniciar o atendimento:</p>
+            
+            <!-- Lista com scroll para as 10 lojas -->
+            <div id="stores-list-container" class="space-y-2 mb-2 overflow-y-auto pr-1 flex-1">
+                <!-- Gerado via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Principal do Chat -->
+    <div class="w-full max-w-2xl bg-white h-full md:h-[85vh] md:rounded-2xl shadow-xl flex flex-col overflow-hidden">
+        
+        <!-- Cabeçalho do Chat (Sem o botão de trocar loja) -->
+        <div class="bg-blue-600 text-white p-4 flex items-center justify-between shadow-md">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Suporte</h1>
+                    <p id="current-store-display" class="text-xs text-blue-100">Nenhuma loja selecionada</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Corpo de Mensagens -->
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50"></div>
+
+        <!-- Pré-visualização de imagem anexada -->
+        <div id="image-preview-container" class="hidden px-4 pt-2 bg-white border-t border-slate-200 flex items-center space-x-3">
+            <img id="image-preview" class="w-16 h-16 object-cover rounded-lg border border-slate-300">
+            <div class="flex-1 text-xs text-slate-600 font-medium">Imagem pronta para envio</div>
+            <button onclick="cancelImage()" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <!-- Caixa de Entrada de Mensagem -->
+        <form id="chat-form" onsubmit="sendMessage(event)" class="bg-white p-3 border-t border-slate-200 flex items-center space-x-2">
+            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+            <button type="button" onclick="document.getElementById('file-input').click()" class="text-slate-500 hover:text-blue-600 p-2.5 rounded-xl transition">
+                <i class="fa-solid fa-paperclip text-lg"></i>
+            </button>
+            <input type="text" id="message-input" placeholder="Digite sua mensagem ou cole um print (Ctrl+V)..." autocomplete="off"
+                class="flex-1 bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium transition flex items-center justify-center shadow-md">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Firebase SDKs (Compat v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9cGs-ePVNJRd8uFbCF5CjQug1LImk6Dc",
+            authDomain: "chat-1b4c4.firebaseapp.com",
+            databaseURL: "https://chat-1b4c4-default-rtdb.firebaseio.com",
+            projectId: "chat-1b4c4",
+            storageBucket: "chat-1b4c4.firebasestorage.app",
+            messagingSenderId: "357782257517",
+            appId: "1:357782257517:web:739878b2a7b0cff2836464",
+            measurementId: "G-RB680YGL8E"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const paramsChat = new URLSearchParams(window.location.search);
+        const lojaInformadaNaUrl = paramsChat.get('loja') || '';
+        let selectedStore = lojaInformadaNaUrl || localStorage.getItem('chat_store') || '';
+        let base64ImageToSend = null;
+
+        // Gera os botões de 1 a 10 automaticamente no modal
+        window.onload = function() {
+            const container = document.getElementById('stores-list-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const storeName = `Loja ${i}`;
+                container.innerHTML += `
+                    <button onclick="selectStore('${storeName}')" class="w-full py-2.5 px-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-500 rounded-xl font-medium text-slate-700 hover:text-blue-600 transition flex items-center justify-between text-sm">
+                        <span>${storeName}</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+                    </button>
+                `;
+            }
+
+            if (selectedStore && /^Loja\s([1-9]|10)$/.test(selectedStore)) {
+                localStorage.setItem('chat_store', selectedStore);
+                document.getElementById('store-modal').style.display = 'none';
+                document.getElementById('current-store-display').innerText = `Conectado como: ${selectedStore}`;
+                listenMessages();
+            } else {
+                document.getElementById('store-modal').style.display = 'flex';
+            }
+        };
+
+        function selectStore(store) {
+            selectedStore = store;
+            localStorage.setItem('chat_store', store);
+            document.getElementById('store-modal').style.display = 'none';
+            document.getElementById('current-store-display').innerText = `Conectado como: ${selectedStore}`;
+            document.getElementById('chat-messages').innerHTML = '';
+            listenMessages();
+        }
+
+        document.getElementById('message-input').addEventListener('paste', function(event) {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let index in items) {
+                const item = items[index];
+                if (item.kind === 'file' && item.type.includes('image')) {
+                    const blob = item.getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        base64ImageToSend = e.target.result;
+                        document.getElementById('image-preview').src = base64ImageToSend;
+                        document.getElementById('image-preview-container').classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64ImageToSend = e.target.result;
+                    document.getElementById('image-preview').src = base64ImageToSend;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function cancelImage() {
+            base64ImageToSend = null;
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('file-input').value = '';
+        }
+
+        function sendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if ((!text && !base64ImageToSend) || !selectedStore) return;
+
+            const messageData = {
+                store: selectedStore,
+                sender: 'user',
+                text: text,
+                image: base64ImageToSend || null,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            db.ref('messages').push(messageData)
+                .then(() => {
+                    input.value = '';
+                    cancelImage();
+                })
+                .catch((error) => {
+                    console.error("Erro ao enviar mensagem:", error);
+                    alert("Erro ao enviar mensagem.");
+                });
+        }
+
+        function listenMessages() {
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            db.ref('messages').limitToLast(50).on('value', (snapshot) => {
+                messagesContainer.innerHTML = '';
+                
+                if (!snapshot.exists()) {
+                    messagesContainer.innerHTML = `
+                        <div class="text-center text-slate-400 my-auto py-10">
+                            <i class="fa-regular fa-comments text-3xl mb-2"></i>
+                            <p class="text-sm">Nenhuma mensagem ainda. Inicie a conversa!</p>
+                        </div>`;
+                    return;
+                }
+
+                snapshot.forEach((childSnapshot) => {
+                    const msg = childSnapshot.val();
+                    
+                    if (msg.store === selectedStore) {
+                        const isUser = msg.sender === 'user';
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = `flex flex-col ${isUser ? 'items-end' : 'items-start'}`;
+                        
+                        const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+                        let imageHtml = '';
+                        if (msg.image) {
+                            imageHtml = `<img src="${msg.image}" class="max-w-xs rounded-lg mb-2 cursor-pointer hover:opacity-90 transition" onclick="window.open(this.src)">`;
+                        }
+
+                        let textHtml = msg.text ? `<p class="break-words">${escapeHtml(msg.text)}</p>` : '';
+
+                        msgDiv.innerHTML = `
+                            <div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                                isUser 
+                                    ? 'bg-blue-600 text-white rounded-br-none' 
+                                    : 'bg-white text-slate-800 border border-slate-200 rounded-bl-none'
+                            }">
+                                <div class="text-[10px] font-semibold mb-1 opacity-80">${isUser ? selectedStore : 'Administração'}</div>
+                                ${imageHtml}
+                                ${textHtml}
+                                <span class="block text-[9px] text-right mt-1 opacity-70">${time}</span>
+                            </div>
+                        `;
+                        messagesContainer.appendChild(msgDiv);
+                    }
+                });
+
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
