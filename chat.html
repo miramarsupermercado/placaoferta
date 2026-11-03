@@ -237,18 +237,47 @@
             if ((!text && !base64ImageToSend) || !selectedStore) return;
 
             const messageData = {
-                store: selectedStore, sender: 'user', text: text,
+                store: selectedStore,
+                sender: 'user',
+                text: text,
                 image: base64ImageToSend || null,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                sentAt: firebase.database.ServerValue.TIMESTAMP
             };
             try {
-                await db.ref('messages').push(messageData);
+                const messageRef = await db.ref('messages').push(messageData);
                 input.value = '';
                 cancelImage();
             } catch (error) {
                 console.error('Erro ao enviar mensagem:', error);
                 alert('Erro ao enviar mensagem.');
             }
+        }
+
+        // Confirma que mensagens da administração chegaram ao navegador da loja.
+        // A confirmação de visualização só é gravada quando a página está visível.
+        async function confirmAdminMessageStatus(messageId, msg) {
+            if (!msg || msg.sender !== 'admin') return;
+            const updates = {};
+            if (!msg.deliveredAt) updates.deliveredAt = firebase.database.ServerValue.TIMESTAMP;
+            if (document.visibilityState === 'visible' && !msg.readAt) {
+                updates.readAt = firebase.database.ServerValue.TIMESTAMP;
+            }
+            if (Object.keys(updates).length) {
+                try {
+                    await db.ref('messages/' + messageId).update(updates);
+                } catch (error) {
+                    console.error('Não foi possível confirmar recebimento/visualização:', error);
+                }
+            }
+        }
+
+        function readReceiptIcon(status) {
+            // O SVG azul abaixo é exatamente o desenho enviado pelo usuário.
+            const doubleCheck = '<svg viewBox="0 0 24 24" width="16" height="16" preserveAspectRatio="xMidYMid meet" fill="currentColor" aria-label="' + status + '"><path fill="currentColor" d="M14.73 6.01a1 1 0 0 1 1.41-.15l.01.01a1 1 0 0 1 .15 1.41L7.6 18.01a1 1 0 0 1-.73.37h-.05c-.26 0-.52-.11-.71-.3l-4.03-4.09a.99.99 0 0 1 0-1.41.99.99 0 0 1 1.41 0l3.25 3.29 7.99-9.86Zm5.71.12a1 1 0 0 1 1.41-.15h-.01a1 1 0 0 1 .15 1.41l-8.41 10.45a1 1 0 0 1-.73.37h-.05a1 1 0 0 1-.71-.3l-1.36-1.26a.55.55 0 0 1-.02-.81l.56-.68c.21-.2.53-.21.75-.03l.71.58 7.71-9.58Z"></path></svg>';
+            if (status === 'read') return '<span class="inline-flex items-center text-sky-300" title="Visualizada">' + doubleCheck + '</span>';
+            if (status === 'delivered') return '<span class="inline-flex items-center text-slate-300" title="Recebida">' + doubleCheck + '</span>';
+            return '<span class="inline-flex items-center text-slate-300" title="Enviada"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9.2 16.2 4.9 12a1 1 0 0 0-1.4 1.4l5 5a1 1 0 0 0 1.4 0L21 7.3a1 1 0 1 0-1.4-1.4z"/></svg></span>';
         }
 
         function listenMessages() {
@@ -265,34 +294,65 @@
                     return;
                 }
                 snapshot.forEach(childSnapshot => {
-                    const msg = childSnapshot.val();
+                    const messageId = childSnapshot.key;
+                    const msg = childSnapshot.val() || {};
                     const isUser = msg.sender === 'user';
+                    if (!isUser) confirmAdminMessageStatus(messageId, msg);
+
                     const msgDiv = document.createElement('div');
                     msgDiv.className = `flex flex-col ${isUser ? 'items-end' : 'items-start'}`;
                     const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
-                    let imageHtml = '';
+                    const bubble = document.createElement('div');
+                    bubble.className = `max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${isUser ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-none'}`;
+
+                    const sender = document.createElement('div');
+                    sender.className = 'text-[10px] font-semibold mb-1 opacity-80';
+                    sender.textContent = isUser ? selectedStore : 'Administração';
+                    bubble.appendChild(sender);
+
                     if (msg.image) {
                         const img = document.createElement('img');
                         img.src = msg.image;
+                        img.alt = 'Imagem enviada';
                         img.className = 'max-w-xs rounded-lg mb-2 cursor-pointer hover:opacity-90 transition';
                         img.onclick = () => window.open(img.src, '_blank');
-                        // A imagem é inserida como elemento, evitando interpolar base64 no HTML.
-                        msgDiv.appendChild(img);
-                        msgDiv.className = `flex flex-col ${isUser ? 'items-end' : 'items-start'}`;
+                        bubble.appendChild(img);
                     }
-                    imageHtml = msg.image ? `<img src="${msg.image}" class="max-w-xs rounded-lg mb-2 cursor-pointer hover:opacity-90 transition" onclick="window.open(this.src, '_blank')">` : '';
-                    const textHtml = msg.text ? `<p class="break-words">${escapeHtml(msg.text)}</p>` : '';
-                    msgDiv.innerHTML = `
-                        <div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${isUser ? 'bg-blue-600 text-white rounded-br-none' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-none'}">
-                            <div class="text-[10px] font-semibold mb-1 opacity-80">${isUser ? selectedStore : 'Administração'}</div>
-                            ${imageHtml}${textHtml}
-                            <span class="block text-[9px] text-right mt-1 opacity-70">${time}</span>
-                        </div>`;
+                    if (msg.text) {
+                        const paragraph = document.createElement('p');
+                        paragraph.className = 'break-words whitespace-pre-wrap';
+                        paragraph.textContent = msg.text;
+                        bubble.appendChild(paragraph);
+                    }
+
+                    const footer = document.createElement('div');
+                    footer.className = 'flex items-center justify-end gap-1 text-[9px] mt-1 opacity-80';
+                    const timeSpan = document.createElement('span');
+                    timeSpan.textContent = time;
+                    footer.appendChild(timeSpan);
+                    if (isUser) {
+                        const status = msg.readAt ? 'read' : (msg.deliveredAt ? 'delivered' : 'sent');
+                        const iconHolder = document.createElement('span');
+                        iconHolder.innerHTML = readReceiptIcon(status);
+                        footer.appendChild(iconHolder);
+                    }
+                    bubble.appendChild(footer);
+                    msgDiv.appendChild(bubble);
                     messagesContainer.appendChild(msgDiv);
                 });
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             });
         }
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState !== 'visible' || !selectedStore) return;
+            db.ref('messages').orderByChild('store').equalTo(selectedStore).once('value')
+                .then(snapshot => snapshot.forEach(child => {
+                    const msg = child.val() || {};
+                    if (msg.sender === 'admin' && !msg.readAt) confirmAdminMessageStatus(child.key, msg);
+                }))
+                .catch(error => console.error('Erro ao confirmar visualizações:', error));
+        });
 
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
