@@ -936,7 +936,22 @@
           </div>
           <div class="field half">
             <label>Preço OFERTA</label>
-            <input id="preco-oferta1" type="text" placeholder="" />
+            <input
+    id="preco-oferta1"
+    type="text"
+    placeholder=""
+    oninput="
+      const aviso = document.getElementById('aviso-preco');
+      if (this.value.includes('.')) {
+        this.value = this.value.replace(/\./g, '');
+        aviso.textContent = 'Use vírgula (,) em vez de ponto (.) para separar os reais de centavos';
+        aviso.style.display = 'block';
+      } else {
+        aviso.style.display = 'none';
+      }
+    "
+  >
+  <small id="aviso-preco" style="color: #d93025; display: none;"></small>
           </div>
         </div>
         <div class="row">
